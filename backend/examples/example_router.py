@@ -151,7 +151,7 @@ async def get_chocolate(chocolate_id: int) -> ChocolateResponse:
     "/orders",
     response_model=OrderResponse,
     status_code=status.HTTP_201_CREATED,
-    tags=["Orders"],  # This endpoint shows under "Orders" in docs
+    tags=["Orders"],  # This endpoint shows under "Orders" in the fast api docs
     responses={
         400: {
             "model": ErrorResponse,
