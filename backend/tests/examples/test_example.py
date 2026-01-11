@@ -14,6 +14,7 @@ Key concepts:
 from decimal import Decimal
 
 import pytest
+
 from examples.example_service_layer import CHOCOLATES, ORDERS, ChocolateService
 
 

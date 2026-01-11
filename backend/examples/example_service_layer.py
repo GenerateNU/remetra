@@ -86,10 +86,10 @@ class ChocolateService:
         return new_chocolate
 
     async def get_chocolates(
-            self,
-            min_price: Decimal | None = None,
-            max_price: Decimal | None = None,
-            in_stock_only: bool = False,
+        self,
+        min_price: Decimal | None = None,
+        max_price: Decimal | None = None,
+        in_stock_only: bool = False,
     ) -> list[dict]:
         """
         Get chocolates with optional filtering.
@@ -214,4 +214,3 @@ class ChocolateService:
         ]
 
         return low_stock
-
