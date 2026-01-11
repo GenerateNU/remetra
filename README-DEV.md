@@ -8,7 +8,7 @@ We're throwing a lot of information at you all at once - Docker, APIs, databases
 
 **It's not expected to stick right away.** Like genuinely, if 10% makes sense at the beginning, that's totally normal. This is a lot, especially if you're coming from a DS background or haven't worked on development projects before.
 
-**Please ask questions.** I know it's easy to feel like you should just figure it out or that asking makes you seem less capable, but that's really not the case. Everyone learns this stuff by asking questions and running into issues. The only reason I know any of this is through a lot of experience and trial and error - there's no shortcut to that.
+**Please ask questions ‼️‼️‼️.** I know it's easy to feel like you should just figure it out or that asking makes you seem less capable, but that's really not the case. Everyone learns this stuff by asking questions and running into issues. The only reason I know any of this is through a lot of experience and trial and error - there's no shortcut to that.
 
 **Seriously, bother us with questions.** Slack, meetings, email, whatever - we want to make sure everyone's comfortable, especially at the beginning. By working through problems and asking when you're stuck, you'll gradually build understanding as the semester goes on. That's the whole point.
 
@@ -531,7 +531,7 @@ That said, fixing IDE errors makes development way easier (autocomplete, type ch
 3. We'll help remove it from history
 
 **Merge conflicts**
-1. Ask for help if this is your first time!
+1. Ask for help if this is your first time‼️‼️‼️
 2. We will walk you through resolving them
 
 ---
