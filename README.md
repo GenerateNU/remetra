@@ -10,6 +10,11 @@ Remetra helps autoimmune disease patients track symptoms, food, and activities t
 
 ### Quick Start
 
+Build Images:
+```bash
+just setup
+```
+
 Start all services with Docker:
 ```bash
 just dev
