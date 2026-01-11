@@ -133,10 +133,7 @@ Follow on-screen instructions. You might need to add Homebrew to your PATH - the
 
 ```bash
 # Install everything in one go
-brew install git just python@3.11
-
-# Install UV
-curl --proto '=https' --tlsv1.2 -sSf https://astral.sh/uv/install.sh | sh
+brew install git just python@3.11 uv
 ```
 
 Restart Terminal, then verify:
