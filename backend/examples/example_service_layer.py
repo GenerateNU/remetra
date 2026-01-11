@@ -84,3 +84,134 @@ class ChocolateService:
 
         CHOCOLATES.append(new_chocolate)
         return new_chocolate
+
+    async def get_chocolates(
+            self,
+            min_price: Decimal | None = None,
+            max_price: Decimal | None = None,
+            in_stock_only: bool = False,
+    ) -> list[dict]:
+        """
+        Get chocolates with optional filtering.
+
+        Business logic:
+        - Filter by price range if specified
+        - Optionally show only in-stock items
+        - Sort by price (low to high)
+
+        Args:
+            min_price: Minimum price filter (optional)
+            max_price: Maximum price filter (optional)
+            in_stock_only: If True, only return chocolates with stock > 0
+
+        Returns:
+            List of chocolate dictionaries matching the filters
+        """
+        chocolates = list(CHOCOLATES)  # Copy the list
+
+        # Apply filters based on parameters
+        if min_price:
+            chocolates = [c for c in chocolates if c["price"] >= min_price]
+        if max_price:
+            chocolates = [c for c in chocolates if c["price"] <= max_price]
+        if in_stock_only:
+            chocolates = [c for c in chocolates if c["stock_quantity"] > 0]
+
+        chocolates.sort(key=lambda c: c["price"])
+
+        return chocolates
+
+    async def get_chocolate_by_id(self, chocolate_id: int) -> dict | None:
+        """
+        Get a specific chocolate by its ID.
+
+        Args:
+            chocolate_id: Unique identifier for the chocolate
+
+        Returns:
+            Chocolate dictionary if found, None if not found
+        """
+        for chocolate in CHOCOLATES:
+            if chocolate["id"] == chocolate_id:
+                return chocolate
+        return None
+
+    async def create_order(self, order_data: dict) -> dict:
+        """
+        Process a new order with inventory checks and price calculation.
+
+        Business rules:
+        1. Check stock availability for all items
+        2. Calculate total price (sum of item_price * quantity)
+        3. Apply bulk discount if order total > $50 (10% off)
+        4. Create order record
+
+        Args:
+            order_data: Validated data from OrderCreate model
+
+        Returns:
+            Created order with calculated total and status
+
+        Raises:
+            ValueError: If insufficient stock for any item or chocolate not found
+        """
+        items = order_data["items"]
+        total_price = Decimal("0.00")
+
+        for item in items:
+            chocolate = await self.get_chocolate_by_id(item["chocolate_id"])
+
+            if not chocolate:
+                raise ValueError(f"Chocolate ID {item['chocolate_id']} not found")
+
+            if chocolate["stock_quantity"] < item["quantity"]:
+                raise ValueError(
+                    f"Insufficient stock for '{chocolate['name']}'. "
+                    f"Available: {chocolate['stock_quantity']}, "
+                    f"Requested: {item['quantity']}"
+                )
+
+            item_total = chocolate["price"] * item["quantity"]
+            total_price += item_total
+
+        if total_price > Decimal("50.00"):
+            total_price *= Decimal("0.90")  # 10% off
+
+        order = {
+            "id": len(ORDERS) + 1,
+            "customer_name": order_data["customer_name"],
+            "items": items,
+            "total_price": total_price,
+            "status": "pending",
+            "created_at": datetime.now(),
+        }
+
+        ORDERS.append(order)
+        return order
+
+    async def check_low_stock(self, threshold: int = 10) -> list[dict]:
+        """
+        Find chocolates with low inventory for restocking alerts.
+
+        Business logic: Identify products below restock threshold
+        so the shop can reorder before running out.
+
+        Args:
+            threshold: Stock quantity threshold (default: 10 units)
+
+        Returns:
+            List of chocolates needing restock with current quantities
+        """
+        low_stock = [
+            {
+                "id": c["id"],
+                "name": c["name"],
+                "current_stock": c["stock_quantity"],
+                "recommended_order": threshold * 2,  # Restock to 2x threshold
+            }
+            for c in CHOCOLATES
+            if c["stock_quantity"] < threshold
+        ]
+
+        return low_stock
+

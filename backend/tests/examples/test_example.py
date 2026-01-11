@@ -11,9 +11,10 @@ Key concepts:
 - Using fixtures for reusable test data
 """
 
-import pytest
 from decimal import Decimal
-from backend.examples.example_service_layer import ChocolateService, CHOCOLATES, ORDERS
+
+import pytest
+from examples.example_service_layer import CHOCOLATES, ORDERS, ChocolateService
 
 
 @pytest.fixture
@@ -37,24 +38,26 @@ def reset_data():
     """
     # Clear and reset to original state
     CHOCOLATES.clear()
-    CHOCOLATES.extend([
-        {
-            "id": 1,
-            "name": "Dark Chocolate Bar",
-            "description": "70% cocoa dark chocolate",
-            "price": Decimal("5.99"),
-            "cocoa_percentage": 70,
-            "stock_quantity": 50,
-        },
-        {
-            "id": 2,
-            "name": "Milk Chocolate Truffle",
-            "description": "Creamy milk chocolate with hazelnut center",
-            "price": Decimal("3.49"),
-            "cocoa_percentage": 35,
-            "stock_quantity": 5,
-        },
-    ])
+    CHOCOLATES.extend(
+        [
+            {
+                "id": 1,
+                "name": "Dark Chocolate Bar",
+                "description": "70% cocoa dark chocolate",
+                "price": Decimal("5.99"),
+                "cocoa_percentage": 70,
+                "stock_quantity": 50,
+            },
+            {
+                "id": 2,
+                "name": "Milk Chocolate Truffle",
+                "description": "Creamy milk chocolate with hazelnut center",
+                "price": Decimal("3.49"),
+                "cocoa_percentage": 35,
+                "stock_quantity": 5,
+            },
+        ]
+    )
     ORDERS.clear()
 
 
@@ -167,6 +170,7 @@ class TestChocolateService:
         assert low_stock[0]["id"] == 2
         assert low_stock[0]["current_stock"] == 5
         assert low_stock[0]["recommended_order"] == 20  # 2x threshold
+
 
 # Run tests with: just test
 # or: docker compose run --rm backend pytest tests/

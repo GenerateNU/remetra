@@ -16,7 +16,6 @@ Common use cases (Most likely what we'll do):
 
 import pytest
 
-
 # Example: In a real app, you'd have fixtures like these
 # @pytest.fixture
 # def db_session():

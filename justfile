@@ -24,7 +24,7 @@ clean:
     docker compose down -v
 
 test:
-    docker compose exec backend pytest
+    docker compose run --rm backend pytest
 
 lint:
     docker compose run --rm backend ruff check .
