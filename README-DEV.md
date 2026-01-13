@@ -203,7 +203,7 @@ git commit -m "feat: add symptom tracking endpoint"
 git push origin feat/your-feature-name
 
 # 8. Open a Pull Request on GitHub
-# Go to the repo on GitHub and click "Compare & pull request"
+# Go to the repo on GitHub, click "Compare & pull request", and fill out the PR description template
 ```
 **Note:** We follow [conventional commits](https://www.conventionalcommits.org/) - prefix with `feat:`, `fix:`, `chore:`, `docs:`, etc.
 ---
