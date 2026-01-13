@@ -11,6 +11,7 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 - [ ] Test B
 
 ## Checklist:
+<!-- [x] indicates a checked off item -->
 
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
