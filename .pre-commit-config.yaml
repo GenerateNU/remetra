@@ -1,0 +1,10 @@
+repos:
+  # Backend
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.11 # we want to sync this with CI
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/

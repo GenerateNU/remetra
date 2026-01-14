@@ -92,7 +92,7 @@ cd remetra
 
 # Set up local Python environment (for IDE autocomplete/linting)
 cd backend
-uv sync
+uv sync && uv run pre-commit install # setup pre-commit hooks
 cd ..
 
 # Build Docker images (takes 3-5 minutes first time)
