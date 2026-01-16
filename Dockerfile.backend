@@ -6,9 +6,9 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 COPY backend/pyproject.toml backend/uv.lock* ./
 
-COPY backend/ .
-
 RUN uv sync --frozen
+
+COPY backend/ .
 
 ENV PATH="/app/.venv/bin:$PATH"
 
