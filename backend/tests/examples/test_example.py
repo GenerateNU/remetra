@@ -15,7 +15,7 @@ from decimal import Decimal
 
 import pytest
 
-from examples.example_service_layer import CHOCOLATES, ORDERS, ChocolateService
+from backend.examples.example_service_layer import CHOCOLATES, ORDERS, ChocolateService
 
 
 @pytest.fixture
@@ -135,6 +135,8 @@ class TestChocolateService:
         # 2 * $5.99 + 1 * $3.49 = $15.47, no discount (under $50)
         assert result["total_price"] == Decimal("15.47")
         assert len(result["items"]) == 2
+        assert CHOCOLATES[0]["stock_quantity"] == 48
+        assert CHOCOLATES[1]["stock_quantity"] == 4
 
     @pytest.mark.asyncio
     async def test_create_order_insufficient_stock(self, chocolate_service):

@@ -171,6 +171,9 @@ class ChocolateService:
                     f"Requested: {item['quantity']}"
                 )
 
+            else:
+                chocolate["stock_quantity"] -= item["quantity"]
+
             item_total = chocolate["price"] * item["quantity"]
             total_price += item_total
 
