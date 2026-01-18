@@ -135,6 +135,7 @@ class TestChocolateService:
         # 2 * $5.99 + 1 * $3.49 = $15.47, no discount (under $50)
         assert result["total_price"] == Decimal("15.47")
         assert len(result["items"]) == 2
+        # Make sure the DB gets updated correctly
         assert CHOCOLATES[0]["stock_quantity"] == 48
         assert CHOCOLATES[1]["stock_quantity"] == 4
 
@@ -151,6 +152,10 @@ class TestChocolateService:
                 {"chocolate_id": 2, "quantity": 10},  # Only 5 in stock...
             ],
         }
+
+        # Make sure that the DB does not get updated
+        assert CHOCOLATES[0]["stock_quantity"] == 50
+        assert CHOCOLATES[1]["stock_quantity"] == 5
 
         # Expecting an error as we are ordering tm
         with pytest.raises(ValueError) as exc_info:
