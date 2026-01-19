@@ -136,8 +136,8 @@ class TestChocolateService:
         assert result["total_price"] == Decimal("15.47")
         assert len(result["items"]) == 2
 
-        assert CHOCOLATES[0]["stock_quantity"] == 48  
-        assert CHOCOLATES[1]["stock_quantity"] == 4   
+        assert CHOCOLATES[0]["stock_quantity"] == 48
+        assert CHOCOLATES[1]["stock_quantity"] == 4
 
     @pytest.mark.asyncio
     async def test_create_order_insufficient_stock(self, chocolate_service):

@@ -187,6 +187,31 @@ async def create_order(order: OrderCreate) -> OrderResponse:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
+@router.get(
+    "/inventory/low-stock",
+    response_model=List[dict],
+    tags=["Inventory"],
+    responses={
+        200: {"description": "list of low-stock chocolates"},
+    },
+)
+async def check_low_stock(threshold: int = 10) -> List[dict]:
+    """
+    Check for chocolates with low stock.
+
+    This endpoint allows us to monitor inventory levels and identify items that need restocking.
+
+    Args:
+        threshold: Minimum stock level to consider "low" (default 10)
+
+    Returns:
+        List of chocolates with stock below the threshold
+    """
+    low_stock_chocolates = await chocolate_service.check_low_stock(threshold)
+
+    return low_stock_chocolates
+
+
 # To use this router in main.py, you'd do:
 # from examples.example_router import router as chocolate_router
 # app.include_router(chocolate_router)
