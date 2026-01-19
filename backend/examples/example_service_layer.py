@@ -173,6 +173,8 @@ class ChocolateService:
 
             item_total = chocolate["price"] * item["quantity"]
             total_price += item_total
+            # Deduct stock
+            chocolate["stock_quantity"] -= item["quantity"]
 
         if total_price > Decimal("50.00"):
             total_price *= Decimal("0.90")  # 10% off
@@ -210,7 +212,9 @@ class ChocolateService:
                 "recommended_order": threshold * 2,  # Restock to 2x threshold
             }
             for c in CHOCOLATES
-            if c["stock_quantity"] < threshold
+            if c["stock_quantity"] < threshold:
+                raise 
         ]
+
 
         return low_stock
