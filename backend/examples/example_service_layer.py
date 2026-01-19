@@ -212,9 +212,7 @@ class ChocolateService:
                 "recommended_order": threshold * 2,  # Restock to 2x threshold
             }
             for c in CHOCOLATES
-            if c["stock_quantity"] < threshold:
-                raise 
+            if c["stock_quantity"] < threshold
         ]
-
 
         return low_stock

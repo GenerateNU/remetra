@@ -135,6 +135,10 @@ class TestChocolateService:
         # 2 * $5.99 + 1 * $3.49 = $15.47, no discount (under $50)
         assert result["total_price"] == Decimal("15.47")
         assert len(result["items"]) == 2
+        
+        # ensure that stock decreases by 2 for choclate_id 1 and by 1 for chocolate_id 2
+        assert CHOCOLATES[0]["stock_quantity"] == 48  # 50 - 2
+        assert CHOCOLATES[1]["stock_quantity"] == 4   # 5 - 1
 
     @pytest.mark.asyncio
     async def test_create_order_insufficient_stock(self, chocolate_service):
@@ -172,6 +176,27 @@ class TestChocolateService:
         assert low_stock[0]["current_stock"] == 5
         assert low_stock[0]["recommended_order"] == 20  # 2x threshold
 
+    @pytest.mark.asyncio
+    async def test_stock_not_updated_with_failed_order(self, chocolate_service):
+        """
+        test that stock remains unchanged if an order fails.
+
+        """
+        initial_stock = CHOCOLATES[1]["stock_quantity"]  
+
+        # try order with 10, but only 5 in stock
+        order_data = {
+            "customer_name": "Charlie",
+            "items": [
+                {"chocolate_id": 2, "quantity": 10},  
+            ],
+        }
+
+        with pytest.raises(ValueError):
+            await chocolate_service.create_order(order_data)
+
+        # assert stock is unchanged 
+        assert CHOCOLATES[1]["stock_quantity"] == initial_stock
 
 # Run tests with: just test
 # or: docker compose run --rm backend pytest tests/
