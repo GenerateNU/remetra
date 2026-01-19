@@ -208,7 +208,7 @@ async def get_low_stock(threshold: Optional[int] = None):
         List of chocolates needing restock with current quantities
 
     Raises:
-        HTTPException: If threshold doesn't exist
+        HTTPException: If no chocolates are low in stock
     """
     if threshold:
         chocolates = await chocolate_service.check_low_stock(threshold)
