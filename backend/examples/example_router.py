@@ -168,6 +168,7 @@ async def create_order(order: OrderCreate) -> OrderResponse:
     - Validates stock availability
     - Calculates totals
     - Returns a detailed response
+    - Subtract ordered quantity from stock quantity
 
     Args:
         order: Order data with customer info and items
