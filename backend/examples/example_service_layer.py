@@ -173,6 +173,7 @@ class ChocolateService:
 
             item_total = chocolate["price"] * item["quantity"]
             total_price += item_total
+            chocolate["stock_quantity"] -= item["quantity"]
 
         if total_price > Decimal("50.00"):
             total_price *= Decimal("0.90")  # 10% off
