@@ -187,6 +187,43 @@ async def create_order(order: OrderCreate) -> OrderResponse:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
+@router.get(
+    "/inventory/low-stock",
+    response_model=ChocolateResponse,
+    responses={
+        200: {"description": "List of low stock chocolates"},
+    },
+)
+async def get_low_stock(threshold: Optional[int] = None):
+    """ "
+    Get the list of chocolates that are almost out of stock.
+
+    Path parameters (like {threshold}) are extracted from the URL automatically.
+    Example: GET /chocolates/inventory/low-stock/42 → threshold = 42
+
+    Args:
+        threshold: Stock quantity threshold (default: 10 units)
+
+    Returns:
+        List of chocolates needing restock with current quantities
+
+    Raises:
+        HTTPException: If threshold doesn't exist
+    """
+    if threshold:
+        chocolates = await chocolate_service.check_low_stock(threshold)
+    else:
+        chocolates = await chocolate_service.check_low_stock()
+
+    if not chocolates:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Chocolates with stock amount under {threshold} were not found",
+        )
+
+    return chocolates
+
+
 # To use this router in main.py, you'd do:
 # from examples.example_router import router as chocolate_router
 # app.include_router(chocolate_router)
