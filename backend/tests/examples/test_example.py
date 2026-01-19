@@ -172,6 +172,65 @@ class TestChocolateService:
         assert low_stock[0]["current_stock"] == 5
         assert low_stock[0]["recommended_order"] == 20  # 2x threshold
 
+    @pytest.mark.asyncio
+    async def test_create_order_subtract_items(self, chocolate_service):
+        """
+        Test subtracting ordered items from stock functionality.
+        """
+        initial_stock = CHOCOLATES[0]["stock_quantity"]
+        order_data = {
+            "customer_name": "Bob",
+            "items": [
+                {"chocolate_id": 1, "quantity": 10},
+            ],
+        }
+        await chocolate_service.create_order(order_data)
+        after_stock = CHOCOLATES[0]["stock_quantity"]
+        assert after_stock == initial_stock - 10
+
+    @pytest.mark.asyncio
+    async def test_create_order_subtract_multiple_items(self, chocolate_service):
+        """
+        Test subtracting multiple ordered items from stock functionality.
+        """
+        initial_stock = CHOCOLATES[0]["stock_quantity"]
+        initial_stock2 = CHOCOLATES[1]["stock_quantity"]
+        order_data = {
+            "customer_name": "Bob",
+            "items": [
+                {"chocolate_id": 1, "quantity": 10},
+                {"chocolate_id": 2, "quantity": 5},
+            ],
+        }
+        await chocolate_service.create_order(order_data)
+        after_stock = CHOCOLATES[0]["stock_quantity"]
+        after_stock2 = CHOCOLATES[1]["stock_quantity"]
+        assert after_stock == initial_stock - 10
+        assert after_stock2 == initial_stock2 - 5
+
+    @pytest.mark.asyncio
+    async def test_create_order_subtract_invalid_quantity(self, chocolate_service):
+        """
+        Test subtracting one item of invalid quantity. Make sure both item's stock quantities remain the same.
+        """
+        initial_stock = CHOCOLATES[0]["stock_quantity"]
+        initial_stock2 = CHOCOLATES[1]["stock_quantity"]
+        order_data = {
+            "customer_name": "Bob",
+            "items": [
+                {"chocolate_id": 1, "quantity": 10},
+                {"chocolate_id": 2, "quantity": 10},
+            ],
+        }
+        with pytest.raises(ValueError) as exc_info:
+            await chocolate_service.create_order(order_data)
+
+        after_stock = CHOCOLATES[0]["stock_quantity"]
+        after_stock2 = CHOCOLATES[1]["stock_quantity"]
+        assert "Insufficient stock" in str(exc_info.value)
+        assert after_stock == initial_stock
+        assert after_stock2 == initial_stock2
+
 
 # Run tests with: just test
 # or: docker compose run --rm backend pytest tests/
