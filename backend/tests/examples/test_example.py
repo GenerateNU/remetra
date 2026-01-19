@@ -15,7 +15,7 @@ from decimal import Decimal
 
 import pytest
 
-from backend.examples.example_service_layer import CHOCOLATES, ORDERS, ChocolateService
+from examples.example_service_layer import CHOCOLATES, ORDERS, ChocolateService
 
 
 @pytest.fixture
