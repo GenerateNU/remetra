@@ -210,6 +210,7 @@ async def get_low_stock(threshold: int = 10) -> List[dict]:
     low_stock_items = await chocolate_service.check_low_stock(threshold=threshold)
     return low_stock_items
 
+
 # To use this router in main.py, you'd do:
 # from examples.example_router import router as chocolate_router
 # app.include_router(chocolate_router)
