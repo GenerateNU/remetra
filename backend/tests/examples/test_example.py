@@ -172,6 +172,57 @@ class TestChocolateService:
         assert low_stock[0]["current_stock"] == 5
         assert low_stock[0]["recommended_order"] == 20  # 2x threshold
 
+    @pytest.mark.asyncio
+    async def test_create_order_reduces_stock(self, chocolate_service):
+        """
+        Test that placing an order actually reduces stock quantities.
+        
+        This verifies the NEW functionality where orders update inventory.
+        """
+        # Arrange - Check initial stock
+        initial_stock = CHOCOLATES[0]["stock_quantity"]  # 50 for Dark Chocolate
+        
+        order_data = {
+            "customer_name": "Alice",
+            "items": [
+                {"chocolate_id": 1, "quantity": 10},
+            ],
+        }
+        
+        # Act
+        await chocolate_service.create_order(order_data)
+        
+        # Assert - Stock should be reduced
+        chocolate = await chocolate_service.get_chocolate_by_id(1)
+        assert chocolate["stock_quantity"] == initial_stock - 10
+        assert chocolate["stock_quantity"] == 40
+
+
+    @pytest.mark.asyncio
+    async def test_create_order_does_not_reduce_stock_on_failure(self, chocolate_service):
+        """
+        Test that stock is NOT reduced when order fails .
+         """
+        # Arrange
+        initial_stock = CHOCOLATES[1]["stock_quantity"]  # 5 for Milk Chocolate
+        
+        order_data = {
+            "customer_name": "Bob",
+            "items": [
+                {"chocolate_id": 2, "quantity": 10},  # Requesting MORE than available!
+            ],
+        }
+        
+        # Act & Assert - Order should fail
+        with pytest.raises(ValueError) as exc_info:
+            await chocolate_service.create_order(order_data)
+        
+        assert "Insufficient stock" in str(exc_info.value)
+        
+        # Assert - Stock should be UNCHANGED
+        chocolate = await chocolate_service.get_chocolate_by_id(2)
+        assert chocolate["stock_quantity"] == initial_stock
+
 
 # Run tests with: just test
 # or: docker compose run --rm backend pytest tests/
