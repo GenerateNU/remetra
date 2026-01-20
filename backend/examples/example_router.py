@@ -186,12 +186,6 @@ async def create_order(order: OrderCreate) -> OrderResponse:
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-@router.get(
-    "/inventory/low-stock",
-    response_model=list[dict],
-)
-async def get_low_stock(threshold: int = 10):
-    return await chocolate_service.check_low_stock(threshold=threshold)
 
 # To use this router in main.py, you'd do:
 # from examples.example_router import router as chocolate_router
