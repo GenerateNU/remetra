@@ -203,7 +203,6 @@ async def get_low_stock(threshold: int = 10):
     low_stock = await chocolate_service.check_low_stock(threshold)
     return low_stock
 
-
 # To use this router in main.py, you'd do:
 # from examples.example_router import router as chocolate_router
 # app.include_router(chocolate_router)
