@@ -145,6 +145,7 @@ class ChocolateService:
         2. Calculate total price (sum of item_price * quantity)
         3. Apply bulk discount if order total > $50 (10% off)
         4. Create order record
+        5. Update the stock  
 
         Args:
             order_data: Validated data from OrderCreate model
@@ -176,6 +177,10 @@ class ChocolateService:
 
         if total_price > Decimal("50.00"):
             total_price *= Decimal("0.90")  # 10% off
+
+        for item in items:
+            chocolate = await self.get_chocolate_by_id(item["chocolate_id"])
+            chocolate["stock_quantity"] -= item["quantity"]
 
         order = {
             "id": len(ORDERS) + 1,
