@@ -176,6 +176,11 @@ class ChocolateService:
 
         if total_price > Decimal("50.00"):
             total_price *= Decimal("0.90")  # 10% off
+        
+        #deletes chocolates from stock (updates inventory)
+        for item in items:
+            chocolate = await self.get_chocolate_by_id(item["chocolate_id"])
+            chocolate["stock_quantity"] -= item["quantity"]
 
         order = {
             "id": len(ORDERS) + 1,
