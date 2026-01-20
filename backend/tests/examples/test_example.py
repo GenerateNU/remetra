@@ -175,21 +175,21 @@ class TestChocolateService:
         assert low_stock[0]["current_stock"] == 5
         assert low_stock[0]["recommended_order"] == 20  # 2x threshold
 
-@pytest.mark.asyncio
-async def test_create_order_does_not_reduce_stock_on_failure(self, chocolate_service):
-    initial_stock = CHOCOLATES[1]["stock_quantity"]  # 5
+    @pytest.mark.asyncio
+    async def test_create_order_does_not_reduce_stock_on_failure(self, chocolate_service):
+        initial_stock = CHOCOLATES[1]["stock_quantity"]  # 5
 
-    order_data = {
-        "customer_name": "Bob",
-        "items": [
-            {"chocolate_id": 2, "quantity": 10},
-        ],
-    }
+        order_data = {
+            "customer_name": "Bob",
+            "items": [
+                {"chocolate_id": 2, "quantity": 10},
+            ],
+        }
 
-    with pytest.raises(ValueError):
-        await chocolate_service.create_order(order_data)
+        with pytest.raises(ValueError):
+            await chocolate_service.create_order(order_data)
 
-    chocolate = await chocolate_service.get_chocolate_by_id(2)
-    assert chocolate["stock_quantity"] == initial_stock
+        chocolate = await chocolate_service.get_chocolate_by_id(2)
+        assert chocolate["stock_quantity"] == initial_stock
 # Run tests with: just test
 # or: docker compose run --rm backend pytest tests/
