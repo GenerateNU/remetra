@@ -141,6 +141,21 @@ class OrderResponse(BaseModel):
     created_at: datetime = Field(..., description="When the order was placed")
 
 
+class LowStockResponse(BaseModel):
+    """
+    Data structure for low stock alert responses.
+
+    Returned when checking inventory levels to identify products that need restocking.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int = Field(..., description="Unique ID of the chocolate product")
+    name: str = Field(..., description="Name of the chocolate product")
+    current_stock: int = Field(..., description="Current stock quantity")
+    recommended_order: int = Field(..., description="Recommended quantity to reorder")
+
+
 class ErrorResponse(BaseModel):
     """
     Standard format for error messages.

@@ -21,6 +21,7 @@ from examples.example_pydantic_models import (
     ChocolateCreate,
     ChocolateResponse,
     ErrorResponse,
+    LowStockResponse,
     OrderCreate,
     OrderResponse,
 )
@@ -189,13 +190,13 @@ async def create_order(order: OrderCreate) -> OrderResponse:
 
 @router.get(
     "/inventory/low-stock",
-    response_model=List[dict],
+    response_model=List[LowStockResponse],
     tags=["Inventory"],
     responses={
         200: {"description": "list of low-stock chocolates"},
     },
 )
-async def check_low_stock(threshold: int = 10) -> List[dict]:
+async def check_low_stock(threshold: int = 10) -> List[LowStockResponse]:
     """
     Check for chocolates with low stock.
 
