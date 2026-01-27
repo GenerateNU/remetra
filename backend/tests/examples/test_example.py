@@ -164,6 +164,26 @@ class TestChocolateService:
         assert "Insufficient stock" in str(exc_info.value)
 
     @pytest.mark.asyncio
+    async def test_sufficient_then_insufficient_stock(self, chocolate_service):
+        """
+        Test that when there is enough stock for the first chocolate but not the second chocolate,
+        that the first chocolate does not have its quantity changed.
+        """
+        order_data = {
+            "customer_name": "Bob",
+            "items": [
+                {"chocolate_id": 1, "quantity": 3},
+                {"chocolate_id": 2, "quantity": 10},  # Only 5 in stock...
+            ],
+        }
+
+        # Expecting an error as we are ordering tm
+        with pytest.raises(ValueError):
+            await chocolate_service.create_order(order_data)
+
+        assert CHOCOLATES[0]["stock_quantity"] == 50
+
+    @pytest.mark.asyncio
     async def test_check_low_stock(self, chocolate_service):
         """
         Test the low stock alert functionality.

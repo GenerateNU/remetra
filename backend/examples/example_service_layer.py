@@ -142,6 +142,7 @@ class ChocolateService:
 
         Business rules:
         1. Check stock availability for all items
+        2. Stocks are only updated if every stock is available
         2. Calculate total price (sum of item_price * quantity)
         3. Apply bulk discount if order total > $50 (10% off)
         4. Create order record
@@ -157,6 +158,8 @@ class ChocolateService:
         """
         items = order_data["items"]
         total_price = Decimal("0.00")
+        chocolates_ordered = []
+        quantity_ordered = []
 
         for item in items:
             chocolate = await self.get_chocolate_by_id(item["chocolate_id"])
@@ -172,10 +175,14 @@ class ChocolateService:
                 )
 
             else:
-                chocolate["stock_quantity"] -= item["quantity"]
+                chocolates_ordered.append(chocolate)
+                quantity_ordered.append(item["quantity"])
 
             item_total = chocolate["price"] * item["quantity"]
             total_price += item_total
+
+        for index in range(len(chocolates_ordered)):
+            chocolates_ordered[index]["stock_quantity"] -= quantity_ordered[index]
 
         if total_price > Decimal("50.00"):
             total_price *= Decimal("0.90")  # 10% off
