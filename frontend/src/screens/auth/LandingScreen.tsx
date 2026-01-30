@@ -1,16 +1,13 @@
 
-import { View, Text, StyleSheet } from 'react-native';
-
-// When adding navigation, uncomment:
-// import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-// import type { YourStackParamList } from '../../navigation/YourStack';
-// type Props = NativeStackScreenProps<YourStackParamList, 'ScreenName'>;
+import { View, StyleSheet, Button } from 'react-native';
+import { useAppNavigation } from '../../navigation/hooks';
 
 export function LandingScreen() {
-  // When adding navigation, change to: export function ScreenName({ navigation }: Props)
+  const navigation = useAppNavigation();
 
   return (
     <View style={styles.container}>
+      <Button title='To Onboarding 1' onPress={() => {navigation.navigate("UserGoals");}} />
     </View>
   );
 }
