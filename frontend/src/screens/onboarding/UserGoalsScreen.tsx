@@ -2,6 +2,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import { useAppNavigation } from '../../navigation/hooks';
+import { useFonts } from 'expo-font';
+import { Lora_400Regular } from '@expo-google-fonts/lora';
+import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 
 const { height } = Dimensions.get('window');
 
@@ -16,6 +19,15 @@ export function UserGoalsScreen() {
   const navigation = useAppNavigation();
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
 
+  const [fontsLoaded] = useFonts({
+    Lora_400Regular,
+    PTSerif_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null; 
+  }
+
   const toggleGoal = (goal: string) => {
     if (selectedGoals.includes(goal)) {
       setSelectedGoals(selectedGoals.filter(g => g !== goal));
@@ -24,6 +36,7 @@ export function UserGoalsScreen() {
     }
   };
 
+  // navigate to the final onboarding screen here, replace name? 
   const handleDone = () => {
     navigation.navigate('finalboardingscreen?'); 
   };
@@ -93,8 +106,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '300',
-    letterSpacing: 8,
-    color: '#E8B4A0',
+    fontFamily: 'Lora_400Regular',
+    letterSpacing: 3,
+    color: '#eea487',
   },
   content: {
     flex: 1,
@@ -102,6 +116,7 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 18,
     color: '#C85A4A',
+    fontFamily: 'PTSerif_400Regular',
     textAlign: 'center',
     marginBottom: 8,
     fontWeight: '400',
@@ -109,6 +124,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#C85A4A',
+    fontFamily: 'PTSerif_400Regular',
     textAlign: 'center',
     marginBottom: 32,
     opacity: 0.8,
@@ -137,6 +153,7 @@ const styles = StyleSheet.create({
   optionText: {
     color: '#FFFFFF',
     fontSize: 15,
+    fontFamily: 'PTSerif_400Regular',
     fontWeight: '500',
     textAlign: 'center',
     lineHeight: 20,
@@ -155,6 +172,7 @@ const styles = StyleSheet.create({
   },
   doneText: {
     color: '#C85A4A',
+    fontFamily: 'PTSerif_400Regular',
     fontSize: 16,
     fontWeight: '600',
   },
