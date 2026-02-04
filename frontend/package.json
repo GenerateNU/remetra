@@ -16,8 +16,10 @@
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
     "react-native": "0.81.5",
+    "react-native-linear-gradient": "^2.8.3",
     "react-native-safe-area-context": "^5.6.2",
     "react-native-screens": "^4.20.0",
+    "rgba": "^0.0.0",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
