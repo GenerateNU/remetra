@@ -1,18 +1,22 @@
 
 import { View, Button, StyleSheet, Text } from 'react-native';
+import {LinearGradient} from 'expo-linear-gradient';
 import { useAppNavigation } from '../../navigation/hooks';
 
 export function SummaryScreen() {
   const navigation = useAppNavigation();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>YOUR SUMMARY</Text>
-      <Button title='To...' onPress={() => {navigation.navigate("Summary")}} />
-      <Text style={styles.text}> {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)} </Text>
-      <Button title="VIEW ALL CORRELATIONS →" onPress={() => {}} />
-      <Button title="+ ADD DATA" onPress={() => {}} />
-    </View>
+    <LinearGradient style={styles.container} start={[0.5, 0.3]} end={[0.5, 1]} colors={["#ffffff", "#fca450"]}>
+        <Text style={styles.title}>YOUR SUMMARY</Text>
+        <Text style={styles.text}> {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)} </Text>
+        <View style={styles.button}>
+          <Button color={"#ca5e5e"} title="VIEW ALL CORRELATIONS -->" onPress={() => {}} />
+        </View>
+        <View style={styles.button}>
+          <Button color={"#ca5e5e"} title="+ Add Data →" onPress={() => {}} />
+        </View>
+    </LinearGradient>
   );
 }
 
@@ -24,19 +28,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 28,
     fontWeight: '600',
     textAlign: 'center',
     color: "#b2939b",
+    fontStyle: "italic",
   },
   text: {
     textAlign: 'center',
     color: '#000000',
+    marginVertical: "10%",
+    marginBottom: "90%",
+    fontSize: 16,
   },
-  body: {
-    backgroundColor: "linear-gradient(to bottom, #ffffff, #fca450)"
-  },
+  button: {
+    margin: "10%",
+  }
 });
