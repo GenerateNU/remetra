@@ -1,11 +1,12 @@
-name: CI
+name: Backend CI
 
 on:
   pull_request:
     branches: [main]
   push:
     branches:
-      - '**'
+      - 'backend/**'
+      - ".github/workflows/BackendCI.yaml"
 
 jobs:
   lint-and-test:
