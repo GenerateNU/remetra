@@ -1,18 +1,30 @@
-# Testing
+# Testing Guide
 
-If you're new to unit-testing or haven't tested code in a bit this should help you 🙏
-
----
-
-## Why we test
+## Why We Test
 
 Tests help us:
-- catch bugs before they hit `main` 😬😬😬
-- refactor without fear 
-- make PRs easier to review 
-- verify edge cases that we may not manually test every time
+- Catch bugs before they hit `main`
+- Refactor without fear
+- Make PRs easier to review
+- Verify edge cases we won't manually test every time
 
 ---
+
+## Core Pattern: Arrange → Act → Assert
+
+Every test follows this structure:
+
+```
+Arrange  →  Set up input data and dependencies
+Act      →  Call the function/render the component
+Assert   →  Check the output matches expectations
+```
+
+Keep this pattern visible in your tests. It makes them scannable.
+
+---
+
+# Backend Testing
 
 ## What we test (priority order)
 
@@ -73,17 +85,6 @@ Run a single test (by name):
 ```
 docker compose run --rm backend pytest -k create_order_success
 ```
-
-## The pattern we want (what our example file shows)
-
-### Arrange → Act → Assert
-
-Basic flow:
-- **Arrange:** set up input data
-- **Act:** call the function you’re testing
-- **Assert:** check the output is what you expect
-
----
 
 ## Fixtures (aka reusable setup)
 
@@ -163,3 +164,142 @@ Look at `tests/examples/` for the style we want. It shows:
 - async tests
 
 If you’re unsure what to test or how much to test, ask a TL‼️‼️‼️‼️
+
+---
+
+# Frontend Testing
+
+### What to Test
+
+| Layer | What to Test |
+|-------|--------------|
+| Hooks | State transitions, API call handling, error states |
+| Components | Rendering, user interactions, conditional display |
+| Utils | Pure function input/output |
+
+### Test File Location
+
+Place tests in `__tests__/` directory adjacent to source:
+
+```
+src/
+├── hooks/
+│   ├── useAuth.ts
+│   └── __tests__/
+│       └── useAuth.test.ts
+```
+
+### Dependencies
+
+- `jest` - Testing framework
+- `jest-expo` - Expo-specific Jest preset
+- `@testing-library/react-native` - Testing utilities for React Native
+- `@types/jest` - TypeScript types for Jest
+- `react-test-renderer`
+
+## Running Tests
+
+```bash
+npm test  # all tests
+
+npm run test:watch  # watch mode
+
+npm run test:coverage  # coverage report
+
+npm test -- test.test.tsx  # specific test file
+```
+
+## Writing Tests
+
+### Simple Component Tests
+
+For simple components, just mock what you need. Ex:
+
+```typescript
+import { render } from "@testing-library/react-native";
+import { MyComponent } from "../my-component";
+
+// Mock external deps
+jest.mock("@/hooks/use-theme-color", () => ({
+  useThemeColor: () => "#000000",
+}));
+
+describe("MyComponent", () => {
+  it("renders correctly", () => {
+    const { getByText } = render(<MyComponent>Hello</MyComponent>);
+    expect(getByText("Hello")).toBeTruthy();
+  });
+});
+```
+
+### Hook Tests
+
+```typescript
+import { renderHook } from "@testing-library/react-native";
+import { useMyHook } from "../use-my-hook";
+
+describe("useMyHook", () => {
+  it("returns expected value", () => {
+    const { result } = renderHook(() => useMyHook());
+    expect(result.current).toBe("expected");
+  });
+});
+```
+
+### Screen Tests
+
+For screens with a lot of dependencies, mock the complex components:
+
+```typescript
+jest.mock("expo-router", () => {
+  const { View } = require("react-native");
+  return {
+    Link: ({ children }: any) => <View>{children}</View>,
+  };
+});
+
+jest.mock("@/components/complex-component", () => ({
+  ComplexComponent: ({ children }: any) => {
+    const { View } = require("react-native");
+    return <View>{children}</View>;
+  },
+}));
+```
+
+## Best Practices
+
+1. **Keep tests simple** - Test component behavior, not implementation
+2. **Mock external dependencies** - Expo modules, navigation, images
+3. **Use lazy requires in mocks** - `require('react-native')` inside mock factories
+4. **Focus on user-visible behavior** - What users see and interact with
+5. **Avoid over-mocking** - Only mock what's necessary for the test to run
+
+## Common Issues
+
+### Module Not Found in Mocks
+
+Use `require()` inside mock factories instead of imports to avoid hoisting issues:
+
+```typescript
+// do this
+jest.mock("my-module", () => ({
+  Component: () => {
+    const { View } = require("react-native");
+    return <View />;
+  },
+}));
+
+// don't do this
+import { View } from "react-native";
+jest.mock("my-module", () => ({
+  Component: () => <View />,
+}));
+```
+
+## Checklist
+
+Before opening a PR:
+- [ ] `npm test` passes
+- [ ] New hooks have success + error tests
+- [ ] Interactive components have user event tests
+- [ ] Mocks are minimal and documented
