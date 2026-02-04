@@ -36,7 +36,7 @@ export function LandingScreen() {
         <View style={styles.signupContainer}>
             <Text style={styles.signupText}>New user? </Text>
             <Pressable onPress={() => navigation.navigate("UserGoals")}>
-              <Text style={styles.signupLink}>Sign up</Text>
+              <Text style={styles.signupLink}>   Sign up</Text>
             </Pressable>
         </View>
        </View>
@@ -83,20 +83,21 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginTop: 175,    
+    marginTop: 150,    
   },
   loginButton: {
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    borderRadius: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 80,
+    borderRadius: 0,
+    paddingVertical: 10,
+    paddingHorizontal: 60,
     marginBottom: 16,
   },
   loginButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '500',
+    
   },
   signupContainer: {
     flexDirection: 'row',
@@ -104,12 +105,14 @@ const styles = StyleSheet.create({
   },
   signupText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 16,
+    fontFamily: 'serif',
   },
   signupLink: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
+    fontFamily: 'serif',
   },
   header: {
   alignItems: 'center',
