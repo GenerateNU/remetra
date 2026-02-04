@@ -25,6 +25,7 @@ npx expo start
 ```
 src/
 ├── api/           # Axios client + endpoint functions
+├── assets/        # pngs, images, etc
 ├── components/    # Reusable UI components
 ├── hooks/         # Custom hooks (ViewModels)
 ├── navigation/    # Navigator configs

@@ -9,6 +9,7 @@ The goal of this doc is just to give you a **high-level mental model** of how th
 You’ll build real understanding by working on tickets and asking questions ‼️‼️‼️ (please do).
 
 ---
+# Backend Architecture
 
 ## High-Level Idea
 
@@ -105,6 +106,124 @@ Rough idea of what happens when a request comes in:
 5. Result flows back up and returns a response  
 
 You’ll see this pattern everywhere.
+
+---
+
+# Frontend Architecture
+
+## High-Level Idea
+
+The frontend follows an **MVVM-lite** pattern adapted for React Native.
+
+Most user interactions flow like this:
+
+```
+User → Screen (View) → Hook (ViewModel) → API Layer (Model)
+```
+
+---
+
+## What Each Layer Does
+
+### Screens (View)
+- Render UI based on data from hooks
+- Handle user gestures (press, scroll, etc.)
+- Should be "dumb" — minimal logic, mostly JSX
+
+They should **not**:
+- Contain business logic
+- Make API calls directly
+- Manage complex state internally
+
+---
+
+### Hooks (ViewModel)
+- Where most of the "thinking" happens
+- Manage local state (loading, error, data)
+- Call the API layer
+- Return everything the screen needs to render
+
+Named like `useUsers`, `useAuth`, `useSymptoms`, etc.
+
+If you're unsure where code should live, it usually belongs here.
+
+---
+
+### API Layer (Model)
+- Axios client configuration
+- Endpoint functions that talk to the backend
+- Type definitions for request/response data
+
+Think of this as a clean interface between the app and the server.
+
+---
+
+### Store (Global State)
+- Zustand stores for state that multiple screens need
+- Auth tokens, user info, app-wide settings
+- Not every piece of state belongs here — prefer hooks for screen-specific data
+
+---
+
+## Folder Mapping
+
+How this shows up in `frontend/`:
+
+```
+frontend/src/
+├── api/           # Axios client + endpoint functions
+├── assets/        # pngs, images, etc
+├── components/    # Reusable UI pieces
+├── hooks/         # Custom hooks ("ViewModels")
+├── navigation/    # React Navigation setup
+├── screens/       # Screen components ("Views")
+├── store/         # Zustand stores (global state)
+└── types/         # TypeScript types
+```
+
+---
+
+## Dependency Rule (Important)
+
+Dependencies should only flow **downward**:
+
+```
+screen → hook → api
+           ↘ store (when needed)
+```
+
+Avoid:
+- API layer importing hooks
+- Hooks importing screens
+- Screens making fetch calls directly
+
+---
+
+## Example Interaction Flow
+
+Rough idea of what happens when a user taps a button:
+
+1. Screen receives the tap event
+2. Screen calls a function from its hook (`fetchUsers()`)
+3. Hook sets loading state, calls the API layer
+4. API layer makes the request to the backend
+5. Hook receives data, updates state
+6. Screen re-renders with new data
+
+You'll see this pattern everywhere.
+
+---
+
+## Quick Comparison
+
+| Backend | Frontend | Role |
+|---------|----------|------|
+| Router | Screen | Entry point, handles I/O |
+| Service | Hook | Business logic, coordination |
+| Repository | API Layer | Data access |
+| Database | Backend API | Persistent storage |
+
+The mental model is the same — just different tech.
 
 ---
 
