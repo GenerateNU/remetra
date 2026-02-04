@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 export function LandingScreen() {
   return (
     <LinearGradient
-      colors={['#FFFFFF', '#FFFFFF', '#F8B4A8', '#F5C76B']}
+      colors={['#FFFFFF', '#FFFFFF',  '#F5C76B','#F8B4A8',]}
       locations={[0, 0.5, 0.7, 1]}
       style={styles.container}
       start={{ x: 0.5, y: 0 }}
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: '30%',
+    paddingTop: '15%',
   },
   title: {
     fontSize: 32,
