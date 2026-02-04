@@ -156,10 +156,15 @@ cd backend
 uv sync
 cd ..
 
+# setup frontend
+cd frontend
+npm install
+cd ..
+
 # Build Docker images (takes 3-5 minutes first time)
 just setup
 
-# Start development server
+# Start development server (backend)
 just dev
 ```
 
@@ -224,7 +229,7 @@ remetra/
 │   ├── main.py              # App entry point
 │   ├── pyproject.toml       # Python dependencies
 │   └── pytest.ini           # Test configuration
-├── mobile/                  # Mobile app (TBD)
+├── frontend/                # Mobile app (separate dev readme in folder)
 ├── docs/                    # Documentation
 ├── docker-compose.yml       # Docker orchestration
 ├── Dockerfile.backend       # Backend container dockerfile

@@ -39,7 +39,7 @@ Run `just --list` to see all available commands.
 ```
 remetra/
 ├── backend/              # FastAPI backend
-├── mobile/               # Mobile app
+├── frontend/             # Mobile app
 ├── tests/                # Test suite
 ├── docs/                 # Documentation
 └── .github/workflows/    # CI/CD
@@ -49,7 +49,7 @@ remetra/
 
 - **Backend**: FastAPI, Python
 - **Database**: TBD
-- **Mobile**: TBD
+- **Mobile**: React Native, Zustand, Axios, etc
 - **Infrastructure**: Docker
 
 ## Team
