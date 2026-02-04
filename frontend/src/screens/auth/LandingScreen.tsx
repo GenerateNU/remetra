@@ -4,7 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 export function LandingScreen() {
   return (
     <LinearGradient
-      colors={['#F8B4A8', '#F5C76B']}
+      colors={['#FFFFFF', '#FFFFFF', '#F8B4A8', '#F5C76B']}
+      locations={[0, 0.5, 0.7, 1]}
       style={styles.container}
       start={{ x: 0.5, y: 0 }}
       end={{ x: 0.5, y: 1 }}
@@ -26,14 +27,15 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 24,
+    paddingTop: '30%',
   },
   title: {
     fontSize: 32,
     fontFamily: 'serif',
-    color: '#8B4A4A',
+    color: '#F8B4A8',
     letterSpacing: 8,
     marginBottom: 12,
   },
@@ -45,11 +47,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'serif',
     fontStyle: 'italic',
-    color: '#8B4A4A',
+    color: '#F8B4A8',
   },
   tagline: {
     fontSize: 16,
     fontFamily: 'serif',
-    color: '#8B4A4A',
+    color: '#F8B4A8',
   },
 });
