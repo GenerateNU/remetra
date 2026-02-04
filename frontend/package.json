@@ -13,7 +13,7 @@
     "lint": "expo lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage -passWithNoTests"
   },
   "dependencies": {
     "@react-navigation/native": "^7.1.28",
