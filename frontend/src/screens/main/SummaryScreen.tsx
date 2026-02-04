@@ -2,6 +2,49 @@
 import { View, Button, StyleSheet, Text } from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import { useAppNavigation } from '../../navigation/hooks';
+import {VictoryBar, VictoryChart, VictoryTheme, VictoryAxis,} from 'victory-native';
+
+function GenericCorrelationChart() {
+  const data = [
+    { food: 'Pizza', correlation: 0.7 },
+    { food: 'Dairy', correlation: 0.4 },
+    { food: 'Spicy', correlation: 0.6 },
+    { food: 'Sugar', correlation: 0.2 },
+  ];
+
+  return (
+    <View style={styles.chartContainer}>
+      <Text style={styles.chartTitle}>Top Food Correlations</Text>
+
+      <VictoryChart
+        theme={VictoryTheme.material}
+        domainPadding={20}
+        height={220}
+      >
+        <VictoryAxis
+          tickFormat={data.map(d => d.food)}
+          style={{
+            tickLabels: { fontSize: 10 },
+          }}
+        />
+        <VictoryAxis
+          dependentAxis
+          tickFormat={(t) => `${Math.round(t * 100)}%`}
+        />
+
+        <VictoryBar
+          data={data}
+          x="food"
+          y="correlation"
+          style={{
+            data: { fill: '#ca5e5e' },
+          }}
+          cornerRadius={4}
+        />
+      </VictoryChart>
+    </View>
+  );
+}
 
 export function SummaryScreen() {
   const navigation = useAppNavigation();
@@ -10,6 +53,8 @@ export function SummaryScreen() {
     <LinearGradient style={styles.container} start={[0.5, 0.3]} end={[0.5, 1]} colors={["#ffffff", "#fca450"]}>
         <Text style={styles.title}>YOUR SUMMARY</Text>
         <Text style={styles.text}> {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)} </Text>
+        <GenericCorrelationChart />
+
         <View style={styles.button}>
           <Button color={"#ca5e5e"} title="VIEW ALL CORRELATIONS -->" onPress={() => {}} />
         </View>
@@ -45,5 +90,21 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: "10%",
-  }
+
+  }, 
+  
+  chartContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    marginVertical: 16,
+  },
+  
+  chartTitle: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  
 });
