@@ -1,5 +1,6 @@
 // This would be in src/api/client.ts
 import axios from 'axios';
+import type { Chocolate, ChocolateFilters } from './chocolates'
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000';
 
@@ -18,8 +19,6 @@ apiClient.interceptors.response.use(
 );
 
 // This would be in src/api/endpoints.ts
-import type { Chocolate, ChocolateFilters } from './chocolates'
-
 export const api = {
   getChocolates: async (filters?: ChocolateFilters): Promise<Chocolate[]> => {
     const params = new URLSearchParams();
