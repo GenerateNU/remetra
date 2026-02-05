@@ -2,7 +2,7 @@
 import { View, Button, StyleSheet, Text } from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import { useAppNavigation } from '../../navigation/hooks';
-import {VictoryBar, VictoryChart, VictoryTheme, VictoryAxis,} from 'victory-native';
+import {VictoryBar, VictoryChart, VictoryTheme, VictoryAxis } from 'victory-native';
 
 function GenericCorrelationChart() {
   const data = [
@@ -29,7 +29,7 @@ function GenericCorrelationChart() {
         />
         <VictoryAxis
           dependentAxis
-          tickFormat={(t) => `${Math.round(t * 100)}%`}
+          tickFormat={(t: number) => `${Math.round(t * 100)}%`}
         />
 
         <VictoryBar
@@ -59,7 +59,7 @@ export function SummaryScreen() {
           <Button color={"#ca5e5e"} title="VIEW ALL CORRELATIONS -->" onPress={() => {}} />
         </View>
         <View style={styles.button}>
-          <Button color={"#ca5e5e"} title="+ Add Data →" onPress={() => {}} />
+          <Button color={"#ca5e5e"} title="+ Add Data" onPress={() => {}} />
         </View>
     </LinearGradient>
   );
@@ -85,13 +85,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#000000',
     marginVertical: "10%",
-    marginBottom: "90%",
     fontSize: 16,
   },
   button: {
     margin: "10%",
 
-  }, 
+  },
   
   chartContainer: {
     backgroundColor: '#ffffff',
