@@ -13,7 +13,7 @@ Note: This example uses in-memory data (fake chocolates list). In the real app,
 you'd have a repository layer that talks to the database - see docs/ARCHITECTURE.md
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 # In-memory data for demonstration (pretend this is our database)
@@ -25,6 +25,8 @@ CHOCOLATES = [
         "price": Decimal("5.99"),
         "cocoa_percentage": 70,
         "stock_quantity": 50,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
     },
     {
         "id": 2,
@@ -33,6 +35,8 @@ CHOCOLATES = [
         "price": Decimal("3.49"),
         "cocoa_percentage": 35,
         "stock_quantity": 5,  # Low stock!
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
     },
 ]
 
