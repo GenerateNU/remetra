@@ -6,7 +6,6 @@ import { useFonts } from 'expo-font';
 import { Lora_400Regular } from '@expo-google-fonts/lora';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 
-const { width, height } = Dimensions.get('window');
 
 const GOAL_OPTIONS = [
   'Track symptoms related to autoimmune disease',
