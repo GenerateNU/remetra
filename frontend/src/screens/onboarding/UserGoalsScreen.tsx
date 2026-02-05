@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { useState } from 'react';
 import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
 import { Lora_400Regular } from '@expo-google-fonts/lora';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 
-const { height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const GOAL_OPTIONS = [
   'Track symptoms related to autoimmune disease',
@@ -42,11 +42,19 @@ export function UserGoalsScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={['#FFE5D9', '#FFB8A3', '#FFA78A', '#FF9A6C']}
-      style={styles.container}
-      locations={[0, 0.4, 0.7, 1]}
-    >
+    <View style={styles.container}>
+      <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
+        <Defs>
+          <RadialGradient id="grad" cx="50%" cy="95%" r="60%">
+            <Stop offset="0%" stopColor="#fd9055" stopOpacity="1" />
+            <Stop offset="30%" stopColor="#fdae57" stopOpacity="1" />
+            <Stop offset="60%" stopColor="#fee0ab" stopOpacity="1" />
+            <Stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
+          </RadialGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#grad)" />
+      </Svg>
+
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -85,7 +93,7 @@ export function UserGoalsScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }
 
