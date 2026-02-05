@@ -1,25 +1,121 @@
-
-import { View, StyleSheet, Button } from 'react-native';
+import { View, StyleSheet, Text, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAppNavigation } from '../../navigation/hooks';
 
 export function LandingScreen() {
-  const navigation = useAppNavigation();
 
+  const navigation = useAppNavigation();
+  
   return (
-    <View style={styles.container}>
-      <Button title='To Onboarding 1' onPress={() => {navigation.navigate("UserGoals");}} />
-    </View>
+    <LinearGradient
+      colors={['#FFFFFF', '#FFFFFF',  '#F5C76B','#F8B4A8',]}
+      locations={[0, 0.5, 0.7, 1]}
+      style={styles.container}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+    >
+      <View style={styles.content}>
+        <View style={styles.header}> 
+        <Text style={styles.title}>R E M E T R A</Text>
+        <View style={styles.taglineContainer}>
+          <Text style={styles.taglineItalic}>peace of mind </Text>
+          <Text style={styles.tagline}>begins here</Text>
+        </View>
+      </View> 
+  
+
+      {/* Buttons */}
+      <View style={styles.buttonContainer}>
+        <Pressable 
+          style={styles.loginButton}
+          onPress={() => navigation.navigate("UserGoals")}
+        >
+          <Text style={styles.loginButtonText}>Log in</Text>
+        </Pressable>
+
+        <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>New user? </Text>
+            <Pressable onPress={() => navigation.navigate("UserGoals")}>
+              <Text style={styles.signupLink}>   Sign up</Text>
+            </Pressable>
+        </View>
+       </View>
+     </View>
+    
+
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    backgroundColor: '#fff',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingTop: '15%',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '600',
+    fontSize: 32,
+    fontFamily: 'serif',
+    color: '#F8B4A8',
+    letterSpacing: 8,
+    marginBottom: 12,
   },
-});
+  taglineContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  taglineItalic: {
+    fontSize: 16,
+    fontFamily: 'serif',
+    fontStyle: 'italic',
+    color: '#F8B4A8',
+  },
+  tagline: {
+    fontSize: 16,
+    fontFamily: 'serif',
+    color: '#F8B4A8',
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 150,    
+  },
+  loginButton: {
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderRadius: 0,
+    paddingVertical: 10,
+    paddingHorizontal: 60,
+    marginBottom: 16,
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '500',
+    
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  signupText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: 'serif',
+  },
+  signupLink: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    fontFamily: 'serif',
+  },
+  header: {
+  alignItems: 'center',
+},
+
+});   

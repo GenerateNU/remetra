@@ -32,6 +32,8 @@
     "react-native-screens": "^4.20.0",
     "react-native-svg": "^15.15.2",
     "react-native-web": "^0.21.0",
+    "react-native-screens": "~4.16.0",
+    "ts-node": "^10.9.2",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
