@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { useState } from 'react';
-// import { useAppNavigation } from '../../navigation/hooks';
+import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
 import { Lora_400Regular } from '@expo-google-fonts/lora';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
@@ -15,7 +15,7 @@ const GOAL_OPTIONS = [
 ];
 
 export function UserGoalsScreen() {
-  // const navigation = useAppNavigation();
+  const navigation = useAppNavigation();
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
 
   const [fontsLoaded] = useFonts({
@@ -37,8 +37,7 @@ export function UserGoalsScreen() {
 
   // navigate to the final onboarding screen here, replace name? 
   const handleDone = () => {
-    // navigation.navigate('finalboardingscreen?'); 
-    // TODO: navigate to onboarding screen when implemented
+    navigation.navigate('Summary'); 
   };
 
   return (
