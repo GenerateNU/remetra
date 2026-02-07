@@ -1,6 +1,6 @@
 from models.symptom_log_model import SymptomLogCreate, SymptomLogResponse
-from repositories.symptom_log_repo import SymptomLogRepository                       
-                                                                                       
+from repositories.symptom_log_repo import SymptomLogRepository
+
 
 class SymptomLogService:
     """Business logic for symptom logs."""
