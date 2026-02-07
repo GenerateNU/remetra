@@ -1,22 +1,23 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional
-
+import sqlalchemy as sa
 from pydantic import BaseModel, ConfigDict, Field
 
 class symptom_log(BaseModel):
+    __tablename__ = 'symptom_logs'
     """
-    Data structure for chocolate responses sent back to clients.
-
-    Includes the original chocolate data plus new fields
-    like ID, timestamps, and current stock that the database tracks automatically.
+    Pydantic model for symptom log entries.
     """
 
     model_config = ConfigDict(from_attributes=True)  # Allows loading from database models (SQLAlchemy)
 
-    log_id: int = Field(..., description="Unique ID for the symptom log")
-    symptom_id: int = Field(..., description="ID of the symptom")
-    intesity: int = Field(..., description="Intensity of the symptom")
-    timestamp: datetime = Field(..., description="When the symptom appeared")
-    duration: Optional[int] = Field(None, description="Duration of the symptom in minutes")
+    log_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    symptom_id = sa.Column(sa.Integer, sa.ForeignKey('symptoms.symptom_id'), nullable=False)
+    intensity = sa.Column(sa.Integer, nullable=False)
+    timestamp = sa.Column(sa.DateTime, nullable=False)
+    duration = sa.Column(sa.Integer, nullable=True)  
+
+    
+
     
