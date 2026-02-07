@@ -8,11 +8,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from scalar_fastapi import get_scalar_api_reference
 
+from middleware.logging_middleware import LoggingMiddleware
+
 app = FastAPI(
     title="Remetra API",
     description="Backend API for Remetra 😛",
     version="0.1.0",
 )
+
+app.add_middleware(LoggingMiddleware)
+
 
 
 app.add_middleware(
