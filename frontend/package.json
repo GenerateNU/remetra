@@ -2,7 +2,8 @@
   "name": "frontend",
   "version": "1.0.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.0.0",
+    "npm": ">=11.0.0"
   },
   "main": "index.ts",
   "scripts": {
