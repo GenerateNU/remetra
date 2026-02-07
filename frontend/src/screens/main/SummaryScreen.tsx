@@ -5,7 +5,7 @@ import { GenericCorrelationChart } from '../../components/GenericCorrelationChar
 import { useAppNavigation } from '../../navigation/hooks';
 
 export function SummaryScreen() {
-  const navigation = useAppNavigation();
+  //const navigation = useAppNavigation();
 
   return (
     <View className="flex-1 relative">
