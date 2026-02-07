@@ -31,6 +31,13 @@ jobs:
           cache: "npm"
           cache-dependency-path: "./frontend/package-lock.json"
 
+      - name: get npm version
+        run: npm --version
+
+      - name: Install npm 11
+        run: npm install -g npm@11
+        working-directory: ./frontend
+
       - name: Install dependencies
         run: npm ci
 
