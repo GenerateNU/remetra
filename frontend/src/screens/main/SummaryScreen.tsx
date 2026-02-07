@@ -1,5 +1,5 @@
 
-import { View, Button, StyleSheet, Text } from 'react-native';
+import { View, Button, Text } from 'react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { useAppNavigation } from '../../navigation/hooks';
 import {VictoryBar, VictoryChart, VictoryTheme, VictoryAxis } from 'victory-native';
@@ -13,8 +13,10 @@ function GenericCorrelationChart() {
   ];
 
   return (
-    <View style={styles.chartContainer}>
-      <Text style={styles.chartTitle}>Top Food Correlations</Text>
+    <View className="bg-white rounded-2xl p-4 my-4">
+      <Text className="text-center text-lg font-semibold mb-2">
+        Top Food Correlations
+      </Text>
 
       <VictoryChart
         theme={VictoryTheme.material}
@@ -30,7 +32,6 @@ function GenericCorrelationChart() {
         <VictoryAxis
           dependentAxis
           tickFormat={(t: number) => `${Math.round(t * 100)}%`}
-
         />
 
         <VictoryBar
@@ -53,16 +54,34 @@ export function SummaryScreen() {
   return (
     <View className="flex-1 relative">
       <BackgroundGradient />
-        <Text style={styles.title}>YOUR SUMMARY</Text>
-        <Text style={styles.text}> {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)} </Text>
+      
+      <View className="flex-1 p-6">
+        <Text className="text-[28px] font-semibold text-center text-[#b2939b] italic">
+          YOUR SUMMARY
+        </Text>
+        
+        <Text className="text-center text-black my-[10%] text-lg">
+          {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)}
+        </Text>
+        
         <GenericCorrelationChart />
 
-        <View style={styles.button}>
-          <Button color={"#ca5e5e"} title="VIEW ALL CORRELATIONS -->" onPress={() => {}} />
+        <View className="m-[10%]">
+          <Button 
+            color="#ca5e5e" 
+            title="VIEW ALL CORRELATIONS -->" 
+            onPress={() => {}} 
+          />
         </View>
-        <View style={styles.button}>
-          <Button color={"#ca5e5e"} title="+ Add Data" onPress={() => {}} />
+        
+        <View className="m-[10%]">
+          <Button 
+            color="#ca5e5e" 
+            title="+ Add Data" 
+            onPress={() => {}} 
+          />
         </View>
+      </View>
     </View>
   );
 }
@@ -70,42 +89,3 @@ export function SummaryScreen() {
 function GetPersonalizedIntro(name: string, symptom: string, food: string, numerator: number, denominator: number) {
   return `${name}, in the last 7 days, your ${symptom} has correlated with eating ${food} ${numerator}/${denominator} times.`
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '600',
-    textAlign: 'center',
-    color: "#b2939b",
-    fontStyle: "italic",
-  },
-  text: {
-    textAlign: 'center',
-    color: '#000000',
-    marginVertical: "10%",
-    fontSize: 16,
-  },
-  button: {
-    margin: "10%",
-
-  },
-  
-  chartContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 16,
-    marginVertical: 16,
-  },
-  
-  chartTitle: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  
-});

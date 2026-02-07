@@ -16,6 +16,10 @@ module.exports = {
         'remetra-terracotta': '#ca5e5e',
         'remetra-mauve': '#b2939b',
       },
+      fontFamily: {
+      lora: ['Lora_400Regular'],
+      ptserif: ['PTSerif_400Regular'],
+    },
     },
   },
   plugins: [],

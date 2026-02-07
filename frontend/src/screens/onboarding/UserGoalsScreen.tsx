@@ -1,5 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
@@ -41,137 +40,58 @@ export function UserGoalsScreen() {
     navigation.navigate('Summary'); 
   };
 
-  return (
-    <View style={styles.container}>
+ return (
+    <View className="flex-1">
       <BackgroundGradient />
 
       <ScrollView 
-        contentContainerStyle={styles.scrollContent}
+        contentContainerClassName="flex-grow px-6 pt-[60px] pb-10"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>R E M E T R A</Text>
+        <View className="items-center mb-10">
+          <Text className="text-[32px] font-light font-ptserif tracking-[3px] text-[#eea487]">
+            R E M E T R A
+          </Text>
         </View>
 
-        <View style={styles.content}>
-          <Text style={styles.question}>
+        <View className="flex-1">
+          <Text className="text-xl text-[#C85A4A] font-ptserif text-center mb-2 font-normal">
             What are you hoping to accomplish with Remetra?
           </Text>
-          <Text style={styles.subtitle}>Select all that apply</Text>
+          <Text className="text-base text-[#C85A4A] font-ptserif text-center mb-8 opacity-80">
+            Select all that apply
+          </Text>
 
-          <View style={styles.optionsContainer}>
+          <View className="gap-5 mb-10">
             {GOAL_OPTIONS.map((goal) => (
               <TouchableOpacity
                 key={goal}
-                style={[
-                  styles.optionButton,
-                  selectedGoals.includes(goal) && styles.optionButtonSelected,
-                ]}
+                className={`py-6 px-6 rounded-xl items-center shadow-md ${
+                  selectedGoals.includes(goal)
+                    ? 'bg-[#B8624F] border-2 border-white'
+                    : 'bg-[#D9806E]'
+                }`}
                 onPress={() => toggleGoal(goal)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.optionText}>{goal}</Text>
+                <Text className="text-white text-[16px] font-ptserif font-medium text-center leading-5">
+                  {goal}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
 
           <TouchableOpacity 
-            style={styles.doneButton}
+            className="bg-white py-4 rounded-[25px] items-center shadow-md mt-auto"
             onPress={handleDone}
           >
-            <Text style={styles.doneText}>Done</Text>
+            <Text className="text-[#C85A4A] font-ptserif text-lg font-semibold">
+              Done
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
   );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 40,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '300',
-    fontFamily: 'Lora_400Regular',
-    letterSpacing: 3,
-    color: '#eea487',
-  },
-  content: {
-    flex: 1,
-  },
-  question: {
-    fontSize: 18,
-    color: '#C85A4A',
-    fontFamily: 'PTSerif_400Regular',
-    textAlign: 'center',
-    marginBottom: 8,
-    fontWeight: '400',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#C85A4A',
-    fontFamily: 'PTSerif_400Regular',
-    textAlign: 'center',
-    marginBottom: 32,
-    opacity: 0.8,
-  },
-  optionsContainer: {
-    gap: 16,
-    marginBottom: 40,
-  },
-  optionButton: {
-    backgroundColor: '#D9806E',
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  optionButtonSelected: {
-    backgroundColor: '#B8624F',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  optionText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontFamily: 'PTSerif_400Regular',
-    fontWeight: '500',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  doneButton: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 16,
-    borderRadius: 25,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-    marginTop: 'auto',
-  },
-  doneText: {
-    color: '#C85A4A',
-    fontFamily: 'PTSerif_400Regular',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+}

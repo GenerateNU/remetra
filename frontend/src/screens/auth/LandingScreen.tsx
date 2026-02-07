@@ -1,5 +1,6 @@
-import { View, StyleSheet, Text, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useAppNavigation } from '../../navigation/hooks';
+import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 
 export function LandingScreen() {
@@ -7,108 +8,49 @@ export function LandingScreen() {
   const navigation = useAppNavigation();
   
   return (
-    <View className='flex-1'> 
+    <View className="flex-1"> 
       <BackgroundGradient />
-        <View className='flex-1 justify-start items-center px-6 pt-[15%]'>
-          <View style={styles.header} className='pt-36'> 
-          <Text style={styles.title}>R E M E T R A</Text>
-          <View style={styles.taglineContainer}>
-            <Text style={styles.taglineItalic}>peace of mind </Text>
-            <Text style={styles.tagline}>begins here</Text>
+      <View className="flex-1 justify-start items-center px-6 pt-[15%]">
+        
+        {/* Title Section */}
+        <View className="pt-36 items-center"> 
+          <Text className="text-4xl text-[#F8B4A8] tracking-[7px] mb-3 font-ptserif">
+            R E M E T R A
+          </Text>
+          
+          <View className="flex-row items-center">
+            <Text className="text-lg text-[#F8B4A8] italic">
+              peace of mind{' '}
+            </Text>
+            <Text className="text-lg text-[#F8B4A8] font-ptserif">
+              begins here
+            </Text>
           </View>
         </View> 
     
-
         {/* Buttons */}
-        <View style={styles.buttonContainer}>
+        <View className="w-full items-center mt-[150px]">
           <Pressable 
-            style={styles.loginButton}
+            className="border-2 border-white rounded-none py-2.5 px-[60px] mb-4"
             onPress={() => navigation.navigate("UserGoals")}
           >
-            <Text style={styles.loginButtonText}>Log in</Text>
+            <Text className="text-white text-2xl font-medium">
+              Log in
+            </Text>
           </Pressable>
 
-          <View style={styles.signupContainer}>
-              <Text style={styles.signupText}>New user? </Text>
-              <Pressable onPress={() => navigation.navigate("UserGoals")}>
-                <Text style={styles.signupLink}>   Sign up</Text>
-              </Pressable>
+          <View className="flex-row items-center">
+            <Text className="text-white text-lg">
+              New user?{' '}
+            </Text>
+            <Pressable onPress={() => navigation.navigate("UserGoals")}>
+              <Text className="text-white text-xl font-semibold">
+                Sign up
+              </Text>
+            </Pressable>
           </View>
         </View>
       </View>  
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: '15%',
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: 'serif',
-    color: '#F8B4A8',
-    letterSpacing: 8,
-    marginBottom: 12,
-  },
-  taglineContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  taglineItalic: {
-    fontSize: 16,
-    fontFamily: 'serif',
-    fontStyle: 'italic',
-    color: '#F8B4A8',
-  },
-  tagline: {
-    fontSize: 16,
-    fontFamily: 'serif',
-    color: '#F8B4A8',
-  },
-  buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 150,    
-  },
-  loginButton: {
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    borderRadius: 0,
-    paddingVertical: 10,
-    paddingHorizontal: 60,
-    marginBottom: 16,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '500',
-    
-  },
-  signupContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  signupText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontFamily: 'serif',
-  },
-  signupLink: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'serif',
-  },
-  header: {
-  alignItems: 'center',
-},
-
-});   
