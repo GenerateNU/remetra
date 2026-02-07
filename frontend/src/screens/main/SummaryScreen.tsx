@@ -1,6 +1,6 @@
 
 import { View, Button, StyleSheet, Text } from 'react-native';
-import {LinearGradient} from 'expo-linear-gradient';
+import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { useAppNavigation } from '../../navigation/hooks';
 import {VictoryBar, VictoryChart, VictoryTheme, VictoryAxis } from 'victory-native';
 
@@ -30,6 +30,7 @@ function GenericCorrelationChart() {
         <VictoryAxis
           dependentAxis
           tickFormat={(t: number) => `${Math.round(t * 100)}%`}
+
         />
 
         <VictoryBar
@@ -50,7 +51,8 @@ export function SummaryScreen() {
   const navigation = useAppNavigation();
 
   return (
-    <LinearGradient style={styles.container} start={[0.5, 0.3]} end={[0.5, 1]} colors={["#ffffff", "#fca450"]}>
+    <View className="flex-1 relative">
+      <BackgroundGradient />
         <Text style={styles.title}>YOUR SUMMARY</Text>
         <Text style={styles.text}> {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)} </Text>
         <GenericCorrelationChart />
@@ -61,7 +63,7 @@ export function SummaryScreen() {
         <View style={styles.button}>
           <Button color={"#ca5e5e"} title="+ Add Data" onPress={() => {}} />
         </View>
-    </LinearGradient>
+    </View>
   );
 }
 

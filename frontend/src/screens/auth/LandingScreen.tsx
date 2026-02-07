@@ -1,49 +1,42 @@
 import { View, StyleSheet, Text, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useAppNavigation } from '../../navigation/hooks';
+import { BackgroundGradient } from '../../components/BackgroundGradient';
 
 export function LandingScreen() {
 
   const navigation = useAppNavigation();
   
   return (
-    <LinearGradient
-      colors={['#FFFFFF', '#FFFFFF',  '#F5C76B','#F8B4A8',]}
-      locations={[0, 0.5, 0.7, 1]}
-      style={styles.container}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-    >
-      <View style={styles.content}>
-        <View style={styles.header}> 
-        <Text style={styles.title}>R E M E T R A</Text>
-        <View style={styles.taglineContainer}>
-          <Text style={styles.taglineItalic}>peace of mind </Text>
-          <Text style={styles.tagline}>begins here</Text>
-        </View>
-      </View> 
-  
-
-      {/* Buttons */}
-      <View style={styles.buttonContainer}>
-        <Pressable 
-          style={styles.loginButton}
-          onPress={() => navigation.navigate("UserGoals")}
-        >
-          <Text style={styles.loginButtonText}>Log in</Text>
-        </Pressable>
-
-        <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>New user? </Text>
-            <Pressable onPress={() => navigation.navigate("UserGoals")}>
-              <Text style={styles.signupLink}>   Sign up</Text>
-            </Pressable>
-        </View>
-       </View>
-     </View>
+    <View className='flex-1'> 
+      <BackgroundGradient />
+        <View className='flex-1 justify-start items-center px-6 pt-[15%]'>
+          <View style={styles.header} className='pt-36'> 
+          <Text style={styles.title}>R E M E T R A</Text>
+          <View style={styles.taglineContainer}>
+            <Text style={styles.taglineItalic}>peace of mind </Text>
+            <Text style={styles.tagline}>begins here</Text>
+          </View>
+        </View> 
     
 
-    </LinearGradient>
+        {/* Buttons */}
+        <View style={styles.buttonContainer}>
+          <Pressable 
+            style={styles.loginButton}
+            onPress={() => navigation.navigate("UserGoals")}
+          >
+            <Text style={styles.loginButtonText}>Log in</Text>
+          </Pressable>
+
+          <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>New user? </Text>
+              <Pressable onPress={() => navigation.navigate("UserGoals")}>
+                <Text style={styles.signupLink}>   Sign up</Text>
+              </Pressable>
+          </View>
+        </View>
+      </View>  
+    </View>
   );
 }
 

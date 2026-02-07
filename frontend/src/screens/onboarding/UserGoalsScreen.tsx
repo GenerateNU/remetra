@@ -5,6 +5,7 @@ import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
 import { Lora_400Regular } from '@expo-google-fonts/lora';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
+import { BackgroundGradient } from '../../components/BackgroundGradient';
 
 
 const GOAL_OPTIONS = [
@@ -42,17 +43,7 @@ export function UserGoalsScreen() {
 
   return (
     <View style={styles.container}>
-      <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
-        <Defs>
-          <RadialGradient id="grad" cx="50%" cy="95%" r="60%">
-            <Stop offset="0%" stopColor="#fd9055" stopOpacity="1" />
-            <Stop offset="30%" stopColor="#fdae57" stopOpacity="1" />
-            <Stop offset="60%" stopColor="#fee0ab" stopOpacity="1" />
-            <Stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
-          </RadialGradient>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill="url(#grad)" />
-      </Svg>
+      <BackgroundGradient />
 
       <ScrollView 
         contentContainerStyle={styles.scrollContent}
