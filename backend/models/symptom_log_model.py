@@ -1,23 +1,12 @@
-from datetime import datetime
-from decimal import Decimal
-from typing import Optional
-import sqlalchemy as sa
+from datetime import datetime                                                        
+from typing import Optional                                                          
 from pydantic import BaseModel, ConfigDict, Field
 
-class symptom_log(BaseModel):
-    __tablename__ = 'symptom_logs'
-    """
-    Pydantic model for symptom log entries.
-    """
 
-    model_config = ConfigDict(from_attributes=True)  # Allows loading from database models (SQLAlchemy)
+class SymptomLog(BaseModel):
+    """Shared fields for symptom log requests and responses."""
 
-    log_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    symptom_id = sa.Column(sa.Integer, sa.ForeignKey('symptoms.symptom_id'), nullable=False)
-    intensity = sa.Column(sa.Integer, nullable=False)
-    timestamp = sa.Column(sa.DateTime, nullable=False)
-    duration = sa.Column(sa.Integer, nullable=True)  
-
-    
-
-    
+    symptom_id: int = Field(..., description="ID of the associated symptom")
+    intensity: int = Field(..., description="Intensity of the symptom", ge=1, le=10)
+    timestamp: datetime = Field(..., description="When the symptom occurred")
+    duration: Optional[int] = Field(None, description="Duration in minutes", ge=0)
