@@ -1,11 +1,19 @@
 import { View, Text, Pressable } from 'react-native';
+import { useFonts } from 'expo-font';
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 
 export function LandingScreen() {
-
   const navigation = useAppNavigation();
+  
+  const [fontsLoaded] = useFonts({
+    PTSerif_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null; 
+  }
   
   return (
     <View className="flex-1"> 
