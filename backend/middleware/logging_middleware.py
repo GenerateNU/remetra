@@ -1,5 +1,6 @@
 import logging
-from fastapi import FastAPI, Request
+
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 logging.basicConfig(
@@ -26,5 +27,4 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         logger.info(f"Response: {method} {url} returned {status_code} to {client_ip}")
 
         return response
-    
     
