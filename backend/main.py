@@ -7,11 +7,16 @@ This module initializes the FastAPI application and registers all route handlers
 from fastapi import FastAPI
 from scalar_fastapi import get_scalar_api_reference
 
+from middleware.logging_middleware import LoggingMiddleware
+
 app = FastAPI(
     title="Remetra API",
     description="Backend API for Remetra 😛",
     version="0.1.0",
 )
+
+app.add_middleware(LoggingMiddleware)
+
 
 
 @app.get("/scalar", include_in_schema=False)
