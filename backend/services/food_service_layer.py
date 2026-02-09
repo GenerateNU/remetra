@@ -10,7 +10,8 @@ class FoodService:
         new_food = {
             "id": len(FOODS) + 1,
             "name": name,
-            "ingredients": ingredients**food_data,
+            "ingredients": ingredients,
+            **food_data,
         }
 
         # replace FOODS with database stuff
@@ -28,14 +29,17 @@ class FoodService:
         return None
 
     async def update_food(self, id: int, name: str = None, ingredients: list[str] = None) -> dict:
-        food = self.get_by_food_id(id)
+        food = await self.get_by_food_id(id)
+        if not food:
+            return None
+
         if name is not None:
-            food.name = name
+            food["name"] = name
         if ingredients is not None:
-            food.ingredients = ingredients
+            food["ingredients"] = ingredients
 
         return food
 
     async def delete_food(self, id: int):
-        self.get_by_food_id(id)
+        await self.get_by_food_id(id)
         # add delete stuff databse

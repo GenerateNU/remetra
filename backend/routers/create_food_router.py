@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from examples.example_pydantic_models import (
     CreateFoodErrorResponse,
     CreateFoodResponse,
-    FoodCreate,
+    FoodBase,
 )
 from services.food_service_layer import FoodService
 
@@ -25,7 +25,7 @@ router = APIRouter(
         400: {"model": CreateFoodErrorResponse, "description": "Invalid food data"},
     },
 )
-async def create_food(food: FoodCreate) -> CreateFoodResponse:
+async def create_food(food: FoodBase) -> CreateFoodResponse:
     try:
         food_dict = food.model_dump()
 
@@ -41,17 +41,13 @@ async def create_food(food: FoodCreate) -> CreateFoodResponse:
     response_model=List[CreateFoodResponse],
     responses={200: {"description": "List of foods"}},
 )
-async def get_foods(
-    name: str,
-    id: int,
-    ingredients: List[str],
-) -> List[CreateFoodResponse]:
-    foods = await food_service.get_foods(name=name, id=id, ingredients=ingredients)
+async def get_foods() -> List[CreateFoodResponse]:
+    foods = await food_service.get_foods()
     return foods
 
 
 @router.get(
-    "/{food_id}",
+    "/{id}",
     response_model=CreateFoodResponse,
     responses={400: {"model": CreateFoodErrorResponse, "description": "Food not found"}},
 )
@@ -60,13 +56,13 @@ async def get_food(
 ) -> CreateFoodResponse:
     food = await food_service.get_by_food_id(id)
     if not food:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"Food with ID {food_id} not found"})
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Food with ID {id} not found")
 
     return food
 
 
 @router.put(
-    "/",
+    "/{id}",
     response_model=CreateFoodResponse,
     status_code=status.HTTP_200_OK,
     responses={
@@ -86,7 +82,7 @@ async def update_food(
 
 
 @router.delete(
-    "/",
+    "/{id}",
     response_model=CreateFoodResponse,
     responses={400: {"model": CreateFoodErrorResponse, "description": "Food not found"}},
 )
@@ -95,4 +91,4 @@ async def delete_food(
 ) -> CreateFoodResponse:
     food = await food_service.delete_food(id)
     if not food:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={"Food with ID {food_id} not found"})
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Food with ID {id} not found")
