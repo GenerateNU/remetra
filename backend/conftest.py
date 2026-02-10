@@ -21,6 +21,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from database import Base
+from models.food import Food
+from models.food_log import FoodLog
+from models.symptom import Symptom
+from models.symptom_log import SymptomLog
+from models.user import User
+
+__all__ = ["User", "Symptom", "SymptomLog", "Food", "FoodLog"]
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "postgresql://test_user:test_password@test-db:5432/test_remetra")
 engine = create_engine(TEST_DATABASE_URL)
