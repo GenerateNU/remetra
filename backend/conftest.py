@@ -14,29 +14,89 @@ Common use cases (Most likely what we'll do):
 - Standard test data that multiple tests need
 """
 
-import pytest
+import os
 
-# Example: In a real app, you'd have fixtures like these
-# @pytest.fixture
-# def db_session():
-#     """Provide a test database session."""
-#     db = TestingSessionLocal()
-#     try:
-#         yield db
-#     finally:
-#         db.close()
+import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from database import Base
+
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "postgresql://test_user:test_password@test-db:5432/test_remetra")
+engine = create_engine(TEST_DATABASE_URL)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+@pytest.fixture(scope="session")
+def db_engine():
+    """
+    Create database engine for the entire test session.
+
+    Creates all tables at start, drops them at end.
+    Scope='session' means this runs once for all tests.
+    """
+    # Create all tables
+    Base.metadata.create_all(bind=engine)
+    yield engine
+    # Drop all tables after all tests complete
+    Base.metadata.drop_all(bind=engine)
+
+
+@pytest.fixture(scope="function")
+def db_session(db_engine):
+    """
+    Provide a test database session for each test.
+
+    Each test gets a fresh transaction that's rolled back after the test.
+    This ensures tests don't interfere with each other.
+
+    Scope='function' means each test gets its own session.
+    """
+    connection = db_engine.connect()
+    transaction = connection.begin()
+    session = TestingSessionLocal(bind=connection)
+
+    yield session
+
+    session.close()
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture
 def sample_user_data():
     """
-    Example fixture providing test user data.
+    Sample user data for testing.
 
     Any test can use this by adding 'sample_user_data' as a parameter.
     Keeps test data consistent across all tests.
     """
     return {
+        "username": "testuser",
         "email": "test@example.com",
-        "password": "testpass123",
-        "name": "Test User",
+        "password": "password123",
+        "dob": "2000-01-01",
+        "disease": ["lupus"],
+        "weight": 150.0,
     }
+
+
+@pytest.fixture
+def authenticated_user(db_session, sample_user_data):
+    """
+    Create and return an authenticated user with token.
+
+    Useful for tests that need a logged-in user.
+    Returns dict with user and access_token.
+    """
+    from schemas.user import UserCreate
+    from services.auth_service import AuthService
+
+    service = AuthService()
+
+    user_create = UserCreate(**sample_user_data)
+    user = service.register_user(db_session, user_create)
+
+    token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
+
+    return {"user": user, "token": token_data["access_token"], "username": user.username}
