@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from scalar_fastapi import get_scalar_api_reference
 
+from middleware.logging_middleware import LoggingMiddleware
 from routers import auth
 from routers.food_router import router as food_router
 
@@ -16,6 +17,9 @@ app = FastAPI(
     description="Backend API for Remetra 😛",
     version="0.1.0",
 )
+
+app.add_middleware(LoggingMiddleware)
+
 
 
 app.add_middleware(
