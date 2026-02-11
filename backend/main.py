@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from scalar_fastapi import get_scalar_api_reference
 
 from routers import auth
+from routers.food_router import router as food_router
 
 app = FastAPI(
     title="Remetra API",
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(food_router)
 
 
 @app.get("/scalar", include_in_schema=False)

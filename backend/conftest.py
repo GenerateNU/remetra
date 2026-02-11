@@ -107,3 +107,32 @@ def authenticated_user(db_session, sample_user_data):
     token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
 
     return {"user": user, "token": token_data["access_token"], "username": user.username}
+
+
+@pytest.fixture
+def sample_food_data():
+    """
+    Sample food data for testing.
+
+    Any test can use this by adding 'sample_food_data' as a parameter.
+    """
+    return {
+        "name": "test pizza",
+        "ingredients": list(["flour", "cheese", "tomato"]),
+        "username": "test user",
+    }
+
+
+@pytest.fixture
+def multiple_foods_data():
+    """ "
+    Sample data for multiple food items.
+
+    Any test can use this by adding 'multiple_foods_data' as a parameter.
+    """
+
+    return [
+        {"name": "test pizza", "ingredients": ["flour", "cheese", "tomato"], "username": "test user"},
+        {"name": "test salad", "ingredients": ["lettuce", "tomato", "cucumber"], "username": "test user"},
+        {"name": "test sandwich", "ingredients": ["bread", "ham", "cheese"], "username": "test user"},
+    ]
