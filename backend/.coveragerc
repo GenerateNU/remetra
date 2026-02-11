@@ -1,0 +1,19 @@
+[run]
+source = .
+omit = 
+    tests/*
+    examples/*
+    .venv/*
+    conftest.py
+    __pycache__/*
+    */__pycache__/*
+    routers/*
+    repositories/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:

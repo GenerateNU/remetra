@@ -303,3 +303,118 @@ Before opening a PR:
 - [ ] New hooks have success + error tests
 - [ ] Interactive components have user event tests
 - [ ] Mocks are minimal and documented
+
+## Test Types
+
+**Integration Tests** (`tests/integration/`)
+- Test the full stack: router → service → repository → database
+- Use real PostgreSQL test database (no mocks)
+- Catch SQL errors, constraint violations, real-world bugs
+- Each test gets fresh transaction (auto-rolled back after test)
+
+**Unit Tests** (`tests/`)
+- Test pure utility functions (password hashing, JWT generation)
+- No database needed, very fast
+- Keep these minimal - only for standalone utilities
+
+**Write integration tests.** They give you the most confidence!
+
+## Test Database Setup
+
+We use a real PostgreSQL database (not mocks) for integration tests.
+
+**Starting the test database:**
+```bash
+docker compose up -d test-db
+```
+
+**Connection:**
+- Inside Docker: `postgresql://test_user:test_password@test-db:5432/test_remetra`
+- From local: `postgresql://test_user:test_password@localhost:5433/test_remetra`
+
+**How it works:**
+1. `conftest.py` creates all tables at start of test session
+2. Each test gets a fresh database transaction
+3. Transaction is rolled back after each test (clean slate)
+4. Tables are dropped after all tests complete
+
+**You don't need to manually reset data - it's automatic.**
+
+## Creating Test Fixtures
+
+Fixtures are defined in `conftest.py` and available to all tests automatically.
+
+**Example - Sample data fixture:**
+```python
+@pytest.fixture
+def sample_user_data():
+    """Reusable test user data."""
+    return {
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "password123",
+        "disease": ["lupus"],
+        "weight": 150.0
+    }
+```
+
+**Example - Database session fixture:**
+```python
+@pytest.fixture(scope="function")
+def db_session(db_engine):
+    """Fresh database session for each test."""
+    connection = db_engine.connect()
+    transaction = connection.begin()
+    session = TestingSessionLocal(bind=connection)
+    
+    yield session
+    
+    session.close()
+    transaction.rollback()  # Automatic cleanup
+    connection.close()
+```
+
+**Using fixtures in tests:**
+```python
+def test_create_user(db_session, sample_user_data):
+    # db_session and sample_user_data are injected automatically
+    repo = UserRepository()
+    user = repo.create(db_session, **sample_user_data)
+    assert user.username == sample_user_data["username"]
+```
+
+**Fixture scopes:**
+- `scope="function"` (default): New fixture for each test
+- `scope="session"`: One fixture for entire test run
+
+## Running Tests
+
+**All tests:**
+```bash
+just test
+```
+
+**Integration tests only:**
+```bash
+docker compose run --rm backend pytest tests/integration/
+```
+
+**Unit tests only:**
+```bash
+docker compose run --rm backend pytest tests/test_*.py
+```
+
+**Single test file:**
+```bash
+docker compose run --rm backend pytest tests/integration/test_auth_integration.py
+```
+
+**Single test by name:**
+```bash
+docker compose run --rm backend pytest -k test_register_user_success
+```
+
+**With coverage:**
+```bash
+docker compose run --rm backend pytest --cov=services --cov-report=term-missing
+```

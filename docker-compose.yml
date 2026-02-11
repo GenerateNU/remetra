@@ -10,3 +10,21 @@ services:
       - /app/.venv
     environment:
       - ENVIRONMENT=development
+    env_file:
+      - path: .env
+        required: false
+
+
+  test-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: test_remetra
+    ports:
+      - "5433:5432"
+    volumes:
+      - test_db_data:/var/lib/postgresql/data
+
+volumes:
+  test_db_data:
