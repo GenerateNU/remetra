@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import { useAuthStore } from '../store/useAuthStore'
 
 // Use EXPO_PUBLIC_API_URL when provided (set in README-DEV / .env for dev);
 // fallback to localhost so the app talks to the locally running FastAPI server.
@@ -10,12 +11,13 @@ export const apiClient: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// --- Auth token handling (temporary hard-coded token for acceptance criteria) ---
-// In future this will be read from secure storage and managed by auth state.
-let authToken: string = 'HARDCODED_JWT'; // hard-code JWT for now
+// const authToken = useAuthStore.getState().accessToken;
+// const authToken = useAuthStore.login().getState();
+// console.log(authToken);
 
 // Request interceptor — attaches Bearer token when available
 apiClient.interceptors.request.use((config) => {
+  const authToken = useAuthStore.getState().accessToken;
   if (authToken) {
     config.headers = config.headers ?? {};
     config.headers['Authorization'] = `Bearer ${authToken}`;
