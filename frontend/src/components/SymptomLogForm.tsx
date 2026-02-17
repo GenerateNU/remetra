@@ -1,6 +1,5 @@
 import { SymptomLogEntry, SymptomItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
-import { Chips } from "./GenericChipComponent";
 
 import { useState } from "react";
 import  DateTimePicker from '@react-native-community/datetimepicker'
@@ -120,7 +119,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
                 onPress={handleSwitchToCustom}
               >
                 <Text className="text-blue-500 font-medium text-base">
-                  + Add "{searchQuery}" as custom symptom
+                  + Add &lsquo;{searchQuery}&rsquo; as custom symptom
                 </Text>
               </TouchableOpacity>
             )}
@@ -220,18 +219,16 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
             <Text>{timestamp.toLocaleTimeString()}</Text>
           </TouchableOpacity>
 
-          {/* 
-            {showDatePicker && (
-              <DateTimePicker
-                value={timestamp}
-                mode="time"
-                onChange={(_, date) => {
-                  setShowDatePicker(false);
-                  if (date) setTimestamp(date);
-                }}
-              />
-            )} 
-          */}
+          {showDatePicker && (
+            <DateTimePicker
+              value={timestamp}
+              mode="time"
+              onChange={(_, date) => {
+                setShowDatePicker(false);
+                if (date) setTimestamp(date);
+              }}
+            />
+          )} 
 
           {!showDuration ? (
             <TouchableOpacity onPress={() => setShowDuration(true)}>
