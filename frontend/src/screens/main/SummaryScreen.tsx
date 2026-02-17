@@ -17,7 +17,6 @@ export function SummaryScreen() {
           visible={showModal}
           onClose={() => setShowModal(false)}
           onLogEntry={(entry) => {
-            console.log('logged: ', entry)
             // persist the entry?
           }}
       />

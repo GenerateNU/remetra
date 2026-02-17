@@ -3,6 +3,7 @@ import { Modal, ScrollView, View, TouchableOpacity, Text } from "react-native";
 import { useState } from "react";
 
 import { LogEntry, ModalStep } from "../types/logs";
+import { FoodLogForm } from "./FoodLogForm";
 
 interface LogEntryModalProps {
   visible: boolean;
@@ -84,11 +85,14 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({
             )}
 
             {step === "food" && (
-              <Text>Food log</Text>
+              <FoodLogForm
+                onSubmit={handleSubmit}
+                onBack={() => setStep("select_type")}
+              />
             )}
 
             {step === "symptom" && (
-              <Text>Symptom log</Text>
+              <Text>Symptom Log</Text>
             )}
           </ScrollView>
         </View>
