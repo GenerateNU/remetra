@@ -8,7 +8,7 @@ interface BankStore {
   fetchFoods: () => Promise<void>;
   fetchSymptoms: () => Promise<void>;
   addCustomFood: (name: string, ingredients: string[]) => string;
-  addCustomSymptom: (symptom: SymptomItem) => void;
+  addCustomSymptom: (name: string, location: string, sensation: string) => string;
 }
 
 export const useBankStore = create<BankStore>((set) => ({
@@ -35,6 +35,14 @@ export const useBankStore = create<BankStore>((set) => ({
     return food.id
   },
 
-  addCustomSymptom: (symptom) =>
-    set((state) => ({ symptoms: [...state.symptoms, symptom] })),
+  addCustomSymptom: (name: string, location: string, sensation: string) => {
+    const symptom = {
+      name,
+      location,
+      sensation,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    };
+    set((state) => ({ symptoms: [...state.symptoms, symptom] }));
+    return symptom.id;
+  },
 }));

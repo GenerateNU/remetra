@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { LogEntry, ModalStep } from "../types/logs";
 import { FoodLogForm } from "./FoodLogForm";
+import { SymptomLogForm } from "./SymptomLogForm";
 
 interface LogEntryModalProps {
   visible: boolean;
@@ -92,7 +93,10 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({
             )}
 
             {step === "symptom" && (
-              <Text>Symptom Log</Text>
+              <SymptomLogForm
+                onSubmit={handleSubmit}
+                onBack={() => setStep("select_type")}
+              />
             )}
           </ScrollView>
         </View>
