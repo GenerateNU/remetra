@@ -33,5 +33,5 @@ export interface SymptomLogEntry {
 
 export type LogEntry = FoodLogEntry | SymptomLogEntry;
 
-type LogType = "food" | "symptom";
-type ModalStep = "select_type" | "food" | "symptom";
+export type LogType = "food" | "symptom";
+export type ModalStep = "select_type" | "food" | "symptom";
