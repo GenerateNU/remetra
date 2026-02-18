@@ -12,6 +12,8 @@ import { SymptomFoodBankScreen } from '../screens/onboarding/SymptomFoodBankScre
 
 export type RootStackParamList = {
   Landing: undefined;
+  Login: undefined;
+  Signup: undefined;
   UserGoals: undefined
   SymptomFoodBank: undefined
   Summary: undefined

@@ -54,7 +54,7 @@ class FoodRepository:
             db.rollback()
             raise e
 
-    def delete_food_by_id(self, db: Session, food_id: UUID) -> Optional[Food] :
+    def delete_food_by_id(self, db: Session, food_id: UUID) -> Optional[Food]:
         """
         Delete a food product from the database by its ID.
 
