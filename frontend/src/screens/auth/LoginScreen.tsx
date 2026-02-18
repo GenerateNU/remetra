@@ -9,6 +9,7 @@ import { authService, AuthError } from '../../api/auth_service';
 export function LoginScreen() {
   const navigation = useAppNavigation();
 
+  // start value is nothing, username is updated by setUsername(name)
   const[username, setUsername] = useState('')
   const[password, setPassword] = useState('')
   // holds error messages for each field
@@ -34,7 +35,10 @@ export function LoginScreen() {
 
   // calls when user presses login
   const handleLogin = async () => {
+
+    // validate inputs (try: waits for api to respond, if it fails -> it catches error)
     if (!validate()) return;
+    // if validate fx doesnt pass, returns nothing + stops 
     setLoading(true);
     try {
       //await authService.login({ username, password });
@@ -115,7 +119,7 @@ export function LoginScreen() {
         {/* buttons */}
         <View className="w-full items-center mt-10">
           <Pressable
-            onPress={handleLogin}disabled={loading}
+            onPress={handleLogin} disabled={loading}
             className="border-2 border-white rounded-none py-2.5 px-[60px] mb-4"
           >
              {/* show spinner while waiting for API, otherwise show button text */}
