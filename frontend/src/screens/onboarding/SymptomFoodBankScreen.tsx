@@ -1,23 +1,31 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
 import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { ItemBank } from '../../components/ItemBank';
+import { AddSymptomModal } from '../../components/AddSymptomModal';
+import { AddFoodModal } from '../../components/AddFoodModal';
+
 
 interface Symptom {
   name: string;
+  location: string;
+  sensation: string;
 }
 
 interface Food {
   name: string;
+  ingredients: string;
 }
 
 export function SymptomFoodBankScreen() {
   const navigation = useAppNavigation();
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [foods, setFoods] = useState<Food[]>([]);
+  const [showSymptomModal, setShowSymptomModal] = useState(false);
+  const [showFoodModal, setShowFoodModal] = useState(false);
 
   const [fontsLoaded] = useFonts({
     PTSerif_400Regular,
@@ -60,8 +68,15 @@ export function SymptomFoodBankScreen() {
           items={symptoms}
           emptyMessage="No symptoms added yet"
           onRemove={removeSymptom}
-          onAdd={() => {
-            // TODO: Open add symptom popup component
+          onAdd={() => setShowSymptomModal(true)}
+        />
+
+        <AddSymptomModal
+          visible={showSymptomModal}
+          onClose={() => setShowSymptomModal(false)}
+          onAdd={(symptom: Symptom) => {
+            setSymptoms([...symptoms, symptom]);
+            setShowSymptomModal(false);
           }}
         />
 
@@ -72,8 +87,15 @@ export function SymptomFoodBankScreen() {
           items={foods}
           emptyMessage="No foods added yet"
           onRemove={removeFood}
-          onAdd={() => {
-            // TODO: Open add food popup component
+          onAdd={() => setShowFoodModal(true)}
+        />
+
+        <AddFoodModal
+          visible={showFoodModal}
+          onClose={() => setShowFoodModal(false)}
+          onAdd={(food: Food) => {
+            setFoods([...foods, food]);
+            setShowFoodModal(false);
           }}
         />
 
