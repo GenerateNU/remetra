@@ -1,15 +1,17 @@
 
 import { View, Button, StyleSheet } from 'react-native';
-import { useAppNavigation } from '../../navigation/hooks';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+import { useAuthStore } from '../../store/useAuthStore';
+
 
 export function SymptomFoodBankScreen() {
-  const navigation = useAppNavigation();
+  const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
+
 
   return (
     <View style={styles.container}>
       <BackgroundGradient />
-      <Button title='To Summary (Main)' onPress={() => {navigation.navigate("Summary");}} />
+      <Button title='To Summary (Main)' onPress={completeOnboarding} />
     </View>
   );
 }
