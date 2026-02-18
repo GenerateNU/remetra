@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Button, Text, SafeAreaView } from 'react-native';
+import { View, Button, Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -13,10 +13,10 @@ const OnboardingPlaceholder = () => {
   const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
 
   return (
-    <SafeAreaView>
+    <View>
       <Text>Onboarding Placeholder</Text>
       <Button title="Complete Onboarding" onPress={completeOnboarding} />  
-    </SafeAreaView>
+    </View>
   );
 };
  

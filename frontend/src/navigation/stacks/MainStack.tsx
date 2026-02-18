@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Button, Text, SafeAreaView } from 'react-native';
+import { View, Button, Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -13,13 +13,13 @@ const MainPlaceholder = () => {
   const logout = useAuthStore((s) => s.logout);
 
   return (
-    <SafeAreaView>
+    <View>
       <Text>Main Placeholder</Text>
       <Button title="Log Out" onPress={logout} />
-    </SafeAreaView>
+    </View>
   );
 };
-
+ 
 export const MainStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }}>
     <Stack.Screen name="MainPlaceholder" component={MainPlaceholder} />
