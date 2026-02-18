@@ -40,7 +40,7 @@ export function LandingScreen() {
         <View className="w-full items-center mt-[150px]">
           <Pressable 
             className="border-2 border-white rounded-none py-2.5 px-[60px] mb-4"
-            onPress={() => navigation.navigate("UserGoals")}
+          //  onPress={() => navigation.navigate("UserGoals")}
           >
             <Text className="text-white text-2xl font-medium">
               Log in
@@ -51,7 +51,7 @@ export function LandingScreen() {
             <Text className="text-white text-lg">
               New user?{' '}
             </Text>
-            <Pressable onPress={() => navigation.navigate("UserGoals")}>
+            <Pressable>
               <Text className="text-white text-xl font-semibold">
                 Sign up
               </Text>
