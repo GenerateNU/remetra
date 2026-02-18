@@ -9,7 +9,7 @@ import { authService, AuthError } from '../../api/auth_service';
 
 export function SignupScreen() {
     const navigation = useAppNavigation();
-  
+    // start value is nothing, username is updated by setUsername(name)
     const[username, setUsername] = useState('')
     const[password, setPassword] = useState('')
     const [email, setEmail] = useState('');
@@ -24,6 +24,7 @@ export function SignupScreen() {
   
     if (!fontsLoaded) return null;
   
+    // checks if inputd are valid before calling API 
     const validate = (): boolean => {
       const newErrors: typeof errors = {};
       if (!username.trim()) newErrors.username = 'Username is required';
@@ -36,7 +37,10 @@ export function SignupScreen() {
       return Object.keys(newErrors).length === 0;
     };
   
+    // calls when user presses signup
     const handleSignup = async() => {
+
+      // validate inputs (try: waits for api to respond, if it fails -> it catches error)
       if (!validate()) return;
       setLoading(true); 
       try {
@@ -80,6 +84,8 @@ export function SignupScreen() {
 
           <View className="w-full px-4">
 
+          {/* username field */}
+
           <TextInput
             placeholder="Username"
             placeholderTextColor="#E5E5E5"
@@ -88,9 +94,13 @@ export function SignupScreen() {
             autoCapitalize="none"
             className="border-b border-white text-white py-3 mb-1"
           />
+          {/* if username field is error, then box turns red*/}
+
           {errors.username && (
             <Text className="text-red-400 mb-2">{errors.username}</Text>
           )}
+
+          {/* email field */}
 
           <TextInput
             placeholder="Email"
@@ -101,9 +111,12 @@ export function SignupScreen() {
             autoCapitalize="none"
             className="border-b border-white text-white py-3 mb-6"
           />
+          {/* if username field is error, then box turns red*/}
           {errors.email && (
             <Text className="text-red-400 mb-2">{errors.email}</Text>
           )}
+
+          {/* password field */}
 
           <TextInput
           placeholder="Password"
@@ -119,7 +132,8 @@ export function SignupScreen() {
         )}
 
           </View>
-  
+          
+          {/* buttons */}
           <View className="w-full items-center mt-10">
             <Pressable
               onPress={handleSignup}
