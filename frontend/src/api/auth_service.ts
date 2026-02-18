@@ -2,7 +2,7 @@ import { apiClient } from './client';
 
 export interface RegisterPayload {
   username: string;
-  // email: string;
+  email: string;
   password: string;
 }
 
