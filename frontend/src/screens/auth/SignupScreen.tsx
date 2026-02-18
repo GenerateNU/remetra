@@ -1,4 +1,5 @@
 import { View, Text, Pressable, TextInput } from 'react-native';
+import { useState } from 'react';
 import { useFonts } from 'expo-font';
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
@@ -9,15 +10,47 @@ import { authService, AuthError } from '../../api/auth_service';
 export function SignupScreen() {
     const navigation = useAppNavigation();
   
+    const[username, setUsername] = useState('')
+    const[password, setPassword] = useState('')
+    // holds error messages for each field
+    const[errors, setErrors] = useState<{ username?: string; password?: string; general?: string }>({});
+    const [loading, setLoading] = useState(false);
+
     const [fontsLoaded] = useFonts({
       PTSerif_400Regular,
     });
   
     if (!fontsLoaded) return null;
   
-    const handleSignup = () => {
-      navigation.navigate('UserGoals');
+    const validate = (): boolean => {
+      const newErrors: typeof errors = {};
+      if (!username.trim()) newErrors.username = 'Username is required';
+      if (!password) newErrors.password = 'Password is required';
+      else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
     };
+  
+    const handleSignup = async() => {
+      if (!validate()) return;
+      setLoading(true); 
+      try {
+        await authService.register({username, password});
+        navigation.navigate('UserGoals');
+    } catch (err) {
+      if (err instanceof AuthError) {
+        if (err.message.includes('already exists')) { 
+          setErrors({ username: 'Username already taken' });
+        } else {
+          setErrors({ general: err.message });
+        }
+      } else {
+        setErrors({ general: 'Something went wrong. Please try again.' }); 
+      }
+    } finally {
+      setLoading(false); 
+    }
+  };
   
     return (
       <View className="flex-1">
