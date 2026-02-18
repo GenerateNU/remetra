@@ -12,8 +12,10 @@ export function SignupScreen() {
   
     const[username, setUsername] = useState('')
     const[password, setPassword] = useState('')
+    const [email, setEmail] = useState('');
+
     // holds error messages for each field
-    const[errors, setErrors] = useState<{ username?: string; password?: string; general?: string }>({});
+    const[errors, setErrors] = useState<{ username?: string; email?: string; password?: string; general?: string }>({});
     const [loading, setLoading] = useState(false);
 
     const [fontsLoaded] = useFonts({
@@ -25,6 +27,9 @@ export function SignupScreen() {
     const validate = (): boolean => {
       const newErrors: typeof errors = {};
       if (!username.trim()) newErrors.username = 'Username is required';
+      if (!email.trim()) {newErrors.email = 'Email is required';} 
+      else if (!/\S+@\S+\.\S+/.test(email)) {newErrors.email = 'Enter a valid email';}
+
       if (!password) newErrors.password = 'Password is required';
       else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
       setErrors(newErrors);
@@ -35,7 +40,7 @@ export function SignupScreen() {
       if (!validate()) return;
       setLoading(true); 
       try {
-        await authService.register({username, password});
+        await authService.register({username, email, password});
         navigation.navigate('UserGoals');
     } catch (err) {
       if (err instanceof AuthError) {
@@ -72,20 +77,47 @@ export function SignupScreen() {
               </Text>
             </View>
           </View>
-  
+
           <View className="w-full px-4">
-            <TextInput
-              placeholder="Username"
-              placeholderTextColor="#E5E5E5"
-              className="border-b border-white text-white py-3 mb-6"
-            />
-  
-            <TextInput
-              placeholder="Password"
-              placeholderTextColor="#E5E5E5"
-              secureTextEntry
-              className="border-b border-white text-white py-3 mb-6"
-            />
+
+          <TextInput
+            placeholder="Username"
+            placeholderTextColor="#E5E5E5"
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+            className="border-b border-white text-white py-3 mb-1"
+          />
+          {errors.username && (
+            <Text className="text-red-400 mb-2">{errors.username}</Text>
+          )}
+
+          <TextInput
+            placeholder="Email"
+            placeholderTextColor="#E5E5E5"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            className="border-b border-white text-white py-3 mb-6"
+          />
+          {errors.email && (
+            <Text className="text-red-400 mb-2">{errors.email}</Text>
+          )}
+
+          <TextInput
+          placeholder="Password"
+          placeholderTextColor="#E5E5E5"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          autoCapitalize="none"
+          className="border-b border-white text-white py-3 mb-1"
+        />
+        {errors.password && (
+          <Text className="text-red-400 mb-2">{errors.password}</Text>
+        )}
+
           </View>
   
           <View className="w-full items-center mt-10">
