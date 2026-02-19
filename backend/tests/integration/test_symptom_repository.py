@@ -8,7 +8,7 @@ from schemas.symptom import SymptomCreate
 class TestSymptomRepository:
     """integration tests for SymptomRepository."""
 
-    def test_create_symptom(self, db_session, sample_symptom_data):
+    def test_create_symptom(self, db_session, authenticated_user, sample_symptom_data):
         """Test creating a symptom product in the database."""
         # arrange
         repo = SymptomRepository()
@@ -20,7 +20,7 @@ class TestSymptomRepository:
         assert result.location == sample_symptom_data["location"]
         assert result.sensation == sample_symptom_data["sensation"]
 
-    def test_get_symptom_by_id(self, db_session, sample_symptom_data):
+    def test_get_symptom_by_id(self, db_session, authenticated_user, sample_symptom_data):
         """Test retrieving a symptom product by ID."""
         repo = SymptomRepository()
         symptom = SymptomCreate(**sample_symptom_data)
@@ -31,7 +31,7 @@ class TestSymptomRepository:
         assert result.id is not None
         assert result.name == sample_symptom_data["name"]
 
-    def test_get_all_symptoms(self, db_session, multiple_symptoms_data):
+    def test_get_all_symptoms(self, db_session, authenticated_user, multiple_symptoms_data):
         """Test retrieving all symptom products."""
         repo = SymptomRepository()
         for symptom_data in multiple_symptoms_data:
@@ -42,11 +42,11 @@ class TestSymptomRepository:
 
         assert len(result) == 3
         names = [symptom.name for symptom in result]
-        assert "test headache" in names
-        assert "test itchyelbow" in names
-        assert "test lala" in names
+        assert "headache" in names
+        assert "itchyelbow" in names
+        assert "lala" in names
 
-    def test_delete_symptom_by_id(self, db_session, sample_symptom_data):
+    def test_delete_symptom_by_id(self, db_session, authenticated_user, sample_symptom_data):
         """Test deleting a symptom product by ID."""
         repo = SymptomRepository()
         symptom = SymptomCreate(**sample_symptom_data)
@@ -60,7 +60,7 @@ class TestSymptomRepository:
         result = repo.get_symptom_by_id(db_session, result.id)
         assert result is None
 
-    def test_update_symptom_by_id(self, db_session, sample_symptom_data):
+    def test_update_symptom_by_id(self, db_session, authenticated_user, sample_symptom_data):
         """Test updating a symptom product by ID."""
         repo = SymptomRepository()
         symptom = SymptomCreate(**sample_symptom_data)
@@ -71,7 +71,7 @@ class TestSymptomRepository:
             "location": "cheeks",
             "sensation": "burning",
         }
-        updated_symptom = repo.update_symptom_by_id(db_session, result.id, SymptomCreate(**updated_data))
+        updated_symptom = repo.update_symptom_by_id(db_session, result.id, updated_data)
         assert updated_symptom is not None
         assert updated_symptom.id == result.id
         assert updated_symptom.name == updated_data["name"]
