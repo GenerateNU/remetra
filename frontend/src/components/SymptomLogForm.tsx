@@ -47,8 +47,8 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     setCustomName(searchQuery);
   };
 
-  const clearError = (field: string) =>
-    setErrors((e) => ({ ...e, [field]: undefined }));
+    const clearError = (field: string) =>
+    setErrors({});
 
   const handleSubmit = () => {
     if (isCustom) {
@@ -194,7 +194,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
               <TouchableOpacity
                 key={val}
                 style={{
-                  width: 32, height: 32, borderRadius: 16,
+                  width: 28, height: 28, borderRadius: 16,
                   alignItems: 'center', justifyContent: 'center',
                   backgroundColor: val <= intensity ? '#eea487' : '#e5e5e5',
                 }}
