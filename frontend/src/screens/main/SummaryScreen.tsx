@@ -1,14 +1,25 @@
 
 import { View, Button, Text } from 'react-native';
+import { useState } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { GenericCorrelationChart } from '../../components/GenericCorrelationChart'
-import { useAppNavigation } from '../../navigation/hooks';
+import LogEntryModal from '../../components/LogEntryModal'
 
 export function SummaryScreen() {
   //const navigation = useAppNavigation();
 
+  const [showModal, setShowModal] = useState(false);
+
   return (
+    
     <View className="flex-1 relative">
+      <LogEntryModal
+          visible={showModal}
+          onClose={() => setShowModal(false)}
+          onLogEntry={(entry) => {
+            // persist the entry?
+          }}
+      />
       <BackgroundGradient />
       
       <View className="flex-1 p-6">
@@ -34,7 +45,9 @@ export function SummaryScreen() {
           <Button 
             color="#ca5e5e" 
             title="+ Add Data" 
-            onPress={() => {}} 
+            onPress={() => (
+              setShowModal(true)
+            )} 
           />
         </View>
       </View>
