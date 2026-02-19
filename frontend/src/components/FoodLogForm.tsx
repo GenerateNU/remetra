@@ -12,7 +12,7 @@ interface FoodLogFormProps {
 }
 
 export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
-  const { foods, addCustomFood } = useBankStore();
+  const { foods, addFood } = useBankStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
@@ -43,7 +43,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
 
   const handleSubmit = () => {
     const foodId = isCustom
-      ? addCustomFood(customName, customIngredients)
+      ? addFood(customName, customIngredients)
       : selectedFood?.id
 
     // this will never occur

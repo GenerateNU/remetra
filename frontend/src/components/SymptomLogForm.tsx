@@ -14,7 +14,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
   onSubmit,
   onBack,
 }) => {
-  const { symptoms, addCustomSymptom } = useBankStore();
+  const { symptoms, addSymptom } = useBankStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSymptom, setSelectedSymptom] = useState<SymptomItem | null>(null);
@@ -67,7 +67,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
     setErrors({});
 
     const symptomId = isCustom
-      ? addCustomSymptom(customName, customLocation, customSensation)
+      ? addSymptom(customName, customLocation, customSensation)
       : selectedSymptom?.id ?? null;
 
     if (!symptomId) {

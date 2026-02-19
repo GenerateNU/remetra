@@ -1,15 +1,16 @@
 import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { useState } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useBankStore } from '../store/bankStore';
 
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onAdd: (symptom: { name: string; location: string; sensation: string }) => void;
 }
 
-export function AddSymptomModal({ visible, onClose, onAdd }: Props) {
+export function AddSymptomModal({ visible, onClose }: Props) {
+  const {symptoms, addSymptom } = useBankStore();
   const [symptomName, setSymptomName] = useState('');
   const [symptomLocation, setSymptomLocation] = useState('');
   const [symptomSensation, setSymptomSensation] = useState('');
@@ -29,7 +30,7 @@ export function AddSymptomModal({ visible, onClose, onAdd }: Props) {
       return;
     }
     setError('');
-    onAdd({ name: symptomName, location: symptomLocation, sensation: symptomSensation });
+    addSymptom(symptomName, symptomLocation, symptomSensation);
     setSymptomName('');
     setSymptomLocation('');
     setSymptomSensation('');

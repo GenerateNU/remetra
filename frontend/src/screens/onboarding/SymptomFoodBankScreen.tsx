@@ -7,23 +7,14 @@ import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { ItemBank } from '../../components/ItemBank';
 import { AddSymptomModal } from '../../components/AddSymptomModal';
 import { AddFoodModal } from '../../components/AddFoodModal';
-
-
-interface Symptom {
-  name: string;
-  location: string;
-  sensation: string;
-}
-
-interface Food {
-  name: string;
-  ingredients: string;
-}
+import { FoodItem, SymptomItem } from '../../types/logs'
+import { useBankStore } from '../../store/bankStore';
 
 export function SymptomFoodBankScreen() {
   const navigation = useAppNavigation();
-  const [symptoms, setSymptoms] = useState<Symptom[]>([]);
-  const [foods, setFoods] = useState<Food[]>([]);
+  const { foods, addFood, symptoms, addSymptom } = useBankStore();
+  // const [symptoms, setSymptoms] = useState<SymptomItem[]>([]);
+  // const [foods, setFoods] = useState<FoodItem[]>([]);
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
 
@@ -36,11 +27,11 @@ export function SymptomFoodBankScreen() {
   }
 
   const removeSymptom = (name: string) => {
-    setSymptoms(symptoms.filter(s => s.name !== name));
+    //setSymptoms(symptoms.filter(s => s.name !== name));
   };
 
   const removeFood = (name: string) => {
-    setFoods(foods.filter(f => f.name !== name));
+    //setFoods(foods.filter(f => f.name !== name));
   };
 
   const handleDone = () => {
@@ -74,10 +65,6 @@ export function SymptomFoodBankScreen() {
         <AddSymptomModal
           visible={showSymptomModal}
           onClose={() => setShowSymptomModal(false)}
-          onAdd={(symptom: Symptom) => {
-            setSymptoms([...symptoms, symptom]);
-            setShowSymptomModal(false);
-          }}
         />
 
         <ItemBank
@@ -93,10 +80,6 @@ export function SymptomFoodBankScreen() {
         <AddFoodModal
           visible={showFoodModal}
           onClose={() => setShowFoodModal(false)}
-          onAdd={(food: Food) => {
-            setFoods([...foods, food]);
-            setShowFoodModal(false);
-          }}
         />
 
         {/* Done Button */}

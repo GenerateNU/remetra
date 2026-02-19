@@ -1,13 +1,14 @@
 import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { useState } from 'react';
+import { useBankStore } from '../store/bankStore';
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onAdd: (food: { name: string; ingredients: string }) => void;
 }
 
-export function AddFoodModal({ visible, onClose, onAdd }: Props) {
+export function AddFoodModal({ visible, onClose }: Props) {
+  const { addFood } = useBankStore();
   const [foodName, setFoodName] = useState('');
   const [foodIngredients, setFoodIngredients] = useState('');
   const [error, setError] = useState('');
@@ -18,7 +19,8 @@ export function AddFoodModal({ visible, onClose, onAdd }: Props) {
       return;
     }
     setError('');
-    onAdd({ name: foodName, ingredients: foodIngredients});
+    // This needs a big change - we are not accepting one string as an ingredient
+    addFood(foodName, [foodIngredients]);
     setFoodName('');
     setFoodIngredients('');
   };

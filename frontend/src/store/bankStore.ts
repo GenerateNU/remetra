@@ -7,8 +7,10 @@ interface BankStore {
   symptoms: SymptomItem[];
   fetchFoods: () => Promise<void>;
   fetchSymptoms: () => Promise<void>;
-  addCustomFood: (name: string, ingredients: string[]) => string;
-  addCustomSymptom: (name: string, location: string, sensation: string) => string;
+  addFood: (name: string, ingredients: string[]) => string;
+  addSymptom: (name: string, location: string, sensation: string) => string;
+  // removeFood: (id: string) => boolean;
+  // removeSymptom: (id: string) => boolean;
 }
 
 export const useBankStore = create<BankStore>((set) => ({
@@ -23,7 +25,7 @@ export const useBankStore = create<BankStore>((set) => ({
     // leave blank for now (replace with api call)
   },
 
-  addCustomFood: (name: string, ingredients: string[]) => {
+  addFood: (name: string, ingredients: string[]) => {
     const food = {
       name: name,
       ingredients: ingredients,
@@ -35,7 +37,7 @@ export const useBankStore = create<BankStore>((set) => ({
     return food.id
   },
 
-  addCustomSymptom: (name: string, location: string, sensation: string) => {
+  addSymptom: (name: string, location: string, sensation: string) => {
     const symptom = {
       name,
       location,
@@ -45,4 +47,11 @@ export const useBankStore = create<BankStore>((set) => ({
     set((state) => ({ symptoms: [...state.symptoms, symptom] }));
     return symptom.id;
   },
+
+  // removeFood: (id: string) => {
+
+  // },
+  // removeSymptom: (id: string) => {
+    
+  // }
 }));
