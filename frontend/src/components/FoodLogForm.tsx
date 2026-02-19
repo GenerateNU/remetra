@@ -103,7 +103,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
                 onPress={handleSwitchToCustom}
               >
                 <Text className="font-medium text-base font-ptserif text-[#eea487]">
-                  + Add '{searchQuery}' as custom food
+                  + Add &apos;{searchQuery}&apos; as custom food
                 </Text>
               </TouchableOpacity>
             )}

@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function AddSymptomModal({ visible, onClose }: Props) {
-  const {symptoms, addSymptom } = useBankStore();
+  const { addSymptom } = useBankStore();
   const [symptomName, setSymptomName] = useState('');
   const [symptomLocation, setSymptomLocation] = useState('');
   const [symptomSensation, setSymptomSensation] = useState('');

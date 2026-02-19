@@ -125,7 +125,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
                 onPress={handleSwitchToCustom}
               >
                 <Text className="font-medium text-base font-ptserif text-[#eea487]">
-                  + Add '{searchQuery}' as custom symptom
+                  + Add &apos;{searchQuery}&apos; as custom symptom
                 </Text>
               </TouchableOpacity>
             )}

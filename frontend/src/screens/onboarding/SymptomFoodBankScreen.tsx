@@ -7,7 +7,6 @@ import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { ItemBank } from '../../components/ItemBank';
 import { AddSymptomModal } from '../../components/AddSymptomModal';
 import { AddFoodModal } from '../../components/AddFoodModal';
-import { FoodItem, SymptomItem } from '../../types/logs'
 import { useBankStore } from '../../store/bankStore';
 
 export function SymptomFoodBankScreen() {
