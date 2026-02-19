@@ -35,9 +35,8 @@ export function UserGoalsScreen() {
     }
   };
 
-  // navigate to the final onboarding screen here, replace name? 
   const handleDone = () => {
-    navigation.navigate('Summary'); 
+    navigation.navigate('SymptomFoodBank');
   };
 
  return (
@@ -66,17 +65,15 @@ export function UserGoalsScreen() {
             {GOAL_OPTIONS.map((goal) => (
               <TouchableOpacity
                 key={goal}
-                className={`py-6 px-6 rounded-xl items-center shadow-md ${
-                  selectedGoals.includes(goal)
-                    ? 'bg-[#B8624F] border-2 border-white'
-                    : 'bg-[#D9806E]'
-                }`}
+                className={`rounded-xl overflow-hidden shadow-md ${selectedGoals.includes(goal) ? 'bg-[#B8624F]' : 'bg-[#D9806E]'}`}
                 onPress={() => toggleGoal(goal)}
                 activeOpacity={0.7}
               >
-                <Text className="text-white text-[16px] font-ptserif font-medium text-center leading-5">
-                  {goal}
-                </Text>
+                <View className="py-6 px-6 items-center">
+                  <Text className="text-white text-[16px] font-ptserif font-medium text-center leading-5">
+                    {goal}
+                  </Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>

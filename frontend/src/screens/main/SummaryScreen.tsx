@@ -1,5 +1,5 @@
 
-import { View, Button, Text } from 'react-native';
+import { View, Button, Text, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { GenericCorrelationChart } from '../../components/GenericCorrelationChart'
@@ -42,13 +42,26 @@ export function SummaryScreen() {
         </View>
         
         <View className="m-[10%]">
-          <Button 
-            color="#ca5e5e" 
-            title="+ Add Data" 
+          <TouchableOpacity
+            style={{
+              paddingVertical: 16,
+              paddingHorizontal: 32,
+              borderRadius: 50,
+              backgroundColor: '#B8624F',
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000',
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+              elevation: 4,
+            }}
             onPress={() => (
               setShowModal(true)
             )} 
-          />
+          >
+            <Text style={{ color: 'white', fontSize: 18, fontFamily: 'PTSerif' }}>+ Add Log</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

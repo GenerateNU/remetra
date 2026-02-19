@@ -29,9 +29,11 @@ class TestFoodService:
 
         # update the info
         new_ingredients = list(["flour", "cheese", "tomato", "pepperoni"])
-        sample_food_update = {"name": sample_food_data["name"], 
-                              "ingredients": list(new_ingredients), 
-                              "username": sample_food_data["username"]}
+        sample_food_update = {
+            "name": sample_food_data["name"],
+            "ingredients": list(new_ingredients),
+            "username": sample_food_data["username"],
+        }
         food_update = FoodCreate(**sample_food_update)
 
         food = service.update_food_by_id(db_session, food_created.id, food_update)

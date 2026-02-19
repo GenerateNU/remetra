@@ -3,7 +3,7 @@ import { useBankStore } from "../store/bankStore";
 import { Chips } from "./GenericChipComponent";
 
 import { useState } from "react";
-import  DateTimePicker from '@react-native-community/datetimepicker'
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 
 interface FoodLogFormProps {
@@ -12,7 +12,7 @@ interface FoodLogFormProps {
 }
 
 export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
-  const { foods, addCustomFood } = useBankStore();
+  const { foods, addFood } = useBankStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
@@ -42,43 +42,36 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
   };
 
   const handleSubmit = () => {
-    const foodId = isCustom
-      ? addCustomFood(customName, customIngredients)
-      : selectedFood?.id
+    const foodId = isCustom ? addFood(customName, customIngredients) : selectedFood?.id;
 
-    // this will never occur
     if (!foodId) {
-      console.error("How the hell did this happen")
+      console.error("How the hell did this happen");
       return;
     }
+
     const entry: FoodLogEntry = {
       type: "food",
       foodId,
       name: isCustom ? customName : selectedFood?.name ?? "",
-      ingredients: isCustom
-        ? customIngredients
-        : selectedFood?.ingredients ?? [],
+      ingredients: isCustom ? customIngredients : selectedFood?.ingredients ?? [],
       servings: parseFloat(servings) || 1,
       timestamp,
     };
-    console.log('New food log: ', entry)
     onSubmit(entry);
   };
 
-  const isValid = isCustom
-    ? customName.trim().length > 0
-    : selectedFood !== null;
+  const isValid = isCustom ? customName.trim().length > 0 : selectedFood !== null;
 
   const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999); 
+  endOfDay.setHours(23, 59, 59, 999);
 
   return (
     <View className="pb-10">
       <TouchableOpacity onPress={onBack}>
-        <Text className="text-base text-blue-500 mb-4">← Back</Text>
+        <Text className="text-base font-ptserif text-[#eea487] mb-4">← Back</Text>
       </TouchableOpacity>
 
-      <Text className="text-2xl font-bold mb-3 text-neutral-900">
+      <Text className="text-2xl font-bold font-ptserif mb-3 text-[#eea487]">
         Log Food
       </Text>
 
@@ -86,7 +79,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
       {!selectedFood && !isCustom && (
         <>
           <TextInput
-            className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
             placeholder="Search foods..."
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -95,12 +88,10 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
             {filtered.map((food) => (
               <TouchableOpacity
                 key={food.id}
-                className="p-3.5 bg-neutral-50 rounded-lg border border-neutral-200"
+                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 14, backgroundColor: '#fafafa' }}
                 onPress={() => handleSelectFood(food)}
               >
-                <Text className="text-base font-medium text-neutral-900">
-                  {food.name}
-                </Text>
+                <Text className="text-base font-medium text-neutral-900">{food.name}</Text>
                 <Text className="text-xs text-neutral-400 mt-0.5">
                   {food.ingredients.join(", ")}
                 </Text>
@@ -108,11 +99,11 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
             ))}
             {searchQuery.trim().length > 0 && (
               <TouchableOpacity
-                className="p-3.5 bg-neutral-50 rounded-lg border border-blue-500 border-dashed"
+                style={{ borderWidth: 1, borderColor: '#eea487', borderStyle: 'dashed', borderRadius: 8, padding: 14, backgroundColor: '#fafafa' }}
                 onPress={handleSwitchToCustom}
               >
-                <Text className="text-blue-500 font-medium text-base">
-                  + Add &lsquo;{searchQuery}&rsquo; as custom food
+                <Text className="font-medium text-base font-ptserif text-[#eea487]">
+                  + Add &apos;{searchQuery}&apos; as custom food
                 </Text>
               </TouchableOpacity>
             )}
@@ -122,18 +113,11 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
 
       {/* Selected food summary */}
       {selectedFood && !isCustom && (
-        <View className="bg-blue-50 p-3.5 rounded-xl border border-blue-500/25 mb-2">
+        <View style={{ backgroundColor: '#fff5f0', borderWidth: 1, borderColor: '#eea487', borderRadius: 12, padding: 14, marginBottom: 8 }}>
           <View className="flex-row justify-between items-center">
-            <Text className="text-lg font-semibold text-neutral-900">
-              {selectedFood.name}
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedFood(null);
-                setSearchQuery("");
-              }}
-            >
-              <Text className="text-blue-500 text-sm font-medium">Change</Text>
+            <Text className="text-lg font-semibold text-neutral-900">{selectedFood.name}</Text>
+            <TouchableOpacity onPress={() => { setSelectedFood(null); setSearchQuery(""); }}>
+              <Text className="text-sm font-medium font-ptserif text-[#eea487]">Change</Text>
             </TouchableOpacity>
           </View>
           <Text className="text-xs text-neutral-400 mt-0.5">
@@ -146,7 +130,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
       {isCustom && (
         <View>
           <TextInput
-            className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
             placeholder="Food name"
             value={customName}
             onChangeText={setCustomName}
@@ -155,17 +139,10 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
             items={customIngredients}
             itemName="Ingredients"
             onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
-            onRemove={(i) =>
-              setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))
-            }
+            onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
           />
-          <TouchableOpacity
-            onPress={() => {
-              setIsCustom(false);
-              setSearchQuery("");
-            }}
-          >
-            <Text className="text-blue-500 text-sm font-medium mt-2">
+          <TouchableOpacity onPress={() => { setIsCustom(false); setSearchQuery(""); }}>
+            <Text className="text-sm font-medium font-ptserif text-[#eea487] mt-2">
               Search bank instead
             </Text>
           </TouchableOpacity>
@@ -175,26 +152,27 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
       {/* Servings + Timestamp */}
       {(selectedFood || isCustom) && (
         <>
-          <Text className="text-sm font-semibold text-neutral-600 mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
             Servings
           </Text>
           <TextInput
-            className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
             keyboardType="numeric"
             value={servings}
             onChangeText={setServings}
             placeholder="1"
           />
 
-          <Text className="text-sm font-semibold text-neutral-600 mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
             Time
           </Text>
           <TouchableOpacity
-            className="border border-neutral-300 rounded-lg p-3 bg-neutral-50 mb-2"
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, backgroundColor: '#fafafa', marginBottom: 8 }}
             onPress={() => setShowDatePicker(true)}
           >
             <Text>
-              {timestamp.toLocaleDateString()} {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              {timestamp.toLocaleDateString()}{" "}
+              {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </Text>
           </TouchableOpacity>
 
@@ -212,13 +190,19 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
           )}
 
           <TouchableOpacity
-            className={`bg-blue-500 py-4 rounded-xl items-center mt-6 ${
-              !isValid ? "opacity-40" : ""
-            }`}
+            style={{
+              borderWidth: 1,
+              borderColor: '#ccc',
+              borderRadius: 25,
+              paddingVertical: 14,
+              alignItems: 'center',
+              marginTop: 24,
+              opacity: isValid ? 1 : 0.4,
+            }}
             onPress={handleSubmit}
             disabled={!isValid}
           >
-            <Text className="text-white text-lg font-semibold">Log Food</Text>
+            <Text className="text-lg font-ptserif text-[#eea487]">Log Food</Text>
           </TouchableOpacity>
         </>
       )}
