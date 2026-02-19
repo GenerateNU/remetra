@@ -41,7 +41,7 @@ export function LoginScreen() {
     // if validate fx doesnt pass, returns nothing + stops 
     setLoading(true);
     try {
-      await authService.login({ username, password });
+      //await authService.login({ username, password });
       navigation.navigate('UserGoals');
     } catch (err) {
       if (err instanceof AuthError) {
@@ -81,11 +81,17 @@ export function LoginScreen() {
         <View className="w-full px-4">
           <TextInput
             placeholder="Username"
-            placeholderTextColor="#E5E5E5"
+            placeholderTextColor="#B8624F"
             autoCapitalize="none"
             value={username}
             onChangeText={setUsername}
-            className={`border-b py-3 mb-1 text-white ${errors.username ? 'border-red-400' : 'border-white'}`}
+            className={`border-b py-3 mb-2 pl-2 text-white ${errors.username ? 'border-red-400' : 'border-white'}`}
+            // Manually insert custom colors with style (we should update this to use nativewind in future)
+            style={{
+              borderColor: '#B8624F',
+              borderWidth: 1,
+              color: '#B8624F',
+            }}
           />
          {/* show username error if it exists */}
           {errors.username && <Text className="text-red-400 text-sm mb-4">{errors.username}</Text>}
@@ -93,12 +99,18 @@ export function LoginScreen() {
          {/* password field — turns red border if there's an error */}
           <TextInput
             placeholder="Password"
-            placeholderTextColor="#E5E5E5"
+            placeholderTextColor="#B8624F"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
             // condition: if there's a error for password, its red, if none, white 
-            className={`border-b py-3 mb-1 text-white ${errors.password ? 'border-red-400' : 'border-white'}`}
+            className={`border-b py-3 mb-2 pl-2 text-white ${errors.password ? 'border-red-400' : 'border-white'}`}
+            // Manually insert custom colors with style (we should update this to use nativewind in future)
+            style={{
+              borderColor: '#B8624F',
+              borderWidth: 1,
+              color: '#B8624F',
+            }}
           />
           {errors.password && <Text className="text-red-400 text-sm mb-4">{errors.password}</Text>}
           {errors.general && <Text className="text-red-400 text-sm mb-4">{errors.general}</Text>}

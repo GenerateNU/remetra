@@ -44,7 +44,7 @@ export function SignupScreen() {
       if (!validate()) return;
       setLoading(true); 
       try {
-        await authService.register({username, email, password});
+        //await authService.register({username, email, password});
         navigation.navigate('UserGoals');
     } catch (err) {
       if (err instanceof AuthError) {
@@ -88,11 +88,16 @@ export function SignupScreen() {
 
           <TextInput
             placeholder="Username"
-            placeholderTextColor="#E5E5E5"
+            placeholderTextColor='#B8624F'
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
-            className="border-b border-white text-white py-3 mb-1"
+            className="border-b border-white text-white py-3 pl-2 mb-2"
+            style={{
+              borderColor: '#B8624F',
+              borderWidth: 1,
+              color: '#B8624F',
+            }}
           />
           {/* if username field is error, then box turns red*/}
 
@@ -104,12 +109,17 @@ export function SignupScreen() {
 
           <TextInput
             placeholder="Email"
-            placeholderTextColor="#E5E5E5"
+            placeholderTextColor='#B8624F'
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            className="border-b border-white text-white py-3 mb-6"
+            className="border-b border-white text-white py-3 pl-2 mb-2"
+            style={{
+              borderColor: '#B8624F',
+              borderWidth: 1,
+              color: '#B8624F',
+            }}
           />
           {/* if username field is error, then box turns red*/}
           {errors.email && (
@@ -120,12 +130,17 @@ export function SignupScreen() {
 
           <TextInput
           placeholder="Password"
-          placeholderTextColor="#E5E5E5"
+          placeholderTextColor='#B8624F'
           secureTextEntry
           value={password}
           onChangeText={setPassword}
           autoCapitalize="none"
-          className="border-b border-white text-white py-3 mb-1"
+          className="border-b border-white text-white py-3 pl-2 mb-2"
+          style={{
+            borderColor: '#B8624F',
+            borderWidth: 1,
+            color: '#B8624F',
+          }}
         />
         {errors.password && (
           <Text className="text-red-400 mb-2">{errors.password}</Text>
