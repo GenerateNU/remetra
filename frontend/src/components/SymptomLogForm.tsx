@@ -17,14 +17,13 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
   const { symptoms, addCustomSymptom } = useBankStore();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSymptom, setSelectedSymptom] = useState<SymptomItem | null>(
-    null
-  );
+  const [selectedSymptom, setSelectedSymptom] = useState<SymptomItem | null>(null);
   const [isCustom, setIsCustom] = useState(false);
 
   const [customName, setCustomName] = useState("");
   const [customLocation, setCustomLocation] = useState("");
   const [customSensation, setCustomSensation] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [intensity, setIntensity] = useState(5);
   const [timestamp, setTimestamp] = useState(new Date());
@@ -51,17 +50,31 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
     setCustomName(searchQuery);
   };
 
+  const clearError = (field: string) =>
+    setErrors({});
+
   const handleSubmit = () => {
+    if (isCustom) {
+      const newErrors: Record<string, string> = {};
+      if (!customLocation.trim()) newErrors.location = "Location is required.";
+      if (!customSensation.trim()) newErrors.sensation = "Sensation is required.";
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return;
+      }
+    }
+
+    setErrors({});
+
     const symptomId = isCustom
       ? addCustomSymptom(customName, customLocation, customSensation)
       : selectedSymptom?.id ?? null;
 
-    // this will never occur
     if (!symptomId) {
-      console.error("How the hell did this happen")
+      console.error("How the hell did this happen");
       return;
     }
-    
+
     const entry: SymptomLogEntry = {
       type: "symptom",
       symptomId,
@@ -70,17 +83,12 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
       sensation: isCustom ? customSensation : selectedSymptom?.sensation ?? "",
       intensity,
       timestamp,
-      durationMinutes: showDuration
-        ? parseFloat(durationMinutes) || null
-        : null,
+      durationMinutes: showDuration ? parseFloat(durationMinutes) || null : null,
     };
-    console.log('New symptom log: ', entry)
     onSubmit(entry);
   };
 
-  const isValid = isCustom
-    ? customName.trim().length > 0
-    : selectedSymptom !== null;
+  const isValid = isCustom ? customName.trim().length > 0 : selectedSymptom !== null;
 
   return (
     <View className="pb-10">
@@ -161,22 +169,42 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
             value={customName}
             onChangeText={setCustomName}
           />
+
           <TextInput
-            className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+            className={`border rounded-lg p-3 text-base bg-neutral-50 mb-0.5 ${
+              errors.location ? "border-red-400" : "border-neutral-300"
+            }`}
             placeholder="Location (e.g., stomach, head)"
             value={customLocation}
-            onChangeText={setCustomLocation}
+            onChangeText={(text) => {
+              setCustomLocation(text);
+              if (errors.location) clearError("location");
+            }}
           />
+          {errors.location && (
+            <Text className="text-red-500 text-xs mb-2">{errors.location}</Text>
+          )}
+
           <TextInput
-            className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+            className={`border rounded-lg p-3 text-base bg-neutral-50 mb-0.5 ${
+              errors.sensation ? "border-red-400" : "border-neutral-300"
+            }`}
             placeholder="Sensation (e.g., burning, throbbing)"
             value={customSensation}
-            onChangeText={setCustomSensation}
+            onChangeText={(text) => {
+              setCustomSensation(text);
+              if (errors.sensation) clearError("sensation");
+            }}
           />
+          {errors.sensation && (
+            <Text className="text-red-500 text-xs mb-2">{errors.sensation}</Text>
+          )}
+
           <TouchableOpacity
             onPress={() => {
               setIsCustom(false);
               setSearchQuery("");
+              setErrors({});
             }}
           >
             <Text className="text-blue-500 text-sm font-medium mt-2">
@@ -220,7 +248,8 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
             onPress={() => setShowDatePicker(true)}
           >
             <Text>
-              {timestamp.toLocaleDateString()} {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              {timestamp.toLocaleDateString()}{" "}
+              {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </Text>
           </TouchableOpacity>
 
@@ -265,9 +294,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
             onPress={handleSubmit}
             disabled={!isValid}
           >
-            <Text className="text-white text-lg font-semibold">
-              Log Symptom
-            </Text>
+            <Text className="text-white text-lg font-semibold">Log Symptom</Text>
           </TouchableOpacity>
         </>
       )}
