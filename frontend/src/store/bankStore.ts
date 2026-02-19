@@ -9,11 +9,11 @@ interface BankStore {
   fetchSymptoms: () => Promise<void>;
   addFood: (name: string, ingredients: string[]) => string;
   addSymptom: (name: string, location: string, sensation: string) => string;
-  // removeFood: (id: string) => boolean;
-  // removeSymptom: (id: string) => boolean;
+  removeFood: (id: string) => boolean;
+  removeSymptom: (id: string) => boolean;
 }
 
-export const useBankStore = create<BankStore>((set) => ({
+export const useBankStore = create<BankStore>((set, get) => ({
   foods: [],
   symptoms: [],
 
@@ -48,10 +48,17 @@ export const useBankStore = create<BankStore>((set) => ({
     return symptom.id;
   },
 
-  // removeFood: (id: string) => {
+  removeFood: (id: string) => {
+    const exists = get().foods.some((f) => f.id === id);
+    if (!exists) return false;
+    set((state) => ({ foods: state.foods.filter((f) => f.id !== id) }));
+    return true;
+  },
 
-  // },
-  // removeSymptom: (id: string) => {
-    
-  // }
+  removeSymptom: (id: string) => {
+    const exists = get().symptoms.some((s) => s.id === id);
+    if (!exists) return false;
+    set((state) => ({ symptoms: state.symptoms.filter((s) => s.id !== id) }));
+    return true;
+  },
 }));

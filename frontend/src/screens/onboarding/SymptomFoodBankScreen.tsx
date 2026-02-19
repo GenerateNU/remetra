@@ -12,9 +12,7 @@ import { useBankStore } from '../../store/bankStore';
 
 export function SymptomFoodBankScreen() {
   const navigation = useAppNavigation();
-  const { foods, addFood, symptoms, addSymptom } = useBankStore();
-  // const [symptoms, setSymptoms] = useState<SymptomItem[]>([]);
-  // const [foods, setFoods] = useState<FoodItem[]>([]);
+  const { foods, symptoms, removeFood, removeSymptom } = useBankStore();
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
 
@@ -25,14 +23,6 @@ export function SymptomFoodBankScreen() {
   if (!fontsLoaded) {
     return null;
   }
-
-  const removeSymptom = (name: string) => {
-    //setSymptoms(symptoms.filter(s => s.name !== name));
-  };
-
-  const removeFood = (name: string) => {
-    //setFoods(foods.filter(f => f.name !== name));
-  };
 
   const handleDone = () => {
     navigation.navigate('Summary');

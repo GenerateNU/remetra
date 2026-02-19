@@ -4,9 +4,9 @@ interface ItemBankProps {
   title: string;
   subtitle: string;
   description: string;
-  items: { name: string }[];
+  items: { name: string, id: string }[];
   emptyMessage: string;
-  onRemove: (name: string) => void;
+  onRemove: (id: string) => void;
   onAdd: () => void;
 }
 
@@ -35,11 +35,11 @@ export function ItemBank({
         <View className="flex-row flex-wrap gap-2">
           {items.map((item) => (
             <View
-              key={item.name}
+              key={item.id}
               className="flex-row items-center bg-white border border-remetra-mauve/30 rounded-full px-3 py-2"
             >
               <TouchableOpacity
-                onPress={() => onRemove(item.name)}
+                onPress={() => onRemove(item.id)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
                 <Text className="text-remetra-rose text-sm mr-2 font-bold">✕</Text>
