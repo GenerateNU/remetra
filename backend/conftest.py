@@ -132,7 +132,38 @@ def multiple_foods_data():
     """
 
     return [
-        {"name": "test pizza", "ingredients": ["flour", "cheese", "tomato"], "username": "test user"},
-        {"name": "test salad", "ingredients": ["lettuce", "tomato", "cucumber"], "username": "test user"},
-        {"name": "test sandwich", "ingredients": ["bread", "ham", "cheese"], "username": "test user"},
+        {"name": "test pizza", "ingredients": ["flour", "cheese", "tomato"], "username": "testuser"},
+        {"name": "test salad", "ingredients": ["lettuce", "tomato", "cucumber"], "username": "testuser"},
+        {"name": "test sandwich", "ingredients": ["bread", "ham", "cheese"], "username": "testuser"},
+    ]
+
+
+@pytest.fixture
+def sample_symptom_data():
+    """
+    Sample symptom data for testing.
+
+    Any test can use this by adding 'sample_symptom_data' as a parameter.
+    """
+
+    return {
+        "name": "headache",
+        "location": "jaw",
+        "sensation": "ache",
+        "username": "testuser",
+    }
+
+
+@pytest.fixture
+def multiple_symptoms_data():
+    """ "
+    Sample data for multiple symptom items.
+
+    Any test can use this by adding 'multiple_symptoms_data' as a parameter.
+    """
+
+    return [
+        {"name": "headache", "location": "jaw", "sensation": "ache", "username": "testuser"},
+        {"name": "itchyelbow", "location": "elbow", "sensation": "itchy", "username": "testuser"},
+        {"name": "lala", "location": "lele", "sensation": "looloo", "username": "testuser"},
     ]
