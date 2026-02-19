@@ -35,9 +35,8 @@ export function UserGoalsScreen() {
     }
   };
 
-  // navigate to the final onboarding screen here, replace name? 
   const handleDone = () => {
-    navigation.navigate('Summary'); 
+    navigation.navigate('SymptomFoodBank');
   };
 
  return (
