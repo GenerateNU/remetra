@@ -25,8 +25,8 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({
   };
 
   const handleClose = () => {
-    setStep("select_type");
     onClose();
+    setTimeout(() => setStep("select_type"), 300);
   };
 
   return (
