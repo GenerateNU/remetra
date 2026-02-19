@@ -36,6 +36,9 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
     sy.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
   const handleSelectSymptom = (symptom: SymptomItem) => {
     setSelectedSymptom(symptom);
     setIsCustom(false);
@@ -216,19 +219,23 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
             className="border border-neutral-300 rounded-lg p-3 bg-neutral-50 mb-2"
             onPress={() => setShowDatePicker(true)}
           >
-            <Text>{timestamp.toLocaleTimeString()}</Text>
+            <Text>
+              {timestamp.toLocaleDateString()} {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </Text>
           </TouchableOpacity>
 
           {showDatePicker && (
             <DateTimePicker
               value={timestamp}
-              mode="time"
+              mode="datetime"
+              display="spinner"
+              maximumDate={endOfDay}
               onChange={(_, date) => {
                 setShowDatePicker(false);
                 if (date) setTimestamp(date);
               }}
             />
-          )} 
+          )}
 
           {!showDuration ? (
             <TouchableOpacity onPress={() => setShowDuration(true)}>

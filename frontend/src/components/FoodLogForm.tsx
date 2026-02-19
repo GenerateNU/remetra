@@ -69,6 +69,9 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
     ? customName.trim().length > 0
     : selectedFood !== null;
 
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999); 
+
   return (
     <View className="pb-10">
       <TouchableOpacity onPress={onBack}>
@@ -190,19 +193,23 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
             className="border border-neutral-300 rounded-lg p-3 bg-neutral-50 mb-2"
             onPress={() => setShowDatePicker(true)}
           >
-            <Text>{timestamp.toLocaleTimeString()}</Text>
+            <Text>
+              {timestamp.toLocaleDateString()} {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </Text>
           </TouchableOpacity>
 
-            {showDatePicker && (
-              <DateTimePicker
-                value={timestamp}
-                mode="time"
-                onChange={(_, date) => {
-                  setShowDatePicker(false);
-                  if (date) setTimestamp(date);
-                }}
-              />
-            )} 
+          {showDatePicker && (
+            <DateTimePicker
+              value={timestamp}
+              mode="datetime"
+              display="spinner"
+              maximumDate={endOfDay}
+              onChange={(_, date) => {
+                setShowDatePicker(false);
+                if (date) setTimestamp(date);
+              }}
+            />
+          )}
 
           <TouchableOpacity
             className={`bg-blue-500 py-4 rounded-xl items-center mt-6 ${
