@@ -1,8 +1,12 @@
-from typing import Optional
-from schemas.symptom import SymptomCreate
-from models.symptom import Symptom
-from sqlalchemy.orm import Session
 import logging
+from typing import Optional
+from uuid import UUID
+
+from sqlalchemy.orm import Session
+
+from models.symptom import Symptom
+from schemas.symptom import SymptomCreate
+
 
 class SymptomRepository:
     """
@@ -44,7 +48,7 @@ class SymptomRepository:
             db.rollback()
             raise e
 
-    def get_symptom_by_id(self, db: Session, symptom_id: int) -> Optional[Symptom]:
+    def get_symptom_by_id(self, db: Session, symptom_id: UUID) -> Optional[Symptom]:
         """
         Retrieve a symptom from the database by its ID.
         """
@@ -65,7 +69,7 @@ class SymptomRepository:
     def update_symptom_by_id(
         self,
         db: Session,
-        symptom_id: int,
+        symptom_id: UUID,
         symptom_data: dict,
     ) -> Optional[Symptom]:
         """
@@ -89,7 +93,7 @@ class SymptomRepository:
     def delete_symptom_by_id(
         self,
         db: Session,
-        symptom_id: int,
+        symptom_id: UUID,
     ) -> Optional[Symptom]:
         """
         Delete a symptom from the database by its ID.
