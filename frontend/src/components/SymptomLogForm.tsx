@@ -2,7 +2,7 @@ import { SymptomLogEntry, SymptomItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
 
 import { useState } from "react";
-import  DateTimePicker from '@react-native-community/datetimepicker'
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 
 interface SymptomLogFormProps {
@@ -10,10 +10,7 @@ interface SymptomLogFormProps {
   onBack: () => void;
 }
 
-export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
-  onSubmit,
-  onBack,
-}) => {
+export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack }) => {
   const { symptoms, addSymptom } = useBankStore();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,7 +48,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
   };
 
   const clearError = (field: string) =>
-    setErrors({});
+    setErrors((e) => ({ ...e, [field]: undefined }));
 
   const handleSubmit = () => {
     if (isCustom) {
@@ -93,10 +90,10 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
   return (
     <View className="pb-10">
       <TouchableOpacity onPress={onBack}>
-        <Text className="text-base text-blue-500 mb-4">← Back</Text>
+        <Text className="text-base font-ptserif text-[#eea487] mb-4">← Back</Text>
       </TouchableOpacity>
 
-      <Text className="text-2xl font-bold mb-3 text-neutral-900">
+      <Text className="text-2xl font-bold font-ptserif mb-3 text-[#eea487]">
         Log Symptom
       </Text>
 
@@ -104,7 +101,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
       {!selectedSymptom && !isCustom && (
         <>
           <TextInput
-            className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
             placeholder="Search symptoms..."
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -113,12 +110,10 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
             {filtered.map((sy) => (
               <TouchableOpacity
                 key={sy.id}
-                className="p-3.5 bg-neutral-50 rounded-lg border border-neutral-200"
+                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 14, backgroundColor: '#fafafa' }}
                 onPress={() => handleSelectSymptom(sy)}
               >
-                <Text className="text-base font-medium text-neutral-900">
-                  {sy.name}
-                </Text>
+                <Text className="text-base font-medium text-neutral-900">{sy.name}</Text>
                 <Text className="text-xs text-neutral-400 mt-0.5">
                   {sy.location} · {sy.sensation}
                 </Text>
@@ -126,11 +121,11 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
             ))}
             {searchQuery.trim().length > 0 && (
               <TouchableOpacity
-                className="p-3.5 bg-neutral-50 rounded-lg border border-blue-500 border-dashed"
+                style={{ borderWidth: 1, borderColor: '#eea487', borderStyle: 'dashed', borderRadius: 8, padding: 14, backgroundColor: '#fafafa' }}
                 onPress={handleSwitchToCustom}
               >
-                <Text className="text-blue-500 font-medium text-base">
-                  + Add &lsquo;{searchQuery}&rsquo; as custom symptom
+                <Text className="font-medium text-base font-ptserif text-[#eea487]">
+                  + Add '{searchQuery}' as custom symptom
                 </Text>
               </TouchableOpacity>
             )}
@@ -140,18 +135,11 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
 
       {/* Selected symptom summary */}
       {selectedSymptom && !isCustom && (
-        <View className="bg-blue-50 p-3.5 rounded-xl border border-blue-500/25 mb-2">
+        <View style={{ backgroundColor: '#fff5f0', borderWidth: 1, borderColor: '#eea487', borderRadius: 12, padding: 14, marginBottom: 8 }}>
           <View className="flex-row justify-between items-center">
-            <Text className="text-lg font-semibold text-neutral-900">
-              {selectedSymptom.name}
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedSymptom(null);
-                setSearchQuery("");
-              }}
-            >
-              <Text className="text-blue-500 text-sm font-medium">Change</Text>
+            <Text className="text-lg font-semibold text-neutral-900">{selectedSymptom.name}</Text>
+            <TouchableOpacity onPress={() => { setSelectedSymptom(null); setSearchQuery(""); }}>
+              <Text className="text-sm font-medium font-ptserif text-[#eea487]">Change</Text>
             </TouchableOpacity>
           </View>
           <Text className="text-xs text-neutral-400 mt-0.5">
@@ -164,50 +152,31 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
       {isCustom && (
         <View>
           <TextInput
-            className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
             placeholder="Symptom name"
             value={customName}
             onChangeText={setCustomName}
           />
-
           <TextInput
-            className={`border rounded-lg p-3 text-base bg-neutral-50 mb-0.5 ${
-              errors.location ? "border-red-400" : "border-neutral-300"
-            }`}
+            style={{ borderWidth: 1, borderColor: errors.location ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 2, backgroundColor: '#fafafa' }}
             placeholder="Location (e.g., stomach, head)"
             value={customLocation}
-            onChangeText={(text) => {
-              setCustomLocation(text);
-              if (errors.location) clearError("location");
-            }}
+            onChangeText={(text) => { setCustomLocation(text); if (errors.location) clearError("location"); }}
           />
           {errors.location && (
             <Text className="text-red-500 text-xs mb-2">{errors.location}</Text>
           )}
-
           <TextInput
-            className={`border rounded-lg p-3 text-base bg-neutral-50 mb-0.5 ${
-              errors.sensation ? "border-red-400" : "border-neutral-300"
-            }`}
+            style={{ borderWidth: 1, borderColor: errors.sensation ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 2, backgroundColor: '#fafafa' }}
             placeholder="Sensation (e.g., burning, throbbing)"
             value={customSensation}
-            onChangeText={(text) => {
-              setCustomSensation(text);
-              if (errors.sensation) clearError("sensation");
-            }}
+            onChangeText={(text) => { setCustomSensation(text); if (errors.sensation) clearError("sensation"); }}
           />
           {errors.sensation && (
             <Text className="text-red-500 text-xs mb-2">{errors.sensation}</Text>
           )}
-
-          <TouchableOpacity
-            onPress={() => {
-              setIsCustom(false);
-              setSearchQuery("");
-              setErrors({});
-            }}
-          >
-            <Text className="text-blue-500 text-sm font-medium mt-2">
+          <TouchableOpacity onPress={() => { setIsCustom(false); setSearchQuery(""); setErrors({}); }}>
+            <Text className="text-sm font-medium font-ptserif text-[#eea487] mt-2">
               Search bank instead
             </Text>
           </TouchableOpacity>
@@ -217,34 +186,32 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
       {/* Intensity + Timestamp + Duration */}
       {(selectedSymptom || isCustom) && (
         <>
-          <Text className="text-sm font-semibold text-neutral-600 mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
             Intensity: {intensity}/10
           </Text>
           <View className="flex-row justify-between gap-1 mb-2">
             {Array.from({ length: 10 }, (_, i) => i + 1).map((val) => (
               <TouchableOpacity
                 key={val}
-                className={`w-8 h-8 rounded-full items-center justify-center ${
-                  val <= intensity ? "bg-blue-500" : "bg-neutral-200"
-                }`}
+                style={{
+                  width: 32, height: 32, borderRadius: 16,
+                  alignItems: 'center', justifyContent: 'center',
+                  backgroundColor: val <= intensity ? '#eea487' : '#e5e5e5',
+                }}
                 onPress={() => setIntensity(val)}
               >
-                <Text
-                  className={`text-xs font-semibold ${
-                    val <= intensity ? "text-white" : "text-neutral-400"
-                  }`}
-                >
+                <Text style={{ fontSize: 12, fontWeight: '600', color: val <= intensity ? 'white' : '#a3a3a3' }}>
                   {val}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <Text className="text-sm font-semibold text-neutral-600 mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
             Time
           </Text>
           <TouchableOpacity
-            className="border border-neutral-300 rounded-lg p-3 bg-neutral-50 mb-2"
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, backgroundColor: '#fafafa', marginBottom: 8 }}
             onPress={() => setShowDatePicker(true)}
           >
             <Text>
@@ -268,17 +235,17 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
 
           {!showDuration ? (
             <TouchableOpacity onPress={() => setShowDuration(true)}>
-              <Text className="text-blue-500 text-sm font-medium mt-2">
+              <Text className="text-sm font-medium font-ptserif text-[#eea487] mt-2">
                 + Add duration
               </Text>
             </TouchableOpacity>
           ) : (
             <View>
-              <Text className="text-sm font-semibold text-neutral-600 mt-4 mb-1.5">
+              <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
                 Duration (minutes)
               </Text>
               <TextInput
-                className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
+                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
                 keyboardType="numeric"
                 value={durationMinutes}
                 onChangeText={setDurationMinutes}
@@ -288,13 +255,15 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({
           )}
 
           <TouchableOpacity
-            className={`bg-blue-500 py-4 rounded-xl items-center mt-6 ${
-              !isValid ? "opacity-40" : ""
-            }`}
+            style={{
+              borderWidth: 1, borderColor: '#ccc', borderRadius: 25,
+              paddingVertical: 14, alignItems: 'center', marginTop: 24,
+              opacity: isValid ? 1 : 0.4,
+            }}
             onPress={handleSubmit}
             disabled={!isValid}
           >
-            <Text className="text-white text-lg font-semibold">Log Symptom</Text>
+            <Text className="text-lg font-ptserif text-[#eea487]">Log Symptom</Text>
           </TouchableOpacity>
         </>
       )}
