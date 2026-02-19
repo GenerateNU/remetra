@@ -30,9 +30,6 @@ export const Chips: React.FC<ChipsProps> = ({
 
   return (
     <View>
-      <Text className="text-sm font-semibold text-neutral-600 mt-4 mb-1.5">
-        {itemName}
-      </Text>
       <View className="flex-row flex-wrap gap-2 mb-2">
         {items.map((item, i) => (
           <View
