@@ -1,9 +1,5 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { LandingScreen } from '../screens/auth/LandingScreen';
-import { SummaryScreen } from '../screens/main/SummaryScreen';
-import { UserGoalsScreen } from '../screens/onboarding/UserGoalsScreen';
-import { SymptomFoodBankScreen } from '../screens/onboarding/SymptomFoodBankScreen';
 import { useAuthStore } from '../store/useAuthStore';
 import { AuthStack } from './stacks/AuthStack';
 import { OnboardingStack } from './stacks/OnboardingStack';
