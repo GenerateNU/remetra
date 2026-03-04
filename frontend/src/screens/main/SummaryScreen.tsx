@@ -4,14 +4,15 @@ import { useState } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { GenericCorrelationChart } from '../../components/GenericCorrelationChart'
 import LogEntryModal from '../../components/LogEntryModal'
+import { useAuthStore } from '../../store/useAuthStore';
 
 export function SummaryScreen() {
   //const navigation = useAppNavigation();
+  const { logout } = useAuthStore()
 
   const [showModal, setShowModal] = useState(false);
 
   return (
-    
     <View className="flex-1 relative">
       <LogEntryModal
           visible={showModal}
@@ -21,12 +22,10 @@ export function SummaryScreen() {
           }}
       />
       <BackgroundGradient />
-      
       <View className="flex-1 p-6">
         <Text className="text-[28px] font-semibold text-center text-[#b2939b] italic">
           YOUR SUMMARY
         </Text>
-        
         <Text className="text-center text-black my-[10%] text-lg">
           {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)}
         </Text>
@@ -61,6 +60,31 @@ export function SummaryScreen() {
             )} 
           >
             <Text style={{ color: 'white', fontSize: 18, fontFamily: 'PTSerif' }}>+ Add Log</Text>
+          </TouchableOpacity>
+        </View>
+        <View className="flex-row justify-between m-[3%] gap-2">
+          <TouchableOpacity
+            className="flex-1 bg-[#ca5e5e] rounded-md py-2 px-1"
+            onPress={logout}
+          >
+            <Text className="text-white text-center text-xs font-semibold">LOGOUT</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="flex-1 bg-[#ca5e5e] rounded-md py-2 px-1"
+            onPress={() => {
+              useAuthStore.setState({ hasCompletedOnboarding: false });
+              logout();
+            }}
+          >
+            <Text className="text-white text-center text-xs font-semibold">LOGOUT + RESET</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="flex-1 bg-[#ca5e5e] rounded-md py-2 px-1"
+            onPress={() => useAuthStore.setState({ hasCompletedOnboarding: false })}
+          >
+            <Text className="text-white text-center text-xs font-semibold">RESET ONBOARD</Text>
           </TouchableOpacity>
         </View>
       </View>

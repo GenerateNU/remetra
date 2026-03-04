@@ -5,10 +5,13 @@ import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { authService, AuthError } from '../../api/auth_service';
+import { useAuthStore } from '../../store/useAuthStore';
 
 
 export function SignupScreen() {
     const navigation = useAppNavigation();
+    const { register } = useAuthStore()
+
     // start value is nothing, username is updated by setUsername(name)
     const[username, setUsername] = useState('')
     const[password, setPassword] = useState('')
@@ -44,8 +47,7 @@ export function SignupScreen() {
       if (!validate()) return;
       setLoading(true); 
       try {
-        //await authService.register({username, email, password});
-        navigation.navigate('UserGoals');
+        await register({username, email, password});
     } catch (err) {
       if (err instanceof AuthError) {
         if (err.message.includes('already exists')) { 

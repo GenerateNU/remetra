@@ -8,9 +8,12 @@ import { ItemBank } from '../../components/ItemBank';
 import { AddSymptomModal } from '../../components/AddSymptomModal';
 import { AddFoodModal } from '../../components/AddFoodModal';
 import { useBankStore } from '../../store/bankStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export function SymptomFoodBankScreen() {
   const navigation = useAppNavigation();
+  const { completeOnboarding } = useAuthStore()
+
   const { foods, symptoms, removeFood, removeSymptom } = useBankStore();
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
@@ -24,7 +27,7 @@ export function SymptomFoodBankScreen() {
   }
 
   const handleDone = () => {
-    navigation.navigate('Summary');
+    completeOnboarding()
   };
 
   return (

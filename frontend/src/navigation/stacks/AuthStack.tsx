@@ -6,8 +6,8 @@ import { LandingScreen } from '../../screens/auth/LandingScreen';
 
 export type AuthStackParamList = {
   Landing: undefined;
-  Signup: undefined; // will do later
-  Login: undefined; // will do later
+  Signup: undefined; 
+  Login: undefined; 
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();

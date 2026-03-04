@@ -4,10 +4,12 @@ import { useFonts } from 'expo-font';
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
-import { authService, AuthError } from '../../api/auth_service';
+import { AuthError } from '../../api/auth_service';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export function LoginScreen() {
   const navigation = useAppNavigation();
+  const { login } = useAuthStore()
 
   // start value is nothing, username is updated by setUsername(name)
   const[username, setUsername] = useState('')
@@ -41,8 +43,7 @@ export function LoginScreen() {
     // if validate fx doesnt pass, returns nothing + stops 
     setLoading(true);
     try {
-      //await authService.login({ username, password });
-      navigation.navigate('UserGoals');
+      await login({ username, password });
     } catch (err) {
       if (err instanceof AuthError) {
         if (err.message.includes('Incorrect')) setErrors({ password: 'Incorrect username or password' });
