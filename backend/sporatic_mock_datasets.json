@@ -1,0 +1,920 @@
+{
+  "celiac_simple": {
+    "description": "Simple 1:1 — gluten triggers GI symptoms within hours. 14 days, 3-7 foods/day.",
+    "username": "celiac_user",
+    "days": 14,
+    "foods": [
+      {"id":"f1-001","name":"Wheat Bread","ingredients":["wheat flour","yeast","salt","water"],"username":null},
+      {"id":"f1-002","name":"Pasta","ingredients":["durum wheat semolina","water"],"username":null},
+      {"id":"f1-003","name":"Beer","ingredients":["water","barley malt","hops","yeast"],"username":null},
+      {"id":"f1-004","name":"Grilled Chicken","ingredients":["chicken breast","olive oil","salt","pepper"],"username":null},
+      {"id":"f1-005","name":"Rice Bowl","ingredients":["white rice","soy sauce","vegetables"],"username":null},
+      {"id":"f1-006","name":"Banana","ingredients":null,"username":null},
+      {"id":"f1-007","name":"Greek Yogurt","ingredients":["milk","live cultures"],"username":null},
+      {"id":"f1-008","name":"Scrambled Eggs","ingredients":["eggs","butter","salt"],"username":null},
+      {"id":"f1-009","name":"Oatmeal","ingredients":["rolled oats","water","honey"],"username":null},
+      {"id":"f1-010","name":"Salad","ingredients":["lettuce","tomato","cucumber","olive oil"],"username":null}
+    ],
+    "symptoms": [
+      {"id":"s1-001","username":"celiac_user","name":"Bloating","location":"abdomen","sensation":"pressure"},
+      {"id":"s1-002","username":"celiac_user","name":"Abdominal Pain","location":"abdomen","sensation":"cramping"}
+    ],
+    "food_logs": [
+      {"id":"fl1-001","username":"celiac_user","food_id":"f1-009","quantity":"1 bowl","timestamp":"2025-01-01T07:50:00Z","notes":null},
+      {"id":"fl1-002","username":"celiac_user","food_id":"f1-004","quantity":"1 breast","timestamp":"2025-01-01T12:20:00Z","notes":null},
+      {"id":"fl1-003","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-01T18:10:00Z","notes":null},
+      {"id":"fl1-004","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-01T20:30:00Z","notes":null},
+
+      {"id":"fl1-005","username":"celiac_user","food_id":"f1-008","quantity":"2 eggs","timestamp":"2025-01-02T08:00:00Z","notes":null},
+      {"id":"fl1-006","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-02T10:15:00Z","notes":null},
+      {"id":"fl1-007","username":"celiac_user","food_id":"f1-001","quantity":"2 slices","timestamp":"2025-01-02T12:30:00Z","notes":"sandwich for lunch"},
+      {"id":"fl1-008","username":"celiac_user","food_id":"f1-007","quantity":"1 cup","timestamp":"2025-01-02T15:45:00Z","notes":null},
+      {"id":"fl1-009","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-02T18:30:00Z","notes":null},
+      {"id":"fl1-010","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-02T20:00:00Z","notes":null},
+
+      {"id":"fl1-011","username":"celiac_user","food_id":"f1-009","quantity":"1 bowl","timestamp":"2025-01-03T07:45:00Z","notes":null},
+      {"id":"fl1-012","username":"celiac_user","food_id":"f1-004","quantity":"1 breast","timestamp":"2025-01-03T12:00:00Z","notes":null},
+      {"id":"fl1-013","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-03T18:15:00Z","notes":null},
+
+      {"id":"fl1-014","username":"celiac_user","food_id":"f1-008","quantity":"2 eggs","timestamp":"2025-01-04T08:10:00Z","notes":null},
+      {"id":"fl1-015","username":"celiac_user","food_id":"f1-002","quantity":"1 plate","timestamp":"2025-01-04T12:00:00Z","notes":"spaghetti"},
+      {"id":"fl1-016","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-04T15:00:00Z","notes":null},
+      {"id":"fl1-017","username":"celiac_user","food_id":"f1-004","quantity":"1 serving","timestamp":"2025-01-04T18:20:00Z","notes":null},
+      {"id":"fl1-018","username":"celiac_user","food_id":"f1-007","quantity":"1 cup","timestamp":"2025-01-04T20:10:00Z","notes":null},
+      {"id":"fl1-019","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-04T21:30:00Z","notes":null},
+      {"id":"fl1-020","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-04T22:00:00Z","notes":null},
+
+      {"id":"fl1-021","username":"celiac_user","food_id":"f1-009","quantity":"1 bowl","timestamp":"2025-01-05T07:30:00Z","notes":null},
+      {"id":"fl1-022","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-05T12:15:00Z","notes":null},
+      {"id":"fl1-023","username":"celiac_user","food_id":"f1-004","quantity":"1 breast","timestamp":"2025-01-05T17:50:00Z","notes":null},
+      {"id":"fl1-024","username":"celiac_user","food_id":"f1-007","quantity":"1 cup","timestamp":"2025-01-05T20:30:00Z","notes":null},
+      {"id":"fl1-025","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-05T21:15:00Z","notes":null},
+
+      {"id":"fl1-026","username":"celiac_user","food_id":"f1-008","quantity":"2 eggs","timestamp":"2025-01-06T08:05:00Z","notes":null},
+      {"id":"fl1-027","username":"celiac_user","food_id":"f1-001","quantity":"2 slices","timestamp":"2025-01-06T10:30:00Z","notes":"toast"},
+      {"id":"fl1-028","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-06T13:00:00Z","notes":null},
+      {"id":"fl1-029","username":"celiac_user","food_id":"f1-004","quantity":"1 serving","timestamp":"2025-01-06T18:15:00Z","notes":null},
+      {"id":"fl1-030","username":"celiac_user","food_id":"f1-003","quantity":"1 bottle","timestamp":"2025-01-06T20:45:00Z","notes":"beer with dinner"},
+
+      {"id":"fl1-031","username":"celiac_user","food_id":"f1-009","quantity":"1 bowl","timestamp":"2025-01-07T08:00:00Z","notes":null},
+      {"id":"fl1-032","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-07T10:20:00Z","notes":null},
+      {"id":"fl1-033","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-07T12:40:00Z","notes":null},
+      {"id":"fl1-034","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-07T17:30:00Z","notes":null},
+
+      {"id":"fl1-035","username":"celiac_user","food_id":"f1-008","quantity":"3 eggs","timestamp":"2025-01-08T07:50:00Z","notes":null},
+      {"id":"fl1-036","username":"celiac_user","food_id":"f1-007","quantity":"1 cup","timestamp":"2025-01-08T10:00:00Z","notes":null},
+      {"id":"fl1-037","username":"celiac_user","food_id":"f1-002","quantity":"1 plate","timestamp":"2025-01-08T12:20:00Z","notes":"penne"},
+      {"id":"fl1-038","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-08T17:00:00Z","notes":null},
+      {"id":"fl1-039","username":"celiac_user","food_id":"f1-004","quantity":"1 breast","timestamp":"2025-01-08T19:30:00Z","notes":null},
+      {"id":"fl1-040","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-08T21:00:00Z","notes":null},
+
+      {"id":"fl1-041","username":"celiac_user","food_id":"f1-009","quantity":"1 bowl","timestamp":"2025-01-09T07:40:00Z","notes":null},
+      {"id":"fl1-042","username":"celiac_user","food_id":"f1-004","quantity":"1 serving","timestamp":"2025-01-09T12:30:00Z","notes":null},
+      {"id":"fl1-043","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-09T18:00:00Z","notes":null},
+
+      {"id":"fl1-044","username":"celiac_user","food_id":"f1-008","quantity":"2 eggs","timestamp":"2025-01-10T08:20:00Z","notes":null},
+      {"id":"fl1-045","username":"celiac_user","food_id":"f1-001","quantity":"2 slices","timestamp":"2025-01-10T12:00:00Z","notes":"BLT"},
+      {"id":"fl1-046","username":"celiac_user","food_id":"f1-007","quantity":"1 cup","timestamp":"2025-01-10T15:10:00Z","notes":null},
+      {"id":"fl1-047","username":"celiac_user","food_id":"f1-004","quantity":"1 breast","timestamp":"2025-01-10T18:30:00Z","notes":null},
+      {"id":"fl1-048","username":"celiac_user","food_id":"f1-003","quantity":"1 pint","timestamp":"2025-01-10T21:00:00Z","notes":null},
+      {"id":"fl1-049","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-10T22:15:00Z","notes":null},
+
+      {"id":"fl1-050","username":"celiac_user","food_id":"f1-009","quantity":"1 bowl","timestamp":"2025-01-11T08:00:00Z","notes":null},
+      {"id":"fl1-051","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-11T12:10:00Z","notes":null},
+      {"id":"fl1-052","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-11T18:00:00Z","notes":null},
+      {"id":"fl1-053","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-11T19:45:00Z","notes":null},
+      {"id":"fl1-054","username":"celiac_user","food_id":"f1-007","quantity":"1 cup","timestamp":"2025-01-11T21:30:00Z","notes":null},
+
+      {"id":"fl1-055","username":"celiac_user","food_id":"f1-008","quantity":"2 eggs","timestamp":"2025-01-12T08:30:00Z","notes":null},
+      {"id":"fl1-056","username":"celiac_user","food_id":"f1-002","quantity":"1 plate","timestamp":"2025-01-12T12:15:00Z","notes":"mac and cheese"},
+      {"id":"fl1-057","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-12T18:45:00Z","notes":null},
+
+      {"id":"fl1-058","username":"celiac_user","food_id":"f1-009","quantity":"1 bowl","timestamp":"2025-01-13T07:55:00Z","notes":null},
+      {"id":"fl1-059","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-13T10:00:00Z","notes":null},
+      {"id":"fl1-060","username":"celiac_user","food_id":"f1-004","quantity":"1 serving","timestamp":"2025-01-13T12:30:00Z","notes":null},
+      {"id":"fl1-061","username":"celiac_user","food_id":"f1-007","quantity":"1 cup","timestamp":"2025-01-13T15:20:00Z","notes":null},
+      {"id":"fl1-062","username":"celiac_user","food_id":"f1-005","quantity":"1 bowl","timestamp":"2025-01-13T18:00:00Z","notes":null},
+      {"id":"fl1-063","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-13T20:30:00Z","notes":null},
+
+      {"id":"fl1-064","username":"celiac_user","food_id":"f1-008","quantity":"2 eggs","timestamp":"2025-01-14T08:10:00Z","notes":null},
+      {"id":"fl1-065","username":"celiac_user","food_id":"f1-001","quantity":"2 slices","timestamp":"2025-01-14T12:30:00Z","notes":"grilled cheese"},
+      {"id":"fl1-066","username":"celiac_user","food_id":"f1-004","quantity":"1 serving","timestamp":"2025-01-14T18:00:00Z","notes":null},
+      {"id":"fl1-067","username":"celiac_user","food_id":"f1-010","quantity":"1 serving","timestamp":"2025-01-14T20:00:00Z","notes":null},
+      {"id":"fl1-068","username":"celiac_user","food_id":"f1-006","quantity":"1 medium","timestamp":"2025-01-14T21:20:00Z","notes":null}
+    ],
+    "symptom_logs": [
+      {"id":"sl1-001","username":"celiac_user","symptom_id":"s1-001","intensity":7,"duration":120,"timestamp":"2025-01-02T14:30:00Z","notes":null},
+      {"id":"sl1-002","username":"celiac_user","symptom_id":"s1-002","intensity":7,"duration":150,"timestamp":"2025-01-02T14:45:00Z","notes":null},
+
+      {"id":"sl1-003","username":"celiac_user","symptom_id":"s1-001","intensity":8,"duration":180,"timestamp":"2025-01-04T14:10:00Z","notes":null},
+      {"id":"sl1-004","username":"celiac_user","symptom_id":"s1-002","intensity":8,"duration":200,"timestamp":"2025-01-04T14:25:00Z","notes":null},
+
+      {"id":"sl1-005","username":"celiac_user","symptom_id":"s1-001","intensity":6,"duration":90,"timestamp":"2025-01-06T12:40:00Z","notes":null},
+      {"id":"sl1-006","username":"celiac_user","symptom_id":"s1-002","intensity":6,"duration":100,"timestamp":"2025-01-06T12:55:00Z","notes":null},
+      {"id":"sl1-007","username":"celiac_user","symptom_id":"s1-001","intensity":7,"duration":130,"timestamp":"2025-01-06T22:50:00Z","notes":null},
+      {"id":"sl1-008","username":"celiac_user","symptom_id":"s1-002","intensity":8,"duration":160,"timestamp":"2025-01-06T23:05:00Z","notes":null},
+
+      {"id":"sl1-009","username":"celiac_user","symptom_id":"s1-001","intensity":7,"duration":140,"timestamp":"2025-01-08T14:30:00Z","notes":null},
+      {"id":"sl1-010","username":"celiac_user","symptom_id":"s1-002","intensity":9,"duration":200,"timestamp":"2025-01-08T14:45:00Z","notes":null},
+
+      {"id":"sl1-011","username":"celiac_user","symptom_id":"s1-001","intensity":7,"duration":110,"timestamp":"2025-01-10T14:10:00Z","notes":null},
+      {"id":"sl1-012","username":"celiac_user","symptom_id":"s1-002","intensity":8,"duration":160,"timestamp":"2025-01-10T14:25:00Z","notes":null},
+      {"id":"sl1-013","username":"celiac_user","symptom_id":"s1-001","intensity":6,"duration":100,"timestamp":"2025-01-10T23:10:00Z","notes":null},
+      {"id":"sl1-014","username":"celiac_user","symptom_id":"s1-002","intensity":7,"duration":130,"timestamp":"2025-01-10T23:25:00Z","notes":null},
+
+      {"id":"sl1-015","username":"celiac_user","symptom_id":"s1-001","intensity":8,"duration":170,"timestamp":"2025-01-12T14:20:00Z","notes":null},
+      {"id":"sl1-016","username":"celiac_user","symptom_id":"s1-002","intensity":9,"duration":220,"timestamp":"2025-01-12T14:35:00Z","notes":null},
+
+      {"id":"sl1-017","username":"celiac_user","symptom_id":"s1-001","intensity":7,"duration":130,"timestamp":"2025-01-14T14:40:00Z","notes":null},
+      {"id":"sl1-018","username":"celiac_user","symptom_id":"s1-002","intensity":8,"duration":170,"timestamp":"2025-01-14T14:55:00Z","notes":null}
+    ]
+  },
+
+  "cumulative_dairy": {
+    "description": "Cumulative threshold — dairy triggers after 3+ servings in a 2-day window. 30 days, 3-7 foods/day.",
+    "username": "dairy_cumul_user",
+    "days": 30,
+    "foods": [
+      {"id":"f2-001","name":"Milk","ingredients":["whole milk"],"username":null},
+      {"id":"f2-002","name":"Cheddar Cheese","ingredients":["milk","salt","enzymes","annatto"],"username":null},
+      {"id":"f2-003","name":"Ice Cream","ingredients":["milk","cream","sugar","vanilla"],"username":null},
+      {"id":"f2-004","name":"Grilled Salmon","ingredients":["salmon","lemon","olive oil"],"username":null},
+      {"id":"f2-005","name":"Steamed Broccoli","ingredients":["broccoli"],"username":null},
+      {"id":"f2-006","name":"Brown Rice","ingredients":["brown rice"],"username":null},
+      {"id":"f2-007","name":"Apple","ingredients":null,"username":null},
+      {"id":"f2-008","name":"Chicken Stir Fry","ingredients":["chicken","bell pepper","soy sauce","sesame oil"],"username":null},
+      {"id":"f2-009","name":"Toast with Jam","ingredients":["bread","strawberry jam"],"username":null},
+      {"id":"f2-010","name":"Black Beans","ingredients":["black beans","cumin","garlic"],"username":null}
+    ],
+    "symptoms": [
+      {"id":"s2-001","username":"dairy_cumul_user","name":"Stomach Cramps","location":"abdomen","sensation":"sharp cramping"},
+      {"id":"s2-002","username":"dairy_cumul_user","name":"Diarrhea","location":"abdomen","sensation":"urgency"}
+    ],
+    "food_logs": [
+      {"id":"fl2-001","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-01T08:00:00Z","notes":null},
+      {"id":"fl2-002","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-01T10:20:00Z","notes":null},
+      {"id":"fl2-003","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-01T12:30:00Z","notes":null},
+      {"id":"fl2-004","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-01T18:45:00Z","notes":null},
+
+      {"id":"fl2-005","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-02T08:10:00Z","notes":null},
+      {"id":"fl2-006","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 slices","timestamp":"2025-03-02T11:00:00Z","notes":null},
+      {"id":"fl2-007","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-02T12:30:00Z","notes":null},
+      {"id":"fl2-008","username":"dairy_cumul_user","food_id":"f2-003","quantity":"1 scoop","timestamp":"2025-03-02T15:30:00Z","notes":null},
+      {"id":"fl2-009","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-02T18:00:00Z","notes":null},
+      {"id":"fl2-010","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-02T20:00:00Z","notes":null},
+
+      {"id":"fl2-011","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-03T08:00:00Z","notes":null},
+      {"id":"fl2-012","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-03T12:30:00Z","notes":null},
+      {"id":"fl2-013","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-03T18:00:00Z","notes":null},
+
+      {"id":"fl2-014","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-04T08:15:00Z","notes":null},
+      {"id":"fl2-015","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-04T10:30:00Z","notes":null},
+      {"id":"fl2-016","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-04T12:45:00Z","notes":null},
+      {"id":"fl2-017","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-04T18:00:00Z","notes":null},
+      {"id":"fl2-018","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-04T19:15:00Z","notes":null},
+
+      {"id":"fl2-019","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-05T08:00:00Z","notes":null},
+      {"id":"fl2-020","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-05T12:30:00Z","notes":null},
+      {"id":"fl2-021","username":"dairy_cumul_user","food_id":"f2-003","quantity":"2 scoops","timestamp":"2025-03-05T15:00:00Z","notes":null},
+      {"id":"fl2-022","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-05T18:00:00Z","notes":null},
+      {"id":"fl2-023","username":"dairy_cumul_user","food_id":"f2-002","quantity":"1 oz","timestamp":"2025-03-05T20:00:00Z","notes":null},
+      {"id":"fl2-024","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-05T21:00:00Z","notes":null},
+      {"id":"fl2-025","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-05T21:45:00Z","notes":null},
+
+      {"id":"fl2-026","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-06T08:00:00Z","notes":null},
+      {"id":"fl2-027","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-06T10:00:00Z","notes":null},
+      {"id":"fl2-028","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-06T12:30:00Z","notes":null},
+      {"id":"fl2-029","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-06T18:00:00Z","notes":null},
+
+      {"id":"fl2-030","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-07T08:00:00Z","notes":null},
+      {"id":"fl2-031","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-07T12:00:00Z","notes":null},
+      {"id":"fl2-032","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-07T15:00:00Z","notes":null},
+      {"id":"fl2-033","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-07T18:30:00Z","notes":null},
+      {"id":"fl2-034","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-07T20:00:00Z","notes":null},
+
+      {"id":"fl2-035","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-08T08:00:00Z","notes":null},
+      {"id":"fl2-036","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-08T12:15:00Z","notes":null},
+      {"id":"fl2-037","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-08T15:00:00Z","notes":null},
+      {"id":"fl2-038","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-08T18:30:00Z","notes":null},
+
+      {"id":"fl2-039","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-09T08:00:00Z","notes":null},
+      {"id":"fl2-040","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-09T12:30:00Z","notes":null},
+      {"id":"fl2-041","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-09T18:00:00Z","notes":null},
+
+      {"id":"fl2-042","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-10T08:10:00Z","notes":null},
+      {"id":"fl2-043","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-10T10:30:00Z","notes":null},
+      {"id":"fl2-044","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-10T12:00:00Z","notes":null},
+      {"id":"fl2-045","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-10T18:00:00Z","notes":null},
+      {"id":"fl2-046","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-10T20:00:00Z","notes":null},
+
+      {"id":"fl2-047","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-11T08:00:00Z","notes":null},
+      {"id":"fl2-048","username":"dairy_cumul_user","food_id":"f2-003","quantity":"1 scoop","timestamp":"2025-03-11T11:00:00Z","notes":null},
+      {"id":"fl2-049","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-11T14:00:00Z","notes":null},
+      {"id":"fl2-050","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-11T18:30:00Z","notes":null},
+
+      {"id":"fl2-051","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-12T08:00:00Z","notes":null},
+      {"id":"fl2-052","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-12T12:00:00Z","notes":null},
+      {"id":"fl2-053","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-12T18:00:00Z","notes":null},
+      {"id":"fl2-054","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-12T19:30:00Z","notes":null},
+      {"id":"fl2-055","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-12T20:15:00Z","notes":null},
+
+      {"id":"fl2-056","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-13T08:00:00Z","notes":null},
+      {"id":"fl2-057","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-13T12:00:00Z","notes":null},
+      {"id":"fl2-058","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-13T18:00:00Z","notes":null},
+
+      {"id":"fl2-059","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-14T08:00:00Z","notes":null},
+      {"id":"fl2-060","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-14T12:00:00Z","notes":null},
+      {"id":"fl2-061","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-14T18:30:00Z","notes":null},
+      {"id":"fl2-062","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-14T20:00:00Z","notes":null},
+
+      {"id":"fl2-063","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-15T08:00:00Z","notes":null},
+      {"id":"fl2-064","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-15T12:30:00Z","notes":null},
+      {"id":"fl2-065","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-15T18:00:00Z","notes":null},
+      {"id":"fl2-066","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-15T20:00:00Z","notes":null},
+      {"id":"fl2-067","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-15T21:00:00Z","notes":null},
+
+      {"id":"fl2-068","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-16T08:00:00Z","notes":null},
+      {"id":"fl2-069","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-16T12:00:00Z","notes":null},
+      {"id":"fl2-070","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-16T18:00:00Z","notes":null},
+
+      {"id":"fl2-071","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-17T08:00:00Z","notes":null},
+      {"id":"fl2-072","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-17T12:30:00Z","notes":null},
+      {"id":"fl2-073","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-17T18:00:00Z","notes":null},
+      {"id":"fl2-074","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-17T20:00:00Z","notes":null},
+
+      {"id":"fl2-075","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-18T08:00:00Z","notes":null},
+      {"id":"fl2-076","username":"dairy_cumul_user","food_id":"f2-003","quantity":"2 scoops","timestamp":"2025-03-18T11:00:00Z","notes":null},
+      {"id":"fl2-077","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-18T14:00:00Z","notes":null},
+      {"id":"fl2-078","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-18T18:00:00Z","notes":null},
+      {"id":"fl2-079","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-18T19:30:00Z","notes":null},
+      {"id":"fl2-080","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-18T20:30:00Z","notes":null},
+
+      {"id":"fl2-081","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-19T08:00:00Z","notes":null},
+      {"id":"fl2-082","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-19T12:00:00Z","notes":null},
+      {"id":"fl2-083","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-19T18:00:00Z","notes":null},
+
+      {"id":"fl2-084","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-20T08:00:00Z","notes":null},
+      {"id":"fl2-085","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-20T12:00:00Z","notes":null},
+      {"id":"fl2-086","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-20T18:00:00Z","notes":null},
+      {"id":"fl2-087","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-20T19:30:00Z","notes":null},
+      {"id":"fl2-088","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-20T20:45:00Z","notes":null},
+
+      {"id":"fl2-089","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-21T08:00:00Z","notes":null},
+      {"id":"fl2-090","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-21T11:00:00Z","notes":null},
+      {"id":"fl2-091","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-21T18:00:00Z","notes":null},
+      {"id":"fl2-092","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-21T19:00:00Z","notes":null},
+
+      {"id":"fl2-093","username":"dairy_cumul_user","food_id":"f2-003","quantity":"1 scoop","timestamp":"2025-03-22T09:00:00Z","notes":null},
+      {"id":"fl2-094","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-22T12:00:00Z","notes":null},
+      {"id":"fl2-095","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-22T18:00:00Z","notes":null},
+      {"id":"fl2-096","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-22T19:30:00Z","notes":null},
+      {"id":"fl2-097","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-22T20:30:00Z","notes":null},
+      {"id":"fl2-098","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-22T21:15:00Z","notes":null},
+
+      {"id":"fl2-099","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-23T08:00:00Z","notes":null},
+      {"id":"fl2-100","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-23T12:30:00Z","notes":null},
+      {"id":"fl2-101","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-23T18:00:00Z","notes":null},
+
+      {"id":"fl2-102","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-24T08:00:00Z","notes":null},
+      {"id":"fl2-103","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-24T12:00:00Z","notes":null},
+      {"id":"fl2-104","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-24T18:00:00Z","notes":null},
+      {"id":"fl2-105","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-24T19:30:00Z","notes":null},
+
+      {"id":"fl2-106","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-25T08:00:00Z","notes":null},
+      {"id":"fl2-107","username":"dairy_cumul_user","food_id":"f2-003","quantity":"2 scoops","timestamp":"2025-03-25T11:00:00Z","notes":null},
+      {"id":"fl2-108","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-25T12:30:00Z","notes":null},
+      {"id":"fl2-109","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-25T18:30:00Z","notes":null},
+      {"id":"fl2-110","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-25T20:00:00Z","notes":null},
+      {"id":"fl2-111","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-25T21:00:00Z","notes":null},
+
+      {"id":"fl2-112","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-26T08:00:00Z","notes":null},
+      {"id":"fl2-113","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-26T12:00:00Z","notes":null},
+      {"id":"fl2-114","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-26T18:00:00Z","notes":null},
+      {"id":"fl2-115","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-26T19:15:00Z","notes":null},
+
+      {"id":"fl2-116","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-27T08:00:00Z","notes":null},
+      {"id":"fl2-117","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-27T12:30:00Z","notes":null},
+      {"id":"fl2-118","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-27T15:00:00Z","notes":null},
+      {"id":"fl2-119","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-27T18:00:00Z","notes":null},
+      {"id":"fl2-120","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-27T19:30:00Z","notes":null},
+
+      {"id":"fl2-121","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-28T08:00:00Z","notes":null},
+      {"id":"fl2-122","username":"dairy_cumul_user","food_id":"f2-003","quantity":"2 scoops","timestamp":"2025-03-28T11:00:00Z","notes":null},
+      {"id":"fl2-123","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-28T18:00:00Z","notes":null},
+
+      {"id":"fl2-124","username":"dairy_cumul_user","food_id":"f2-009","quantity":"2 slices","timestamp":"2025-03-29T08:00:00Z","notes":null},
+      {"id":"fl2-125","username":"dairy_cumul_user","food_id":"f2-004","quantity":"1 fillet","timestamp":"2025-03-29T12:00:00Z","notes":null},
+      {"id":"fl2-126","username":"dairy_cumul_user","food_id":"f2-007","quantity":"1 medium","timestamp":"2025-03-29T15:00:00Z","notes":null},
+      {"id":"fl2-127","username":"dairy_cumul_user","food_id":"f2-010","quantity":"1 cup","timestamp":"2025-03-29T18:00:00Z","notes":null},
+      {"id":"fl2-128","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-29T19:30:00Z","notes":null},
+      {"id":"fl2-129","username":"dairy_cumul_user","food_id":"f2-005","quantity":"1 cup","timestamp":"2025-03-29T20:45:00Z","notes":null},
+
+      {"id":"fl2-130","username":"dairy_cumul_user","food_id":"f2-001","quantity":"1 glass","timestamp":"2025-03-30T08:00:00Z","notes":null},
+      {"id":"fl2-131","username":"dairy_cumul_user","food_id":"f2-002","quantity":"2 oz","timestamp":"2025-03-30T11:30:00Z","notes":null},
+      {"id":"fl2-132","username":"dairy_cumul_user","food_id":"f2-008","quantity":"1 serving","timestamp":"2025-03-30T18:00:00Z","notes":null},
+      {"id":"fl2-133","username":"dairy_cumul_user","food_id":"f2-006","quantity":"1 cup","timestamp":"2025-03-30T19:00:00Z","notes":null}
+    ],
+    "symptom_logs": [
+      {"id":"sl2-001","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":7,"duration":90,"timestamp":"2025-03-02T21:00:00Z","notes":"rolling 2-day: milk(d1)+cheese+ice cream(d2)=3"},
+      {"id":"sl2-002","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":7,"duration":120,"timestamp":"2025-03-02T21:15:00Z","notes":null},
+
+      {"id":"sl2-003","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":8,"duration":120,"timestamp":"2025-03-05T22:00:00Z","notes":"rolling: cheese(d4)+milk+ice cream+cheese(d5)=4"},
+      {"id":"sl2-004","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":9,"duration":150,"timestamp":"2025-03-05T22:15:00Z","notes":null},
+
+      {"id":"sl2-005","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":9,"duration":130,"timestamp":"2025-03-11T21:30:00Z","notes":"rolling: cheese(d10)+milk+ice cream+cheese(d11)=4"},
+      {"id":"sl2-006","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":9,"duration":160,"timestamp":"2025-03-11T21:45:00Z","notes":null},
+
+      {"id":"sl2-007","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":9,"duration":150,"timestamp":"2025-03-18T22:00:00Z","notes":"rolling: cheese(d17)+milk+ice cream+cheese(d18)=4"},
+      {"id":"sl2-008","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":10,"duration":180,"timestamp":"2025-03-18T22:15:00Z","notes":null},
+
+      {"id":"sl2-009","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":8,"duration":110,"timestamp":"2025-03-22T22:00:00Z","notes":"rolling: milk+cheese(d21)+ice cream+cheese(d22)=4"},
+      {"id":"sl2-010","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":8,"duration":130,"timestamp":"2025-03-22T22:15:00Z","notes":null},
+
+      {"id":"sl2-011","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":8,"duration":130,"timestamp":"2025-03-25T22:00:00Z","notes":"rolling: milk(d24)+cheese+ice cream(d25)=3"},
+      {"id":"sl2-012","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":9,"duration":160,"timestamp":"2025-03-25T22:15:00Z","notes":null},
+
+      {"id":"sl2-013","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":8,"duration":120,"timestamp":"2025-03-28T21:00:00Z","notes":"rolling: cheese(d27)+milk+ice cream(d28)=3"},
+      {"id":"sl2-014","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":8,"duration":140,"timestamp":"2025-03-28T21:15:00Z","notes":null},
+
+      {"id":"sl2-015","username":"dairy_cumul_user","symptom_id":"s2-001","intensity":7,"duration":100,"timestamp":"2025-03-30T21:00:00Z","notes":"rolling: milk+ice cream(d28)+milk+cheese(d30)=4"},
+      {"id":"sl2-016","username":"dairy_cumul_user","symptom_id":"s2-002","intensity":8,"duration":130,"timestamp":"2025-03-30T21:15:00Z","notes":null}
+    ]
+  },
+
+  "histamine_multi_trigger": {
+    "description": "Multiple trigger foods → same symptom cluster (histamine intolerance). 20 days, 3-7 foods/day.",
+    "username": "histamine_user",
+    "days": 20,
+    "foods": [
+      {"id":"f3-001","name":"Aged Parmesan","ingredients":["milk","salt","rennet"],"username":null},
+      {"id":"f3-002","name":"Red Wine","ingredients":["grapes","sulfites","yeast"],"username":null},
+      {"id":"f3-003","name":"Sauerkraut","ingredients":["cabbage","salt"],"username":null},
+      {"id":"f3-004","name":"Canned Tuna","ingredients":["tuna","water","salt"],"username":null},
+      {"id":"f3-005","name":"Soy Sauce","ingredients":["soybeans","wheat","salt","water"],"username":null},
+      {"id":"f3-006","name":"Fresh Chicken","ingredients":["chicken breast"],"username":null},
+      {"id":"f3-007","name":"White Rice","ingredients":["white rice"],"username":null},
+      {"id":"f3-008","name":"Fresh Salmon","ingredients":["salmon"],"username":null},
+      {"id":"f3-009","name":"Lettuce Salad","ingredients":["lettuce","cucumber","olive oil"],"username":null},
+      {"id":"f3-010","name":"Banana","ingredients":null,"username":null},
+      {"id":"f3-011","name":"Blueberries","ingredients":null,"username":null},
+      {"id":"f3-012","name":"Sweet Potato","ingredients":["sweet potato"],"username":null}
+    ],
+    "symptoms": [
+      {"id":"s3-001","username":"histamine_user","name":"Facial Flushing","location":"face","sensation":"warmth"},
+      {"id":"s3-002","username":"histamine_user","name":"Headache","location":"head","sensation":"throbbing"},
+      {"id":"s3-003","username":"histamine_user","name":"Nasal Congestion","location":"nose","sensation":"pressure"}
+    ],
+    "food_logs": [
+      {"id":"fl3-001","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-01T08:00:00Z","notes":null},
+      {"id":"fl3-002","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-01T12:10:00Z","notes":null},
+      {"id":"fl3-003","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-01T18:00:00Z","notes":null},
+      {"id":"fl3-004","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-01T20:15:00Z","notes":null},
+
+      {"id":"fl3-005","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-02T08:00:00Z","notes":null},
+      {"id":"fl3-006","username":"histamine_user","food_id":"f3-001","quantity":"2 oz","timestamp":"2025-05-02T11:30:00Z","notes":"parmesan on salad"},
+      {"id":"fl3-007","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-02T13:00:00Z","notes":null},
+      {"id":"fl3-008","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-02T18:15:00Z","notes":null},
+      {"id":"fl3-009","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-02T20:00:00Z","notes":null},
+      {"id":"fl3-010","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-02T21:00:00Z","notes":null},
+
+      {"id":"fl3-011","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-03T07:45:00Z","notes":null},
+      {"id":"fl3-012","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-03T12:30:00Z","notes":null},
+      {"id":"fl3-013","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-03T18:00:00Z","notes":null},
+
+      {"id":"fl3-014","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-04T08:00:00Z","notes":null},
+      {"id":"fl3-015","username":"histamine_user","food_id":"f3-002","quantity":"1 glass","timestamp":"2025-05-04T13:00:00Z","notes":"wine with lunch"},
+      {"id":"fl3-016","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-04T18:00:00Z","notes":null},
+      {"id":"fl3-017","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-04T19:30:00Z","notes":null},
+      {"id":"fl3-018","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-04T20:30:00Z","notes":null},
+
+      {"id":"fl3-019","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-05T08:00:00Z","notes":null},
+      {"id":"fl3-020","username":"histamine_user","food_id":"f3-004","quantity":"1 can","timestamp":"2025-05-05T12:00:00Z","notes":"tuna sandwich"},
+      {"id":"fl3-021","username":"histamine_user","food_id":"f3-003","quantity":"1/2 cup","timestamp":"2025-05-05T18:00:00Z","notes":"sauerkraut with sausage"},
+      {"id":"fl3-022","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-05T19:15:00Z","notes":null},
+      {"id":"fl3-023","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-05T20:30:00Z","notes":null},
+      {"id":"fl3-024","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-05T21:15:00Z","notes":null},
+      {"id":"fl3-025","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-05T22:00:00Z","notes":null},
+
+      {"id":"fl3-026","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-06T08:00:00Z","notes":null},
+      {"id":"fl3-027","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-06T12:15:00Z","notes":null},
+      {"id":"fl3-028","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-06T18:00:00Z","notes":null},
+      {"id":"fl3-029","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-06T20:00:00Z","notes":null},
+
+      {"id":"fl3-030","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-07T08:00:00Z","notes":null},
+      {"id":"fl3-031","username":"histamine_user","food_id":"f3-005","quantity":"2 tbsp","timestamp":"2025-05-07T12:00:00Z","notes":"soy sauce with rice"},
+      {"id":"fl3-032","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-07T12:05:00Z","notes":null},
+      {"id":"fl3-033","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-07T18:00:00Z","notes":null},
+
+      {"id":"fl3-034","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-08T08:00:00Z","notes":null},
+      {"id":"fl3-035","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-08T12:15:00Z","notes":null},
+      {"id":"fl3-036","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-08T15:00:00Z","notes":null},
+      {"id":"fl3-037","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-08T18:00:00Z","notes":null},
+      {"id":"fl3-038","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-08T19:30:00Z","notes":null},
+
+      {"id":"fl3-039","username":"histamine_user","food_id":"f3-001","quantity":"2 oz","timestamp":"2025-05-09T08:00:00Z","notes":"parmesan omelette"},
+      {"id":"fl3-040","username":"histamine_user","food_id":"f3-002","quantity":"1 glass","timestamp":"2025-05-09T13:00:00Z","notes":null},
+      {"id":"fl3-041","username":"histamine_user","food_id":"f3-004","quantity":"1 can","timestamp":"2025-05-09T18:00:00Z","notes":null},
+      {"id":"fl3-042","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-09T20:00:00Z","notes":null},
+
+      {"id":"fl3-043","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-10T08:00:00Z","notes":null},
+      {"id":"fl3-044","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-10T11:15:00Z","notes":null},
+      {"id":"fl3-045","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-10T18:00:00Z","notes":null},
+      {"id":"fl3-046","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-10T19:30:00Z","notes":null},
+      {"id":"fl3-047","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-10T20:30:00Z","notes":null},
+      {"id":"fl3-048","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-10T21:15:00Z","notes":null},
+
+      {"id":"fl3-049","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-11T08:00:00Z","notes":null},
+      {"id":"fl3-050","username":"histamine_user","food_id":"f3-003","quantity":"1/2 cup","timestamp":"2025-05-11T12:00:00Z","notes":null},
+      {"id":"fl3-051","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-11T18:00:00Z","notes":null},
+
+      {"id":"fl3-052","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-12T08:00:00Z","notes":null},
+      {"id":"fl3-053","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-12T12:30:00Z","notes":null},
+      {"id":"fl3-054","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-12T18:00:00Z","notes":null},
+      {"id":"fl3-055","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-12T19:15:00Z","notes":null},
+      {"id":"fl3-056","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-12T20:30:00Z","notes":null},
+
+      {"id":"fl3-057","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-13T08:00:00Z","notes":null},
+      {"id":"fl3-058","username":"histamine_user","food_id":"f3-005","quantity":"2 tbsp","timestamp":"2025-05-13T12:00:00Z","notes":"stir fry"},
+      {"id":"fl3-059","username":"histamine_user","food_id":"f3-001","quantity":"1 oz","timestamp":"2025-05-13T18:00:00Z","notes":"parmesan on pasta"},
+      {"id":"fl3-060","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-13T19:15:00Z","notes":null},
+
+      {"id":"fl3-061","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-14T08:00:00Z","notes":null},
+      {"id":"fl3-062","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-14T12:00:00Z","notes":null},
+      {"id":"fl3-063","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-14T18:00:00Z","notes":null},
+      {"id":"fl3-064","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-14T19:30:00Z","notes":null},
+      {"id":"fl3-065","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-14T20:30:00Z","notes":null},
+      {"id":"fl3-066","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-14T21:15:00Z","notes":null},
+
+      {"id":"fl3-067","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-15T08:00:00Z","notes":null},
+      {"id":"fl3-068","username":"histamine_user","food_id":"f3-002","quantity":"2 glasses","timestamp":"2025-05-15T13:00:00Z","notes":"wine lunch"},
+      {"id":"fl3-069","username":"histamine_user","food_id":"f3-001","quantity":"2 oz","timestamp":"2025-05-15T18:00:00Z","notes":"cheese plate"},
+      {"id":"fl3-070","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-15T19:00:00Z","notes":null},
+      {"id":"fl3-071","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-15T20:30:00Z","notes":null},
+
+      {"id":"fl3-072","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-16T08:00:00Z","notes":null},
+      {"id":"fl3-073","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-16T12:15:00Z","notes":null},
+      {"id":"fl3-074","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-16T18:00:00Z","notes":null},
+
+      {"id":"fl3-075","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-17T08:00:00Z","notes":null},
+      {"id":"fl3-076","username":"histamine_user","food_id":"f3-004","quantity":"1 can","timestamp":"2025-05-17T12:00:00Z","notes":"tuna salad"},
+      {"id":"fl3-077","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-17T18:00:00Z","notes":null},
+      {"id":"fl3-078","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-17T19:15:00Z","notes":null},
+      {"id":"fl3-079","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-17T20:30:00Z","notes":null},
+
+      {"id":"fl3-080","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-18T08:00:00Z","notes":null},
+      {"id":"fl3-081","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-18T12:00:00Z","notes":null},
+      {"id":"fl3-082","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-18T18:00:00Z","notes":null},
+      {"id":"fl3-083","username":"histamine_user","food_id":"f3-011","quantity":"1 cup","timestamp":"2025-05-18T19:15:00Z","notes":null},
+      {"id":"fl3-084","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-18T20:30:00Z","notes":null},
+
+      {"id":"fl3-085","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-19T08:00:00Z","notes":null},
+      {"id":"fl3-086","username":"histamine_user","food_id":"f3-003","quantity":"1/2 cup","timestamp":"2025-05-19T12:00:00Z","notes":null},
+      {"id":"fl3-087","username":"histamine_user","food_id":"f3-002","quantity":"1 glass","timestamp":"2025-05-19T13:30:00Z","notes":null},
+      {"id":"fl3-088","username":"histamine_user","food_id":"f3-005","quantity":"2 tbsp","timestamp":"2025-05-19T18:00:00Z","notes":null},
+      {"id":"fl3-089","username":"histamine_user","food_id":"f3-008","quantity":"1 fillet","timestamp":"2025-05-19T19:00:00Z","notes":null},
+      {"id":"fl3-090","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-19T20:30:00Z","notes":null},
+
+      {"id":"fl3-091","username":"histamine_user","food_id":"f3-006","quantity":"1 breast","timestamp":"2025-05-20T08:00:00Z","notes":null},
+      {"id":"fl3-092","username":"histamine_user","food_id":"f3-009","quantity":"1 serving","timestamp":"2025-05-20T12:15:00Z","notes":null},
+      {"id":"fl3-093","username":"histamine_user","food_id":"f3-007","quantity":"1 cup","timestamp":"2025-05-20T18:00:00Z","notes":null},
+      {"id":"fl3-094","username":"histamine_user","food_id":"f3-012","quantity":"1 medium","timestamp":"2025-05-20T19:45:00Z","notes":null},
+      {"id":"fl3-095","username":"histamine_user","food_id":"f3-010","quantity":"1 medium","timestamp":"2025-05-20T21:00:00Z","notes":null}
+    ],
+    "symptom_logs": [
+      {"id":"sl3-001","username":"histamine_user","symptom_id":"s3-001","intensity":5,"duration":60,"timestamp":"2025-05-02T22:00:00Z","notes":null},
+      {"id":"sl3-002","username":"histamine_user","symptom_id":"s3-002","intensity":5,"duration":90,"timestamp":"2025-05-02T22:15:00Z","notes":null},
+
+      {"id":"sl3-003","username":"histamine_user","symptom_id":"s3-002","intensity":6,"duration":100,"timestamp":"2025-05-04T21:00:00Z","notes":null},
+      {"id":"sl3-004","username":"histamine_user","symptom_id":"s3-003","intensity":5,"duration":80,"timestamp":"2025-05-04T21:15:00Z","notes":null},
+
+      {"id":"sl3-005","username":"histamine_user","symptom_id":"s3-001","intensity":7,"duration":90,"timestamp":"2025-05-05T22:30:00Z","notes":null},
+      {"id":"sl3-006","username":"histamine_user","symptom_id":"s3-002","intensity":7,"duration":110,"timestamp":"2025-05-05T22:45:00Z","notes":null},
+      {"id":"sl3-007","username":"histamine_user","symptom_id":"s3-003","intensity":6,"duration":70,"timestamp":"2025-05-05T23:00:00Z","notes":null},
+
+      {"id":"sl3-008","username":"histamine_user","symptom_id":"s3-001","intensity":4,"duration":45,"timestamp":"2025-05-07T21:00:00Z","notes":null},
+      {"id":"sl3-009","username":"histamine_user","symptom_id":"s3-003","intensity":5,"duration":60,"timestamp":"2025-05-07T21:15:00Z","notes":null},
+
+      {"id":"sl3-010","username":"histamine_user","symptom_id":"s3-001","intensity":8,"duration":120,"timestamp":"2025-05-09T21:00:00Z","notes":null},
+      {"id":"sl3-011","username":"histamine_user","symptom_id":"s3-002","intensity":8,"duration":150,"timestamp":"2025-05-09T21:15:00Z","notes":null},
+      {"id":"sl3-012","username":"histamine_user","symptom_id":"s3-003","intensity":7,"duration":100,"timestamp":"2025-05-09T21:30:00Z","notes":null},
+
+      {"id":"sl3-013","username":"histamine_user","symptom_id":"s3-002","intensity":5,"duration":70,"timestamp":"2025-05-11T21:00:00Z","notes":null},
+      {"id":"sl3-014","username":"histamine_user","symptom_id":"s3-003","intensity":6,"duration":80,"timestamp":"2025-05-11T21:15:00Z","notes":null},
+
+      {"id":"sl3-015","username":"histamine_user","symptom_id":"s3-001","intensity":6,"duration":80,"timestamp":"2025-05-13T21:00:00Z","notes":null},
+      {"id":"sl3-016","username":"histamine_user","symptom_id":"s3-002","intensity":7,"duration":100,"timestamp":"2025-05-13T21:15:00Z","notes":null},
+      {"id":"sl3-017","username":"histamine_user","symptom_id":"s3-003","intensity":5,"duration":60,"timestamp":"2025-05-13T21:30:00Z","notes":null},
+
+      {"id":"sl3-018","username":"histamine_user","symptom_id":"s3-001","intensity":7,"duration":90,"timestamp":"2025-05-15T21:30:00Z","notes":null},
+      {"id":"sl3-019","username":"histamine_user","symptom_id":"s3-002","intensity":8,"duration":120,"timestamp":"2025-05-15T21:45:00Z","notes":null},
+      {"id":"sl3-020","username":"histamine_user","symptom_id":"s3-003","intensity":6,"duration":80,"timestamp":"2025-05-15T22:00:00Z","notes":null},
+
+      {"id":"sl3-021","username":"histamine_user","symptom_id":"s3-001","intensity":5,"duration":60,"timestamp":"2025-05-17T21:00:00Z","notes":null},
+      {"id":"sl3-022","username":"histamine_user","symptom_id":"s3-002","intensity":6,"duration":80,"timestamp":"2025-05-17T21:15:00Z","notes":null},
+
+      {"id":"sl3-023","username":"histamine_user","symptom_id":"s3-001","intensity":8,"duration":110,"timestamp":"2025-05-19T21:30:00Z","notes":null},
+      {"id":"sl3-024","username":"histamine_user","symptom_id":"s3-002","intensity":8,"duration":130,"timestamp":"2025-05-19T21:45:00Z","notes":null},
+      {"id":"sl3-025","username":"histamine_user","symptom_id":"s3-003","intensity":7,"duration":90,"timestamp":"2025-05-19T22:00:00Z","notes":null}
+    ]
+  },
+
+  "delayed_nightshade": {
+    "description": "Delayed 24-48h reaction — nightshades → joint pain next morning. 15 days, sparse 3-5 foods/day.",
+    "username": "delayed_user",
+    "days": 15,
+    "foods": [
+      {"id":"f4-001","name":"Tomato Soup","ingredients":["tomatoes","onion","garlic","cream"],"username":null},
+      {"id":"f4-002","name":"Stuffed Bell Pepper","ingredients":["bell pepper","rice","ground beef","onion"],"username":null},
+      {"id":"f4-003","name":"Eggplant Parmesan","ingredients":["eggplant","mozzarella","tomato sauce","breadcrumbs"],"username":null},
+      {"id":"f4-004","name":"Baked Potato","ingredients":["potato","butter","sour cream"],"username":null},
+      {"id":"f4-005","name":"Grilled Chicken","ingredients":["chicken breast","olive oil","herbs"],"username":null},
+      {"id":"f4-006","name":"Quinoa Bowl","ingredients":["quinoa","black beans","corn","avocado"],"username":null},
+      {"id":"f4-007","name":"Oatmeal","ingredients":["rolled oats","almond milk","honey"],"username":null},
+      {"id":"f4-008","name":"Steak","ingredients":["beef ribeye","salt","pepper"],"username":null},
+      {"id":"f4-009","name":"Mixed Berries","ingredients":["strawberries","blueberries","raspberries"],"username":null},
+      {"id":"f4-010","name":"Steamed Fish","ingredients":["cod","lemon","dill"],"username":null}
+    ],
+    "symptoms": [
+      {"id":"s4-001","username":"delayed_user","name":"Joint Pain","location":"knees","sensation":"aching"},
+      {"id":"s4-002","username":"delayed_user","name":"Morning Stiffness","location":"hands","sensation":"stiffness"}
+    ],
+    "food_logs": [
+      {"id":"fl4-001","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-01T08:00:00Z","notes":null},
+      {"id":"fl4-002","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-01T12:30:00Z","notes":null},
+      {"id":"fl4-003","username":"delayed_user","food_id":"f4-001","quantity":"1 bowl","timestamp":"2025-06-01T18:00:00Z","notes":"tomato soup"},
+
+      {"id":"fl4-004","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-02T08:00:00Z","notes":null},
+      {"id":"fl4-005","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-02T12:15:00Z","notes":null},
+      {"id":"fl4-006","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-06-02T18:00:00Z","notes":null},
+      {"id":"fl4-007","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-02T20:00:00Z","notes":null},
+      {"id":"fl4-008","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-02T21:15:00Z","notes":null},
+
+      {"id":"fl4-009","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-03T08:00:00Z","notes":null},
+      {"id":"fl4-010","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-03T12:00:00Z","notes":null},
+      {"id":"fl4-011","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-03T18:00:00Z","notes":null},
+      {"id":"fl4-012","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-03T19:30:00Z","notes":null},
+
+      {"id":"fl4-013","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-04T08:00:00Z","notes":null},
+      {"id":"fl4-014","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-04T12:30:00Z","notes":null},
+      {"id":"fl4-015","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-04T15:00:00Z","notes":null},
+      {"id":"fl4-016","username":"delayed_user","food_id":"f4-002","quantity":"1 pepper","timestamp":"2025-06-04T18:30:00Z","notes":"stuffed bell pepper"},
+      {"id":"fl4-017","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-04T21:00:00Z","notes":null},
+
+      {"id":"fl4-018","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-05T08:00:00Z","notes":null},
+      {"id":"fl4-019","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-05T12:00:00Z","notes":null},
+      {"id":"fl4-020","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-05T18:00:00Z","notes":null},
+
+      {"id":"fl4-021","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-06T08:00:00Z","notes":null},
+      {"id":"fl4-022","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-06T12:00:00Z","notes":null},
+      {"id":"fl4-023","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-06-06T18:30:00Z","notes":null},
+      {"id":"fl4-024","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-06T20:00:00Z","notes":null},
+      {"id":"fl4-025","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-06T21:15:00Z","notes":null},
+
+      {"id":"fl4-026","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-07T08:00:00Z","notes":null},
+      {"id":"fl4-027","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-07T12:00:00Z","notes":null},
+      {"id":"fl4-028","username":"delayed_user","food_id":"f4-003","quantity":"1 serving","timestamp":"2025-06-07T18:00:00Z","notes":"eggplant parmesan"},
+      {"id":"fl4-029","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-07T20:30:00Z","notes":null},
+
+      {"id":"fl4-030","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-08T08:00:00Z","notes":null},
+      {"id":"fl4-031","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-08T12:30:00Z","notes":null},
+      {"id":"fl4-032","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-08T18:00:00Z","notes":null},
+
+      {"id":"fl4-033","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-09T08:00:00Z","notes":null},
+      {"id":"fl4-034","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-09T12:00:00Z","notes":null},
+      {"id":"fl4-035","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-09T18:00:00Z","notes":null},
+      {"id":"fl4-036","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-09T19:15:00Z","notes":null},
+      {"id":"fl4-037","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-09T20:30:00Z","notes":null},
+
+      {"id":"fl4-038","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-10T08:00:00Z","notes":null},
+      {"id":"fl4-039","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-10T12:00:00Z","notes":null},
+      {"id":"fl4-040","username":"delayed_user","food_id":"f4-004","quantity":"1 large","timestamp":"2025-06-10T18:00:00Z","notes":"baked potato"},
+      {"id":"fl4-041","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-10T19:30:00Z","notes":null},
+
+      {"id":"fl4-042","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-11T08:00:00Z","notes":null},
+      {"id":"fl4-043","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-11T12:30:00Z","notes":null},
+      {"id":"fl4-044","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-11T18:00:00Z","notes":null},
+      {"id":"fl4-045","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-11T19:30:00Z","notes":null},
+      {"id":"fl4-046","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-11T21:00:00Z","notes":null},
+
+      {"id":"fl4-047","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-12T08:00:00Z","notes":null},
+      {"id":"fl4-048","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-06-12T12:00:00Z","notes":null},
+      {"id":"fl4-049","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-12T18:00:00Z","notes":null},
+
+      {"id":"fl4-050","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-13T08:00:00Z","notes":null},
+      {"id":"fl4-051","username":"delayed_user","food_id":"f4-001","quantity":"1 bowl","timestamp":"2025-06-13T12:00:00Z","notes":"tomato soup"},
+      {"id":"fl4-052","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-13T15:30:00Z","notes":null},
+      {"id":"fl4-053","username":"delayed_user","food_id":"f4-004","quantity":"1 medium","timestamp":"2025-06-13T18:30:00Z","notes":"baked potato"},
+      {"id":"fl4-054","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-13T20:00:00Z","notes":null},
+      {"id":"fl4-055","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-13T21:30:00Z","notes":null},
+
+      {"id":"fl4-056","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-14T08:00:00Z","notes":null},
+      {"id":"fl4-057","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-14T12:00:00Z","notes":null},
+      {"id":"fl4-058","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-14T18:00:00Z","notes":null},
+      {"id":"fl4-059","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-14T19:30:00Z","notes":null},
+
+      {"id":"fl4-060","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-15T08:00:00Z","notes":null},
+      {"id":"fl4-061","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-15T12:00:00Z","notes":null},
+      {"id":"fl4-062","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-15T18:00:00Z","notes":null},
+      {"id":"fl4-063","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-15T20:00:00Z","notes":null},
+
+      {"id":"fl4-064","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-16T08:00:00Z","notes":null},
+      {"id":"fl4-065","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-16T12:30:00Z","notes":null},
+      {"id":"fl4-066","username":"delayed_user","food_id":"f4-002","quantity":"1 pepper","timestamp":"2025-06-16T18:00:00Z","notes":"stuffed bell pepper"},
+      {"id":"fl4-067","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-16T19:45:00Z","notes":null},
+      {"id":"fl4-068","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-16T21:00:00Z","notes":null},
+
+      {"id":"fl4-069","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-17T08:00:00Z","notes":null},
+      {"id":"fl4-070","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-06-17T12:00:00Z","notes":null},
+      {"id":"fl4-071","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-17T18:15:00Z","notes":null},
+
+      {"id":"fl4-072","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-18T08:00:00Z","notes":null},
+      {"id":"fl4-073","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-18T12:00:00Z","notes":null},
+      {"id":"fl4-074","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-18T18:00:00Z","notes":null},
+      {"id":"fl4-075","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-18T19:30:00Z","notes":null},
+      {"id":"fl4-076","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-18T21:00:00Z","notes":null},
+
+      {"id":"fl4-077","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-19T08:00:00Z","notes":null},
+      {"id":"fl4-078","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-19T12:30:00Z","notes":null},
+      {"id":"fl4-079","username":"delayed_user","food_id":"f4-003","quantity":"1 serving","timestamp":"2025-06-19T18:00:00Z","notes":"eggplant parmesan"},
+
+      {"id":"fl4-080","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-20T08:00:00Z","notes":null},
+      {"id":"fl4-081","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-20T12:00:00Z","notes":null},
+      {"id":"fl4-082","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-20T15:00:00Z","notes":null},
+      {"id":"fl4-083","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-20T18:30:00Z","notes":null},
+      {"id":"fl4-084","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-20T20:00:00Z","notes":null},
+      {"id":"fl4-085","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-20T21:15:00Z","notes":null},
+
+      {"id":"fl4-086","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-21T08:00:00Z","notes":null},
+      {"id":"fl4-087","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-06-21T12:30:00Z","notes":null},
+      {"id":"fl4-088","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-21T18:00:00Z","notes":null},
+      {"id":"fl4-089","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-21T20:00:00Z","notes":null},
+
+      {"id":"fl4-090","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-22T08:00:00Z","notes":null},
+      {"id":"fl4-091","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-22T12:00:00Z","notes":null},
+      {"id":"fl4-092","username":"delayed_user","food_id":"f4-004","quantity":"1 large","timestamp":"2025-06-22T18:00:00Z","notes":"loaded baked potato"},
+      {"id":"fl4-093","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-22T19:30:00Z","notes":null},
+      {"id":"fl4-094","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-22T21:00:00Z","notes":null},
+
+      {"id":"fl4-095","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-23T08:00:00Z","notes":null},
+      {"id":"fl4-096","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-23T12:00:00Z","notes":null},
+      {"id":"fl4-097","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-23T18:30:00Z","notes":null},
+
+      {"id":"fl4-098","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-24T08:00:00Z","notes":null},
+      {"id":"fl4-099","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-24T12:00:00Z","notes":null},
+      {"id":"fl4-100","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-24T15:00:00Z","notes":null},
+      {"id":"fl4-101","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-24T18:00:00Z","notes":null},
+      {"id":"fl4-102","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-24T20:00:00Z","notes":null},
+
+      {"id":"fl4-103","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-25T08:00:00Z","notes":null},
+      {"id":"fl4-104","username":"delayed_user","food_id":"f4-001","quantity":"1 bowl","timestamp":"2025-06-25T12:00:00Z","notes":"tomato soup"},
+      {"id":"fl4-105","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-06-25T18:30:00Z","notes":null},
+      {"id":"fl4-106","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-25T20:00:00Z","notes":null},
+
+      {"id":"fl4-107","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-26T08:00:00Z","notes":null},
+      {"id":"fl4-108","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-26T12:30:00Z","notes":null},
+      {"id":"fl4-109","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-26T18:00:00Z","notes":null},
+
+      {"id":"fl4-110","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-27T08:00:00Z","notes":null},
+      {"id":"fl4-111","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-27T12:00:00Z","notes":null},
+      {"id":"fl4-112","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-27T15:00:00Z","notes":null},
+      {"id":"fl4-113","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-27T18:00:00Z","notes":null},
+      {"id":"fl4-114","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-27T20:00:00Z","notes":null},
+      {"id":"fl4-115","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-27T21:30:00Z","notes":null},
+
+      {"id":"fl4-116","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-28T08:00:00Z","notes":null},
+      {"id":"fl4-117","username":"delayed_user","food_id":"f4-002","quantity":"1 pepper","timestamp":"2025-06-28T12:00:00Z","notes":"bell pepper for lunch"},
+      {"id":"fl4-118","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-28T18:30:00Z","notes":null},
+      {"id":"fl4-119","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-28T20:00:00Z","notes":null},
+
+      {"id":"fl4-120","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-29T08:00:00Z","notes":null},
+      {"id":"fl4-121","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-06-29T12:00:00Z","notes":null},
+      {"id":"fl4-122","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-06-29T18:00:00Z","notes":null},
+      {"id":"fl4-123","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-06-29T19:30:00Z","notes":null},
+      {"id":"fl4-124","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-06-29T21:00:00Z","notes":null},
+
+      {"id":"fl4-125","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-06-30T08:00:00Z","notes":null},
+      {"id":"fl4-126","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-06-30T12:00:00Z","notes":null},
+      {"id":"fl4-127","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-06-30T18:30:00Z","notes":null},
+
+      {"id":"fl4-128","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-01T08:00:00Z","notes":null},
+      {"id":"fl4-129","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-07-01T12:00:00Z","notes":null},
+      {"id":"fl4-130","username":"delayed_user","food_id":"f4-003","quantity":"1 serving","timestamp":"2025-07-01T18:00:00Z","notes":"eggplant parmesan"},
+      {"id":"fl4-131","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-07-01T19:30:00Z","notes":null},
+      {"id":"fl4-132","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-07-01T21:00:00Z","notes":null},
+
+      {"id":"fl4-133","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-02T08:00:00Z","notes":null},
+      {"id":"fl4-134","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-07-02T12:30:00Z","notes":null},
+      {"id":"fl4-135","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-07-02T18:00:00Z","notes":null},
+      {"id":"fl4-136","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-07-02T20:00:00Z","notes":null},
+
+      {"id":"fl4-137","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-03T08:00:00Z","notes":null},
+      {"id":"fl4-138","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-07-03T12:00:00Z","notes":null},
+      {"id":"fl4-139","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-07-03T18:00:00Z","notes":null},
+      {"id":"fl4-140","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-07-03T19:30:00Z","notes":null},
+      {"id":"fl4-141","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-07-03T21:00:00Z","notes":null},
+
+      {"id":"fl4-142","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-04T08:00:00Z","notes":null},
+      {"id":"fl4-143","username":"delayed_user","food_id":"f4-004","quantity":"1 medium","timestamp":"2025-07-04T12:00:00Z","notes":"baked potato"},
+      {"id":"fl4-144","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-07-04T18:00:00Z","notes":null},
+
+      {"id":"fl4-145","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-05T08:00:00Z","notes":null},
+      {"id":"fl4-146","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-07-05T12:30:00Z","notes":null},
+      {"id":"fl4-147","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-07-05T18:00:00Z","notes":null},
+      {"id":"fl4-148","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-07-05T19:30:00Z","notes":null},
+
+      {"id":"fl4-149","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-06T08:00:00Z","notes":null},
+      {"id":"fl4-150","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-07-06T12:00:00Z","notes":null},
+      {"id":"fl4-151","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-07-06T15:00:00Z","notes":null},
+      {"id":"fl4-152","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-07-06T18:00:00Z","notes":null},
+      {"id":"fl4-153","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-07-06T20:00:00Z","notes":null},
+      {"id":"fl4-154","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-07-06T21:30:00Z","notes":null},
+
+      {"id":"fl4-155","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-07T08:00:00Z","notes":null},
+      {"id":"fl4-156","username":"delayed_user","food_id":"f4-001","quantity":"1 bowl","timestamp":"2025-07-07T12:00:00Z","notes":"tomato soup"},
+      {"id":"fl4-157","username":"delayed_user","food_id":"f4-003","quantity":"1 serving","timestamp":"2025-07-07T18:00:00Z","notes":"eggplant parmesan"},
+      {"id":"fl4-158","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-07-07T19:30:00Z","notes":null},
+      {"id":"fl4-159","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-07-07T21:00:00Z","notes":null},
+
+      {"id":"fl4-160","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-08T08:00:00Z","notes":null},
+      {"id":"fl4-161","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-07-08T12:00:00Z","notes":null},
+      {"id":"fl4-162","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-07-08T18:00:00Z","notes":null},
+
+      {"id":"fl4-163","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-09T08:00:00Z","notes":null},
+      {"id":"fl4-164","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-07-09T12:30:00Z","notes":null},
+      {"id":"fl4-165","username":"delayed_user","food_id":"f4-008","quantity":"8 oz","timestamp":"2025-07-09T18:00:00Z","notes":null},
+      {"id":"fl4-166","username":"delayed_user","food_id":"f4-006","quantity":"1 bowl","timestamp":"2025-07-09T19:30:00Z","notes":null},
+
+      {"id":"fl4-167","username":"delayed_user","food_id":"f4-007","quantity":"1 bowl","timestamp":"2025-07-10T08:00:00Z","notes":null},
+      {"id":"fl4-168","username":"delayed_user","food_id":"f4-010","quantity":"1 fillet","timestamp":"2025-07-10T12:00:00Z","notes":null},
+      {"id":"fl4-169","username":"delayed_user","food_id":"f4-009","quantity":"1 cup","timestamp":"2025-07-10T15:00:00Z","notes":null},
+      {"id":"fl4-170","username":"delayed_user","food_id":"f4-005","quantity":"1 breast","timestamp":"2025-07-10T18:00:00Z","notes":null},
+      {"id":"fl4-171","username":"delayed_user","food_id":"f4-008","quantity":"6 oz","timestamp":"2025-07-10T20:30:00Z","notes":null}
+      ],
+    "symptom_logs": [
+      {"id":"sl4-001","username":"delayed_user","symptom_id":"s4-001","intensity":7,"duration":240,"timestamp":"2025-06-02T07:00:00Z","notes":"24h after tomato soup d1"},
+      {"id":"sl4-002","username":"delayed_user","symptom_id":"s4-002","intensity":6,"duration":180,"timestamp":"2025-06-02T07:15:00Z","notes":null},
+
+      {"id":"sl4-003","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":120,"timestamp":"2025-06-03T07:30:00Z","notes":"48h after tomato soup d1"},
+      {"id":"sl4-004","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":90,"timestamp":"2025-06-03T07:45:00Z","notes":null},
+
+      {"id":"sl4-005","username":"delayed_user","symptom_id":"s4-001","intensity":7,"duration":200,"timestamp":"2025-06-05T07:00:00Z","notes":"24h after bell pepper d4"},
+      {"id":"sl4-006","username":"delayed_user","symptom_id":"s4-002","intensity":6,"duration":150,"timestamp":"2025-06-05T07:15:00Z","notes":null},
+
+      {"id":"sl4-007","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":100,"timestamp":"2025-06-06T07:30:00Z","notes":"48h after bell pepper d4"},
+      {"id":"sl4-008","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":60,"timestamp":"2025-06-06T07:45:00Z","notes":null},
+
+      {"id":"sl4-009","username":"delayed_user","symptom_id":"s4-001","intensity":8,"duration":300,"timestamp":"2025-06-08T06:30:00Z","notes":"24h after eggplant d7"},
+      {"id":"sl4-010","username":"delayed_user","symptom_id":"s4-002","intensity":7,"duration":240,"timestamp":"2025-06-08T06:45:00Z","notes":null},
+
+      {"id":"sl4-011","username":"delayed_user","symptom_id":"s4-001","intensity":5,"duration":150,"timestamp":"2025-06-09T07:00:00Z","notes":"48h after eggplant d7"},
+      {"id":"sl4-012","username":"delayed_user","symptom_id":"s4-002","intensity":4,"duration":100,"timestamp":"2025-06-09T07:15:00Z","notes":null},
+
+      {"id":"sl4-013","username":"delayed_user","symptom_id":"s4-001","intensity":6,"duration":200,"timestamp":"2025-06-11T07:00:00Z","notes":"24h after potato d10"},
+      {"id":"sl4-014","username":"delayed_user","symptom_id":"s4-002","intensity":5,"duration":150,"timestamp":"2025-06-11T07:15:00Z","notes":null},
+
+      {"id":"sl4-015","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":120,"timestamp":"2025-06-12T07:30:00Z","notes":"48h after potato d10"},
+      {"id":"sl4-016","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":80,"timestamp":"2025-06-12T07:45:00Z","notes":null},
+
+      {"id":"sl4-017","username":"delayed_user","symptom_id":"s4-001","intensity":9,"duration":360,"timestamp":"2025-06-14T06:00:00Z","notes":"24h after double nightshade d13"},
+      {"id":"sl4-018","username":"delayed_user","symptom_id":"s4-002","intensity":8,"duration":300,"timestamp":"2025-06-14T06:15:00Z","notes":null},
+
+      {"id":"sl4-019","username":"delayed_user","symptom_id":"s4-001","intensity":5,"duration":180,"timestamp":"2025-06-15T07:00:00Z","notes":"48h after double nightshade d13"},
+      {"id":"sl4-020","username":"delayed_user","symptom_id":"s4-002","intensity":5,"duration":150,"timestamp":"2025-06-15T07:15:00Z","notes":null},
+
+      {"id":"sl4-021","username":"delayed_user","symptom_id":"s4-001","intensity":7,"duration":220,"timestamp":"2025-06-17T07:00:00Z","notes":"24h after bell pepper d16"},
+      {"id":"sl4-022","username":"delayed_user","symptom_id":"s4-002","intensity":6,"duration":160,"timestamp":"2025-06-17T07:15:00Z","notes":null},
+
+      {"id":"sl4-023","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":110,"timestamp":"2025-06-18T07:30:00Z","notes":"48h after bell pepper d16"},
+      {"id":"sl4-024","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":70,"timestamp":"2025-06-18T07:45:00Z","notes":null},
+
+      {"id":"sl4-025","username":"delayed_user","symptom_id":"s4-001","intensity":8,"duration":280,"timestamp":"2025-06-20T06:30:00Z","notes":"24h after eggplant d19"},
+      {"id":"sl4-026","username":"delayed_user","symptom_id":"s4-002","intensity":7,"duration":230,"timestamp":"2025-06-20T06:45:00Z","notes":null},
+
+      {"id":"sl4-027","username":"delayed_user","symptom_id":"s4-001","intensity":5,"duration":140,"timestamp":"2025-06-21T07:00:00Z","notes":"48h after eggplant d19"},
+      {"id":"sl4-028","username":"delayed_user","symptom_id":"s4-002","intensity":4,"duration":100,"timestamp":"2025-06-21T07:15:00Z","notes":null},
+
+      {"id":"sl4-029","username":"delayed_user","symptom_id":"s4-001","intensity":6,"duration":210,"timestamp":"2025-06-23T07:00:00Z","notes":"24h after potato d22"},
+      {"id":"sl4-030","username":"delayed_user","symptom_id":"s4-002","intensity":5,"duration":160,"timestamp":"2025-06-23T07:15:00Z","notes":null},
+
+      {"id":"sl4-031","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":110,"timestamp":"2025-06-24T07:30:00Z","notes":"48h after potato d22"},
+      {"id":"sl4-032","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":80,"timestamp":"2025-06-24T07:45:00Z","notes":null},
+
+      {"id":"sl4-033","username":"delayed_user","symptom_id":"s4-001","intensity":7,"duration":230,"timestamp":"2025-06-26T07:00:00Z","notes":"24h after tomato soup d25"},
+      {"id":"sl4-034","username":"delayed_user","symptom_id":"s4-002","intensity":6,"duration":170,"timestamp":"2025-06-26T07:15:00Z","notes":null},
+
+      {"id":"sl4-035","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":120,"timestamp":"2025-06-27T07:30:00Z","notes":"48h after tomato soup d25"},
+      {"id":"sl4-036","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":90,"timestamp":"2025-06-27T07:45:00Z","notes":null},
+
+      {"id":"sl4-037","username":"delayed_user","symptom_id":"s4-001","intensity":7,"duration":210,"timestamp":"2025-06-29T07:00:00Z","notes":"24h after bell pepper d28"},
+      {"id":"sl4-038","username":"delayed_user","symptom_id":"s4-002","intensity":6,"duration":160,"timestamp":"2025-06-29T07:15:00Z","notes":null},
+
+      {"id":"sl4-039","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":100,"timestamp":"2025-06-30T07:30:00Z","notes":"48h after bell pepper d28"},
+      {"id":"sl4-040","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":70,"timestamp":"2025-06-30T07:45:00Z","notes":null},
+
+      {"id":"sl4-041","username":"delayed_user","symptom_id":"s4-001","intensity":8,"duration":290,"timestamp":"2025-07-02T06:30:00Z","notes":"24h after eggplant d31"},
+      {"id":"sl4-042","username":"delayed_user","symptom_id":"s4-002","intensity":7,"duration":240,"timestamp":"2025-07-02T06:45:00Z","notes":null},
+
+      {"id":"sl4-043","username":"delayed_user","symptom_id":"s4-001","intensity":5,"duration":150,"timestamp":"2025-07-03T07:00:00Z","notes":"48h after eggplant d31"},
+      {"id":"sl4-044","username":"delayed_user","symptom_id":"s4-002","intensity":4,"duration":100,"timestamp":"2025-07-03T07:15:00Z","notes":null},
+
+      {"id":"sl4-045","username":"delayed_user","symptom_id":"s4-001","intensity":6,"duration":200,"timestamp":"2025-07-05T07:00:00Z","notes":"24h after potato d34"},
+      {"id":"sl4-046","username":"delayed_user","symptom_id":"s4-002","intensity":5,"duration":150,"timestamp":"2025-07-05T07:15:00Z","notes":null},
+
+      {"id":"sl4-047","username":"delayed_user","symptom_id":"s4-001","intensity":4,"duration":120,"timestamp":"2025-07-06T07:30:00Z","notes":"48h after potato d34"},
+      {"id":"sl4-048","username":"delayed_user","symptom_id":"s4-002","intensity":3,"duration":80,"timestamp":"2025-07-06T07:45:00Z","notes":null},
+
+      {"id":"sl4-049","username":"delayed_user","symptom_id":"s4-001","intensity":9,"duration":360,"timestamp":"2025-07-08T06:00:00Z","notes":"24h after double nightshade d37"},
+      {"id":"sl4-050","username":"delayed_user","symptom_id":"s4-002","intensity":9,"duration":320,"timestamp":"2025-07-08T06:15:00Z","notes":null},
+
+      {"id":"sl4-051","username":"delayed_user","symptom_id":"s4-001","intensity":5,"duration":180,"timestamp":"2025-07-09T07:00:00Z","notes":"48h after double nightshade d37"},
+      {"id":"sl4-052","username":"delayed_user","symptom_id":"s4-002","intensity":5,"duration":150,"timestamp":"2025-07-09T07:15:00Z","notes":null}
+    ]
+  },
+
+  "no_correlation_control": {
+    "description": "Control — random symptoms, no dietary trigger (false-positive test). 10 days, 3-7 foods/day.",
+    "username": "control_user",
+    "days": 10,
+    "foods": [
+      {"id":"f5-001","name":"Avocado Toast","ingredients":["bread","avocado","lemon","salt"],"username":null},
+      {"id":"f5-002","name":"Smoothie","ingredients":["banana","spinach","protein powder","almond milk"],"username":null},
+      {"id":"f5-003","name":"Turkey Sandwich","ingredients":["turkey","bread","lettuce","mustard"],"username":null},
+      {"id":"f5-004","name":"Sushi Roll","ingredients":["rice","nori","salmon","avocado"],"username":null},
+      {"id":"f5-005","name":"Caesar Salad","ingredients":["romaine","croutons","parmesan","caesar dressing"],"username":null},
+      {"id":"f5-006","name":"Tacos","ingredients":["tortilla","ground beef","cheese","salsa"],"username":null},
+      {"id":"f5-007","name":"Fruit Salad","ingredients":["watermelon","grapes","kiwi","mint"],"username":null},
+      {"id":"f5-008","name":"Veggie Wrap","ingredients":["tortilla","hummus","cucumber","bell pepper"],"username":null}
+    ],
+    "symptoms": [
+      {"id":"s5-001","username":"control_user","name":"Mild Headache","location":"head","sensation":"dull ache"},
+      {"id":"s5-002","username":"control_user","name":"Fatigue","location":"whole body","sensation":"tiredness"},
+      {"id":"s5-003","username":"control_user","name":"Nausea","location":"stomach","sensation":"queasy"}
+    ],
+    "food_logs": [
+      {"id":"fl5-001","username":"control_user","food_id":"f5-001","quantity":"2 slices","timestamp":"2025-08-01T08:00:00Z","notes":null},
+      {"id":"fl5-002","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-01T10:00:00Z","notes":null},
+      {"id":"fl5-003","username":"control_user","food_id":"f5-003","quantity":"1 sandwich","timestamp":"2025-08-01T12:30:00Z","notes":null},
+      {"id":"fl5-004","username":"control_user","food_id":"f5-006","quantity":"3 tacos","timestamp":"2025-08-01T19:00:00Z","notes":null},
+
+      {"id":"fl5-005","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-02T08:30:00Z","notes":null},
+      {"id":"fl5-006","username":"control_user","food_id":"f5-005","quantity":"1 serving","timestamp":"2025-08-02T12:00:00Z","notes":null},
+      {"id":"fl5-007","username":"control_user","food_id":"f5-008","quantity":"1 wrap","timestamp":"2025-08-02T15:00:00Z","notes":null},
+      {"id":"fl5-008","username":"control_user","food_id":"f5-004","quantity":"6 pieces","timestamp":"2025-08-02T18:30:00Z","notes":null},
+      {"id":"fl5-009","username":"control_user","food_id":"f5-007","quantity":"1 bowl","timestamp":"2025-08-02T20:00:00Z","notes":null},
+      {"id":"fl5-010","username":"control_user","food_id":"f5-001","quantity":"1 slice","timestamp":"2025-08-02T21:15:00Z","notes":null},
+
+      {"id":"fl5-011","username":"control_user","food_id":"f5-001","quantity":"2 slices","timestamp":"2025-08-03T08:00:00Z","notes":null},
+      {"id":"fl5-012","username":"control_user","food_id":"f5-006","quantity":"2 tacos","timestamp":"2025-08-03T12:15:00Z","notes":null},
+      {"id":"fl5-013","username":"control_user","food_id":"f5-003","quantity":"1 sandwich","timestamp":"2025-08-03T17:30:00Z","notes":null},
+
+      {"id":"fl5-014","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-04T07:45:00Z","notes":null},
+      {"id":"fl5-015","username":"control_user","food_id":"f5-005","quantity":"1 serving","timestamp":"2025-08-04T12:00:00Z","notes":null},
+      {"id":"fl5-016","username":"control_user","food_id":"f5-001","quantity":"2 slices","timestamp":"2025-08-04T15:00:00Z","notes":null},
+      {"id":"fl5-017","username":"control_user","food_id":"f5-004","quantity":"8 pieces","timestamp":"2025-08-04T18:00:00Z","notes":null},
+      {"id":"fl5-018","username":"control_user","food_id":"f5-007","quantity":"1 bowl","timestamp":"2025-08-04T20:30:00Z","notes":null},
+
+      {"id":"fl5-019","username":"control_user","food_id":"f5-001","quantity":"2 slices","timestamp":"2025-08-05T08:00:00Z","notes":null},
+      {"id":"fl5-020","username":"control_user","food_id":"f5-003","quantity":"1 sandwich","timestamp":"2025-08-05T12:30:00Z","notes":null},
+      {"id":"fl5-021","username":"control_user","food_id":"f5-008","quantity":"1 wrap","timestamp":"2025-08-05T15:00:00Z","notes":null},
+      {"id":"fl5-022","username":"control_user","food_id":"f5-006","quantity":"3 tacos","timestamp":"2025-08-05T18:00:00Z","notes":null},
+      {"id":"fl5-023","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-05T20:00:00Z","notes":null},
+      {"id":"fl5-024","username":"control_user","food_id":"f5-004","quantity":"4 pieces","timestamp":"2025-08-05T21:00:00Z","notes":null},
+      {"id":"fl5-025","username":"control_user","food_id":"f5-007","quantity":"1 bowl","timestamp":"2025-08-05T22:00:00Z","notes":null},
+
+      {"id":"fl5-026","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-06T08:00:00Z","notes":null},
+      {"id":"fl5-027","username":"control_user","food_id":"f5-004","quantity":"6 pieces","timestamp":"2025-08-06T11:30:00Z","notes":null},
+      {"id":"fl5-028","username":"control_user","food_id":"f5-005","quantity":"1 serving","timestamp":"2025-08-06T14:00:00Z","notes":null},
+      {"id":"fl5-029","username":"control_user","food_id":"f5-003","quantity":"1 sandwich","timestamp":"2025-08-06T19:00:00Z","notes":null},
+
+      {"id":"fl5-030","username":"control_user","food_id":"f5-001","quantity":"2 slices","timestamp":"2025-08-07T08:15:00Z","notes":null},
+      {"id":"fl5-031","username":"control_user","food_id":"f5-007","quantity":"1 bowl","timestamp":"2025-08-07T10:30:00Z","notes":null},
+      {"id":"fl5-032","username":"control_user","food_id":"f5-006","quantity":"2 tacos","timestamp":"2025-08-07T13:00:00Z","notes":null},
+      {"id":"fl5-033","username":"control_user","food_id":"f5-008","quantity":"1 wrap","timestamp":"2025-08-07T16:00:00Z","notes":null},
+      {"id":"fl5-034","username":"control_user","food_id":"f5-004","quantity":"8 pieces","timestamp":"2025-08-07T19:30:00Z","notes":null},
+      {"id":"fl5-035","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-07T21:00:00Z","notes":null},
+
+      {"id":"fl5-036","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-08T07:30:00Z","notes":null},
+      {"id":"fl5-037","username":"control_user","food_id":"f5-005","quantity":"1 serving","timestamp":"2025-08-08T12:00:00Z","notes":null},
+      {"id":"fl5-038","username":"control_user","food_id":"f5-006","quantity":"3 tacos","timestamp":"2025-08-08T19:30:00Z","notes":null},
+
+      {"id":"fl5-039","username":"control_user","food_id":"f5-001","quantity":"2 slices","timestamp":"2025-08-09T08:00:00Z","notes":null},
+      {"id":"fl5-040","username":"control_user","food_id":"f5-004","quantity":"6 pieces","timestamp":"2025-08-09T12:00:00Z","notes":null},
+      {"id":"fl5-041","username":"control_user","food_id":"f5-008","quantity":"1 wrap","timestamp":"2025-08-09T15:00:00Z","notes":null},
+      {"id":"fl5-042","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-09T17:30:00Z","notes":null},
+      {"id":"fl5-043","username":"control_user","food_id":"f5-005","quantity":"1 serving","timestamp":"2025-08-09T19:00:00Z","notes":null},
+
+      {"id":"fl5-044","username":"control_user","food_id":"f5-002","quantity":"1 glass","timestamp":"2025-08-10T08:00:00Z","notes":null},
+      {"id":"fl5-045","username":"control_user","food_id":"f5-003","quantity":"1 sandwich","timestamp":"2025-08-10T11:00:00Z","notes":null},
+      {"id":"fl5-046","username":"control_user","food_id":"f5-006","quantity":"2 tacos","timestamp":"2025-08-10T13:30:00Z","notes":null},
+      {"id":"fl5-047","username":"control_user","food_id":"f5-007","quantity":"1 bowl","timestamp":"2025-08-10T16:00:00Z","notes":null},
+      {"id":"fl5-048","username":"control_user","food_id":"f5-004","quantity":"8 pieces","timestamp":"2025-08-10T19:00:00Z","notes":null},
+      {"id":"fl5-049","username":"control_user","food_id":"f5-001","quantity":"2 slices","timestamp":"2025-08-10T21:00:00Z","notes":null}
+    ],
+    "symptom_logs": [
+      {"id":"sl5-001","username":"control_user","symptom_id":"s5-002","intensity":3,"duration":60,"timestamp":"2025-08-02T14:00:00Z","notes":"just tired"},
+      {"id":"sl5-002","username":"control_user","symptom_id":"s5-001","intensity":2,"duration":30,"timestamp":"2025-08-04T10:00:00Z","notes":"mild"},
+      {"id":"sl5-003","username":"control_user","symptom_id":"s5-003","intensity":4,"duration":45,"timestamp":"2025-08-07T20:00:00Z","notes":"felt queasy"},
+      {"id":"sl5-004","username":"control_user","symptom_id":"s5-002","intensity":2,"duration":90,"timestamp":"2025-08-09T16:00:00Z","notes":"afternoon slump"}
+    ]
+  }
+}
