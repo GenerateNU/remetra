@@ -6,7 +6,6 @@ from dataclasses import dataclass
 class FoodLogEntry:
     timestamp: datetime
     ingredients: list[str] 
-    servings: int
 
 @dataclass
 class SymptomLogEntry:
