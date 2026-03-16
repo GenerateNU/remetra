@@ -28,7 +28,7 @@ async def fetch_food_logs(db: AsyncSession, username: str) -> list[FoodLogEntry]
     FoodLogEntry(
       timestamp = food_log.timestamp,
       ingredients = food.ingredients,
-      servings = food_log.quantity 
+      # servings = food_log.quantity
 
     )
     for food_log, food in rows 
