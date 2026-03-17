@@ -12,6 +12,7 @@ class FoodLogEntry:
 class SymptomLogEntry:
     timestamp: datetime
     symptom_name: str
+<<<<<<< HEAD
     intensity: int
     location: str = ("",)
     sensation: str = ("",)
@@ -25,3 +26,9 @@ class IngredientSymptomMetrics:
     base_rate: float  # P(symptom follows | did NOT eat ingredient) = c / (F - ingredient_total)
     fishers_p_value: float  # one-sided Fisher's exact test — probability this association is random chance
     average_intensity: float  # mean symptom intensity (1-10) across the exposures
+=======
+    location: str
+    sensation: str
+    intensity: int
+    duration: int | None = None
+>>>>>>> f672dc0 (feat: add binary search algorithm to get all food logs within a variable time window of a symptom log)

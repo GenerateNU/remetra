@@ -30,8 +30,14 @@ def get_food_logs_within_time_window_before_symptoms(
         raise ValueError("time_window_hours must be >= 0")
 
     window_delta = timedelta(hours=time_window_hours)
+<<<<<<< HEAD
     
     sorted_food_timestamps = [log.timestamp for log in food_logs]
+=======
+
+    sorted_food_logs = sorted(food_logs, key=lambda log: log.timestamp)
+    sorted_food_timestamps = [log.timestamp for log in sorted_food_logs]
+>>>>>>> f672dc0 (feat: add binary search algorithm to get all food logs within a variable time window of a symptom log)
 
     results: list[SymptomFoodWindowResult] = []
     for symptom_log in symptom_logs:
@@ -43,7 +49,11 @@ def get_food_logs_within_time_window_before_symptoms(
         results.append(
             SymptomFoodWindowResult(
                 symptom_log=symptom_log,
+<<<<<<< HEAD
                 food_logs=food_logs[start_index:end_index],
+=======
+                food_logs=sorted_food_logs[start_index:end_index],
+>>>>>>> f672dc0 (feat: add binary search algorithm to get all food logs within a variable time window of a symptom log)
             )
         )
 
