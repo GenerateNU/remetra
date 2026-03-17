@@ -5,6 +5,8 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from schemas.tag import SuggestedIngredientResponse, SuggestedBucketResponse
+
 
 class FoodBase(BaseModel):
     """
@@ -41,10 +43,17 @@ class FoodResponse(FoodBase):
     """
     Data structure for food responses sent back to clients.
 
-    Includes food data
-    like ID, timestamps, and current stock that the database tracks automatically.
+    Includes food data like ID, timestamps, and current stock that the database tracks automatically.
     """
 
-    model_config = ConfigDict(from_attributes=True)  # Allows loading from database models (SQLAlchemy)
+    model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(..., description="Unique ID for this food product")
+    suggested_ingredients: list[SuggestedIngredientResponse] = Field(
+        default=[],
+        description="LLM-suggested ingredients with their trigger buckets"
+    )
+    suggested_buckets: list[SuggestedBucketResponse] = Field(
+        default=[],
+        description="LLM-suggested trigger bucket tags for this food"
+    )
