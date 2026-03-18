@@ -1,19 +1,24 @@
-from sentence_transformers import SentenceTransformer
+from typing import List
 
+from pdfconvert import chunk_text, convert
+from sentence_transformers import SentenceTransformer
 from sqlalchemy.orm import Session
 
-from models import KnowledgeChunk
-from pdfconvert import convert, chunk_text
+from models.KnowledgeChunk import KnowledgeChunk
+from repositories.chunk_repository import ChunkRepository
 
 # all-MiniLM-L6-v2 as the embedding model
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+chunkRepo = ChunkRepository()
+
 
 def embed(texts: list[str]) -> list[list[float]]:
     """Embed a list of strings using all-MiniLM-L6-v2."""
     embeddings = model.encode(texts, convert_to_numpy=True)
-    return embeddings.tolist()  
+    return embeddings.tolist()
 
-def ingest_pdf(db: Session, file, source: str) -> KnowledgeChunk:
+
+def ingest_pdf(db: Session, file, source: str) -> List[KnowledgeChunk]:
     # 1. Parse
     full_text = convert(file)
 
@@ -26,16 +31,16 @@ def ingest_pdf(db: Session, file, source: str) -> KnowledgeChunk:
     # 4. Pair each chunk with its embedding and source
     return [
         {
-            "content":     text,
+            "content": text,
             "chunk_index": idx,
-            "embedding":   vector,
-            "source":      source,
+            "embedding": vector,
+            "source": source,
         }
         for idx, (text, vector) in enumerate(zip(chunks, vectors))
     ]
 
-    #Got to add below to a different file as it edits the DB 
-    '''
+    # Got to add below to a different file as it edits the DB
+    """
     # 4. Persist
     doc = KnowledgeChunk(source=source)
     db.add(doc)
@@ -53,4 +58,9 @@ def ingest_pdf(db: Session, file, source: str) -> KnowledgeChunk:
     db.commit()
     db.refresh(doc)
     return doc
-    '''
+    """
+
+
+def similarity_search(input: str, db: Session, n: int = 5) -> List[KnowledgeChunk]:
+    embedQuery = embed([input])[0]
+    return chunkRepo.get_top_chunks(db, embedQuery, n)
