@@ -10,7 +10,7 @@ from backend.models.symptom_log import SymptomLog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import FoodLogEntry, SymptomLogEntry
+from analysis.models import FoodLogEntry, SymptomLogEntry
 
 
 async def fetch_food_logs(db: AsyncSession, username: str) -> list[FoodLogEntry]:
