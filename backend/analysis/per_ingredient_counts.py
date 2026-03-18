@@ -1,6 +1,5 @@
 from analysis.models import FoodLogEntry
 
-
 def count_ingredient_occurrences(
     food_logs: list[FoodLogEntry],
 ) -> tuple[dict[str, int], int]:

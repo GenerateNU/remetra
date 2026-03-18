@@ -1,9 +1,10 @@
-from analysis.models import FoodLogEntry, SymptomLogEntry, IngredientSymptomMetrics
-from analysis.per_ingredient_counts import count_ingredient_occurrences
-from analysis.search import get_food_logs_within_time_window_before_symptoms, SymptomFoodWindowResult
-
 from collections import defaultdict
+
 from scipy.stats import fisher_exact
+
+from analysis.models import FoodLogEntry, IngredientSymptomMetrics, SymptomLogEntry
+from analysis.per_ingredient_counts import count_ingredient_occurrences
+from analysis.search import SymptomFoodWindowResult, get_food_logs_within_time_window_before_symptoms
 
 
 def get_analysis(
@@ -12,9 +13,7 @@ def get_analysis(
     time_window_hours: float,
 ) -> dict[str, dict[str, IngredientSymptomMetrics]]:
     ingredient_counts, total_food_events = count_ingredient_occurrences(food_logs)
-    counts, foods_in_windows = get_food_symptom_counts(
-        food_logs, symptom_logs, time_window_hours
-    )
+    counts, foods_in_windows = get_food_symptom_counts(food_logs, symptom_logs, time_window_hours)
 
     result: dict[str, dict[str, IngredientSymptomMetrics]] = {}
     for symptom_name, ingredient_data in counts.items():
@@ -25,7 +24,7 @@ def get_analysis(
             ingredient_total = ingredient_counts.get(ingredient, 0)
             if ingredient_total == 0:
                 continue
-          
+
             # a = food events with ingredient found in symptom windows
             # b = food events with ingredient NOT in any symptom window
             # c = food events WITHOUT ingredient found in symptom windows
@@ -74,15 +73,11 @@ def get_food_symptom_counts(
         foods_in_windows: symptom_name -> total food events found across all windows
                           (needed for computing c in the contingency table)
     """
-    counts: dict[str, dict[str, list]] = defaultdict(
-        lambda: defaultdict(lambda: [0, []])
-    )
+    counts: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(lambda: [0, []]))
     foods_in_windows: dict[str, int] = defaultdict(int)
 
-    window_results: list[SymptomFoodWindowResult] = (
-        get_food_logs_within_time_window_before_symptoms(
-            food_logs, symptom_logs, time_window_hours
-        )
+    window_results: list[SymptomFoodWindowResult] = get_food_logs_within_time_window_before_symptoms(
+        food_logs, symptom_logs, time_window_hours
     )
 
     for window_result in window_results:
