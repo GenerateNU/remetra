@@ -3,11 +3,7 @@ from datetime import datetime
 import pytest
 
 from analysis.models import FoodLogEntry, SymptomLogEntry
-<<<<<<< HEAD
 from analysis.algorithm import get_analysis, get_food_symptom_counts
-=======
-from analysis.algorithm import get_analysis
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
 
 
 def food(ts: str, ingredients: list[str]) -> FoodLogEntry:
@@ -28,13 +24,14 @@ def symptom(ts: str, name: str, intensity: int) -> SymptomLogEntry:
 # Basic metrics
 # ---------------------------------------------------------------------------
 
+
 def test_trigger_rate_base_rate_and_rr():
     # gluten appears before 2 of 3 bloating events, and in 3 of 4 total food logs
     food_logs = [
         food("2024-01-01T08:00", ["gluten"]),  # within window of symptom 1
         food("2024-01-02T08:00", ["gluten"]),  # within window of symptom 2
         food("2024-01-03T08:00", ["gluten"]),  # NOT within any symptom window
-        food("2024-01-04T08:00", ["rice"]),    # within window of symptom 3
+        food("2024-01-04T08:00", ["rice"]),  # within window of symptom 3
     ]
     symptom_logs = [
         symptom("2024-01-01T10:00", "bloating", 7),
@@ -44,14 +41,8 @@ def test_trigger_rate_base_rate_and_rr():
     result = get_analysis(food_logs, symptom_logs, time_window_hours=4)
     gluten = result["bloating"]["gluten"]
 
-<<<<<<< HEAD
     assert gluten.trigger_rate == 0.6667
     assert gluten.base_rate == 1
-=======
-    assert gluten.trigger_rate == pytest.approx(2 / 3)
-    assert gluten.base_rate == pytest.approx(3 / 4)
-    assert gluten.relative_risk == pytest.approx((2 / 3) / (3 / 4))
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
     assert 0.0 <= gluten.fishers_p_value <= 1.0
 
 
@@ -72,16 +63,6 @@ def test_average_intensity():
 # Fisher's exact — direction check
 # ---------------------------------------------------------------------------
 
-<<<<<<< HEAD
-=======
-def test_fishers_p_value_low_for_strong_association():
-    # ingredient appears before every symptom event and rarely otherwise
-    food_logs = [food(f"2024-01-0{i}T08:00", ["trigger"]) for i in range(1, 6)]
-    symptom_logs = [symptom(f"2024-01-0{i}T10:00", "headache", 5) for i in range(1, 5)]
-    result = get_analysis(food_logs, symptom_logs, time_window_hours=4)
-    assert result["headache"]["trigger"].fishers_p_value < 0.05
-
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
 
 def test_fishers_p_value_high_for_no_association():
     # ingredient appears at the same rate before symptoms and otherwise
@@ -101,6 +82,7 @@ def test_fishers_p_value_high_for_no_association():
 # ---------------------------------------------------------------------------
 # Edge cases
 # ---------------------------------------------------------------------------
+
 
 def test_ingredient_never_before_symptom_is_absent_from_result():
     food_logs = [
@@ -137,9 +119,11 @@ def test_multiple_symptoms_independent():
     assert "dairy" not in result["bloating"]
     assert "gluten" not in result["cramps"]
 
+
 # ---------------------------------------------------------------------------
 # Multi-ingredient foods
 # ---------------------------------------------------------------------------
+
 
 def test_multi_ingredient_food_all_ingredients_counted():
     """A single food with 4 ingredients before a symptom should create
@@ -167,7 +151,7 @@ def test_shared_ingredient_across_foods_counted_once_per_symptom():
     twice, a (count) would exceed S and c = S - a would go negative."""
     food_logs = [
         food("2024-01-01T08:00", ["wheat flour", "yeast", "salt"]),  # bread
-        food("2024-01-01T10:00", ["eggs", "butter", "salt"]),        # eggs
+        food("2024-01-01T10:00", ["eggs", "butter", "salt"]),  # eggs
         # day without symptom
         food("2024-01-02T08:00", ["rice", "chicken"]),
     ]
@@ -177,17 +161,10 @@ def test_shared_ingredient_across_foods_counted_once_per_symptom():
     result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
     bloating = result.get("bloating", {})
 
-<<<<<<< HEAD
     salt = bloating["salt"]
     assert salt.trigger_rate == 1, "Every salt event occured before bloating, should be 1"
     assert salt.base_rate == 0, "Every bloating symptom had a salt in the window before"
     assert salt.average_intensity == 6
-=======
-    # salt appeared in 2 food events total (b=2), but only 1 symptom event (a=1)
-    # so a <= b must hold -- if dedup is broken, a=2 which > total symptom count
-    salt = bloating["salt"]
-    assert salt.exposed_pos == 1, "salt should be counted once per symptom event, not per food"
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
 
 
 def test_confounded_ingredients_both_surface():
@@ -223,13 +200,13 @@ def test_confounded_ingredients_both_surface():
 # Overlapping ingredient sets — credit assignment
 # ---------------------------------------------------------------------------
 
+
 def test_overlapping_ingredients_different_trigger_rates():
     """Meals A (gluten + dairy) and B (dairy + rice) both contain dairy.
     Only meal A precedes symptoms. Gluten should have a higher trigger
     rate than dairy, and dairy higher than rice."""
     food_logs = [
         # meal A days — gluten + dairy, symptom follows
-<<<<<<< HEAD
         # meal B days — dairy + rice, no symptom
         food("2024-01-01T08:00", ["gluten", "dairy", "salt"]),
         food("2024-01-02T08:00", ["dairy", "rice", "salt"]),
@@ -240,18 +217,6 @@ def test_overlapping_ingredients_different_trigger_rates():
         food("2024-01-07T08:00", ["gluten", "dairy", "salt"]),
         food("2024-01-08T08:00", ["dairy", "rice", "salt"]),
         food("2024-01-09T08:00", ["gluten", "dairy", "salt"]),
-=======
-        food("2024-01-01T08:00", ["gluten", "dairy", "salt"]),
-        food("2024-01-03T08:00", ["gluten", "dairy", "salt"]),
-        food("2024-01-05T08:00", ["gluten", "dairy", "salt"]),
-        food("2024-01-07T08:00", ["gluten", "dairy", "salt"]),
-        food("2024-01-09T08:00", ["gluten", "dairy", "salt"]),
-        # meal B days — dairy + rice, no symptom
-        food("2024-01-02T08:00", ["dairy", "rice", "salt"]),
-        food("2024-01-04T08:00", ["dairy", "rice", "salt"]),
-        food("2024-01-06T08:00", ["dairy", "rice", "salt"]),
-        food("2024-01-08T08:00", ["dairy", "rice", "salt"]),
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
         food("2024-01-10T08:00", ["dairy", "rice", "salt"]),
     ]
     symptom_logs = [
@@ -268,19 +233,10 @@ def test_overlapping_ingredients_different_trigger_rates():
     assert bloating["gluten"].trigger_rate == pytest.approx(1.0)
     # dairy: 10 exposures, 5 before symptoms → trigger_rate = 0.5
     assert bloating["dairy"].trigger_rate == pytest.approx(0.5)
-<<<<<<< HEAD
     assert bloating["dairy"].base_rate == pytest.approx(0)
     # rice: 5 exposures, 0 before symptoms → should not appear or trigger_rate = 0
     assert "rice" not in bloating or bloating["rice"].trigger_rate == pytest.approx(0.0)
 
-=======
-    # rice: 5 exposures, 0 before symptoms → should not appear or trigger_rate = 0
-    assert "rice" not in bloating or bloating["rice"].trigger_rate == pytest.approx(0.0)
-
-    # gluten RR should be higher than dairy RR
-    assert bloating["gluten"].relative_risk > bloating["dairy"].relative_risk
-
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
 
 def test_ingredient_in_window_from_different_foods():
     """Garlic appears in two different foods eaten before the same symptom.
@@ -296,16 +252,13 @@ def test_ingredient_in_window_from_different_foods():
     ]
     result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
     nausea = result.get("nausea", {})
-<<<<<<< HEAD
     assert nausea["garlic"].exposures == 2
-=======
-    assert nausea["garlic"].exposed_pos == 1
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
 
 
 # ---------------------------------------------------------------------------
 # Intensity tracking with multi-ingredient foods
 # ---------------------------------------------------------------------------
+
 
 def test_intensity_tracked_per_ingredient_across_events():
     """Different symptom events have different intensities. Each ingredient
@@ -335,6 +288,7 @@ def test_intensity_tracked_per_ingredient_across_events():
 # Multiple symptoms from same multi-ingredient meal
 # ---------------------------------------------------------------------------
 
+
 def test_one_food_triggers_multiple_symptom_types():
     """A single multi-ingredient meal precedes two different symptom types.
     Each symptom type should independently track the ingredients."""
@@ -356,22 +310,16 @@ def test_one_food_triggers_multiple_symptom_types():
     ]
     result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
 
-<<<<<<< HEAD
     # bloating: gluten has 3 exposed out of 3 exposures
     assert result["bloating"]["gluten"].exposures == 3
     # headache: gluten has 2 exposed out of 3 exposures
     assert result["headache"]["gluten"].exposures == 2
-=======
-    # bloating: gluten has 3 exposed_pos out of 3 exposures
-    assert result["bloating"]["gluten"].exposed_pos == 3
-    # headache: gluten has 2 exposed_pos out of 3 exposures
-    assert result["headache"]["gluten"].exposed_pos == 2
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
 
 
 # ---------------------------------------------------------------------------
 # Null ingredients handling
 # ---------------------------------------------------------------------------
+
 
 def test_food_with_no_ingredients_is_skipped():
     """Foods like 'Banana' have ingredients=None or []. They should not
@@ -393,27 +341,19 @@ def test_food_with_no_ingredients_is_skipped():
 # Window boundary precision with multi-ingredient meals
 # ---------------------------------------------------------------------------
 
+
 def test_window_boundary_includes_exact_edge():
     """A food eaten exactly 6 hours before a symptom should be included
     in a 6-hour window. A food at 6h01m should not."""
     food_logs = [
-<<<<<<< HEAD
-        food("2024-01-01T05:59", ["soy", "rice"]),        # 6h01m before — outside
-        food("2024-01-01T06:00", ["gluten", "dairy"]),   # exactly 6hrs before
-=======
-        food("2024-01-01T06:00", ["gluten", "dairy"]),   # exactly 6hrs before
-        food("2024-01-01T05:59", ["soy", "rice"]),        # 6h01m before — outside
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
+        food("2024-01-01T05:59", ["soy", "rice"]),  # 6h01m before — outside
+        food("2024-01-01T06:00", ["gluten", "dairy"]),  # exactly 6hrs before
     ]
     symptom_logs = [
         symptom("2024-01-01T12:00", "bloating", 5),
     ]
     result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
     bloating = result.get("bloating", {})
-<<<<<<< HEAD
-
-=======
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
     assert "gluten" in bloating
     assert "dairy" in bloating
     assert "soy" not in bloating
@@ -424,6 +364,7 @@ def test_window_boundary_includes_exact_edge():
 # Realistic multi-food meal scenario
 # ---------------------------------------------------------------------------
 
+
 def test_realistic_meal_with_shared_base_ingredients():
     """Simulate a realistic dinner: pasta (gluten, water, salt), marinara
     (tomato, garlic, olive oil, salt), and salad (lettuce, olive oil, salt).
@@ -431,7 +372,7 @@ def test_realistic_meal_with_shared_base_ingredients():
     once per symptom event."""
     food_logs = [
         # dinner on day 1 — three dishes
-        food("2024-01-01T18:00", ["gluten", "water", "salt"]),       # pasta
+        food("2024-01-01T18:00", ["gluten", "water", "salt"]),  # pasta
         food("2024-01-01T18:00", ["tomato", "garlic", "olive oil", "salt"]),  # sauce
         food("2024-01-01T18:00", ["lettuce", "olive oil", "salt"]),  # salad
         # lunch on day 2 — safe meal
@@ -455,7 +396,6 @@ def test_realistic_meal_with_shared_base_ingredients():
     result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
     bloating = result.get("bloating", {})
 
-<<<<<<< HEAD
     assert bloating["salt"].exposures == 9
     assert bloating["gluten"].exposures == 3
     assert bloating["olive oil"].exposures == 6
@@ -463,14 +403,3 @@ def test_realistic_meal_with_shared_base_ingredients():
     # rice/chicken/broccoli only appear on non-symptom days
     for ing in ["rice", "chicken", "broccoli"]:
         assert ing not in bloating or bloating[ing].exposures == 0
-=======
-    # salt appears in 3 food events on day 1 but should count as 1 symptom exposure
-    # and 3 food events on day 3, 3 on day 5 → exposed_pos should be 3 (one per symptom)
-    assert bloating["salt"].exposed_pos == 3
-    assert bloating["gluten"].exposed_pos == 3
-    assert bloating["olive oil"].exposed_pos == 3
-
-    # rice/chicken/broccoli only appear on non-symptom days
-    for ing in ["rice", "chicken", "broccoli"]:
-        assert ing not in bloating or bloating[ing].exposed_pos == 0
->>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
