@@ -12,16 +12,16 @@ class FoodLogEntry:
 class SymptomLogEntry:
     timestamp: datetime
     symptom_name: str
-    location: str
-    sensation: str
     intensity: int
+    location: str = "",
+    sensation: str = "",
     duration: int | None = None
 
 
 @dataclass
 class IngredientSymptomMetrics:
-    trigger_rate: float       # P(ingredient | symptom)
-    base_rate: float          # P(ingredient overall)
-    relative_risk: float      # trigger_rate / base_rate
-    fishers_p_value: float    # one-sided Fisher's exact p-value
-    average_intensity: float  # mean symptom intensity when ingredient present
+    exposures: int            # food events with this ingredient that preceded a symptom (a)
+    trigger_rate: float       # P(symptom follows | ate ingredient) = a / ingredient_total
+    base_rate: float          # P(symptom follows | did NOT eat ingredient) = c / (F - ingredient_total)
+    fishers_p_value: float    # one-sided Fisher's exact test — probability this association is random chance
+    average_intensity: float  # mean symptom intensity (1-10) across the exposures

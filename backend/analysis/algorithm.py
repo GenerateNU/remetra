@@ -12,38 +12,52 @@ def get_analysis(
     time_window_hours: float,
 ) -> dict[str, dict[str, IngredientSymptomMetrics]]:
     ingredient_counts, total_food_events = count_ingredient_occurrences(food_logs)
-    counts = get_food_symptom_counts(food_logs, symptom_logs, time_window_hours)
-
-    symptom_event_counts: dict[str, int] = defaultdict(int)
-    for s in symptom_logs:
-        symptom_event_counts[s.symptom_name] += 1
+    counts, foods_in_windows = get_food_symptom_counts(
+        food_logs, symptom_logs, time_window_hours
+    )
 
     result: dict[str, dict[str, IngredientSymptomMetrics]] = {}
     for symptom_name, ingredient_data in counts.items():
         result[symptom_name] = {}
-        total_symptom_events = symptom_event_counts[symptom_name]
+        total_in_window = foods_in_windows[symptom_name]
 
-        for ingredient, (co_count, intensities) in ingredient_data.items():
+        for ingredient, (a, intensities) in ingredient_data.items():
             ingredient_total = ingredient_counts.get(ingredient, 0)
+            if ingredient_total == 0:
+                continue
+          
+            # a = food events with ingredient found in symptom windows
+            # b = food events with ingredient NOT in any symptom window
+            # c = food events WITHOUT ingredient found in symptom windows
+            # d = food events WITHOUT ingredient NOT in any symptom window
 
-            trigger_rate = co_count / total_symptom_events if total_symptom_events > 0 else 0.0
-            base_rate = ingredient_total / total_food_events if total_food_events > 0 else 0.0
-            relative_risk = trigger_rate / base_rate if base_rate > 0 else 0.0
+            b = ingredient_total - a
+            c = total_in_window - a
+            d = (total_food_events - ingredient_total) - c
 
-            a = co_count
-            b = total_symptom_events - co_count
-            c = ingredient_total - co_count
-            d = total_food_events - ingredient_total - b
+            # guard against edge cases from overlapping windows
+            b = max(b, 0)
+            c = max(c, 0)
+            d = max(d, 0)
+
+            # ── metrics ──
+            # trigger_rate: "when you eat X, how often does symptom follow?"
+            trigger_rate = a / ingredient_total
+
+            # base_rate: "when you DON'T eat X, how often does symptom follow?"
+            unexposed_total = total_food_events - ingredient_total
+            base_rate = c / unexposed_total if unexposed_total > 0 else 0.0
+
             _, p_value = fisher_exact([[a, b], [c, d]], alternative="greater")
 
             avg_intensity = sum(intensities) / len(intensities) if intensities else 0.0
 
             result[symptom_name][ingredient] = IngredientSymptomMetrics(
-                trigger_rate=trigger_rate,
-                base_rate=base_rate,
-                relative_risk=relative_risk,
-                fishers_p_value=p_value,
-                average_intensity=avg_intensity,
+                exposures=a,
+                trigger_rate=round(trigger_rate, 4),
+                base_rate=round(base_rate, 4),
+                fishers_p_value=round(p_value, 6),
+                average_intensity=round(avg_intensity, 2),
             )
 
     return result
@@ -53,36 +67,34 @@ def get_food_symptom_counts(
     food_logs: list[FoodLogEntry],
     symptom_logs: list[SymptomLogEntry],
     time_window_hours: float,
-) -> dict[str, dict[str, list]]:
-  
-  # symptom_name -> ingredient -> [count, 
-  counts: dict[str, dict[str, list]] = defaultdict(
-    lambda: defaultdict(lambda: [0, []])
-)
+) -> tuple[dict[str, dict[str, list]], dict[str, int]]:
+    """
+    Returns:
+        counts: symptom_name -> ingredient -> [co_occurrence_count, [intensities]]
+        foods_in_windows: symptom_name -> total food events found across all windows
+                          (needed for computing c in the contingency table)
+    """
+    counts: dict[str, dict[str, list]] = defaultdict(
+        lambda: defaultdict(lambda: [0, []])
+    )
+    foods_in_windows: dict[str, int] = defaultdict(int)
 
-  foods_before_symptom: list[SymptomFoodWindowResult] = get_food_logs_within_time_window_before_symptoms(
-    food_logs,
-    symptom_logs,
-    time_window_hours
-  )
+    window_results: list[SymptomFoodWindowResult] = (
+        get_food_logs_within_time_window_before_symptoms(
+            food_logs, symptom_logs, time_window_hours
+        )
+    )
 
-  # loop through all symptom -> foods pairings and track ingredient counts
-  for windowResult in foods_before_symptom:
-    symp = windowResult.symptom_log
-    s_name = symp.symptom_name
+    for window_result in window_results:
+        symp = window_result.symptom_log
+        s_name = symp.symptom_name
 
-    # union all ingredients across foods in this window
-    unique_ingredients: set[str] = set()
-    for food in windowResult.food_logs:
-        unique_ingredients.update(food.ingredients)
+        foods_in_windows[s_name] += len(window_result.food_logs)
 
-    # now count each ingredient once per symptom event (only for the sake of future metric computation)
-    for ingredient in unique_ingredients:
-        entry = counts[s_name][ingredient]
-        entry[0] += 1
-        entry[1].append(symp.intensity)
-    
-  return counts
+        for food in window_result.food_logs:
+            for ingredient in set(food.ingredients):
+                entry = counts[s_name][ingredient]
+                entry[0] += 1
+                entry[1].append(symp.intensity)
 
-
-
+    return counts, foods_in_windows
