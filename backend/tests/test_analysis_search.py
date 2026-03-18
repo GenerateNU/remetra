@@ -52,6 +52,7 @@ class TestBinarySearchWindow:
         assert [f.ingredients[0] for f in result[0].food_logs] == ["start-boundary"]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     def test_handles_unsorted_food_logs(self):
         foods = [
@@ -66,6 +67,8 @@ class TestBinarySearchWindow:
         assert [f.ingredients[0] for f in result[0].food_logs] == ["middle", "latest"]
 
 >>>>>>> f672dc0 (feat: add binary search algorithm to get all food logs within a variable time window of a symptom log)
+=======
+>>>>>>> 09ff03a (Implement get_analysis and add tests (some failing))
     def test_raises_for_negative_time_window(self):
         foods = [food_at("toast", "2026-03-16T08:00:00+00:00")]
         symptoms = [symptom_at("headache", "2026-03-16T11:00:00+00:00")]
