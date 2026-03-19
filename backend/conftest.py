@@ -21,6 +21,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from database import Base
+import models
 from models.food import Food
 from models.food_log import FoodLog
 from models.symptom import Symptom

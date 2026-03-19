@@ -10,6 +10,10 @@ from scalar_fastapi import get_scalar_api_reference
 from sqlalchemy import text
 
 from database import Base, engine
+<<<<<<< HEAD
+=======
+import models
+>>>>>>> cc74836 (WIP)
 from middleware.logging_middleware import LoggingMiddleware
 from routers.algorithm_router import router as algorithm_router
 from routers.auth import router as auth_router
@@ -19,6 +23,12 @@ from routers.ingest_router import router as ingest_router
 from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
+
+with engine.connect() as conn:
+    conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+    conn.commit()
+
+Base.metadata.create_all(bind=engine)
 
 with engine.connect() as conn:
     conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
