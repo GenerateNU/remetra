@@ -21,4 +21,4 @@ class Food(Base):
     username = Column(String, nullable=True)  # Optional: if foods are user-specific
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    food_logs = relationship("FoodLog", back_populates="food")
+    food_tags = relationship("FoodTag", back_populates="food")

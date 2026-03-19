@@ -4,9 +4,7 @@ import uuid
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
-
 from schemas.tag import SuggestedIngredientResponse, SuggestedBucketResponse
-
 
 class FoodBase(BaseModel):
     """
@@ -57,3 +55,13 @@ class FoodResponse(FoodBase):
         default=[],
         description="LLM-suggested trigger bucket tags for this food"
     )
+
+class FoodSuggestionRequest(BaseModel):
+    """
+    Request schema for pre-create food suggestions.
+    Accepts draft food info and optional pre-selected tags,
+    returns LLM/RAG suggested ingredients and buckets without persisting anything.
+    """
+    name: str = Field(..., description="Name of the food", min_length=1, max_length=100)
+    ingredients: list[str] = Field(default=[], description="List of ingredients already known")
+    selected_tag_ids: list[uuid.UUID] = Field(default=[], description="Tag IDs the user already selected")

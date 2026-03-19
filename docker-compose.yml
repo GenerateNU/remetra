@@ -10,13 +10,15 @@ services:
       - /app/.venv
     environment:
       - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://test_user:test_password@test-db:5432/test_remetra
     env_file:
       - path: .env
         required: false
-
+    depends_on:
+      - test-db
 
   test-db:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_USER: test_user
       POSTGRES_PASSWORD: test_password
@@ -26,5 +28,18 @@ services:
     volumes:
       - test_db_data:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@remetra.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - test-db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   test_db_data:
+  pgadmin_data:

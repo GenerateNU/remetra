@@ -3,14 +3,14 @@ from uuid import UUID
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TagBase(BaseModel):
     """Shared tag fields."""
     name: str
     description: Optional[str] = None
-    llm_suggested: bool = False
+    is_system: bool = False
 
 
 class TagCreate(TagBase):
@@ -23,7 +23,7 @@ class TagResponse(TagBase):
     id: UUID
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SuggestedIngredientResponse(BaseModel):
@@ -42,3 +42,13 @@ class SuggestedTagsAndIngredientsResponse(BaseModel):
     """Schema for the full LLM suggestion response."""
     suggested_ingredients: list[SuggestedIngredientResponse]
     suggested_buckets: list[SuggestedBucketResponse]
+
+class FoodSuggestionRequest(BaseModel):
+    """
+    Request schema for pre-create food suggestions.
+    Accepts draft food info and optional pre-selected tags,
+    returns LLM/RAG suggested ingredients and buckets without persisting anything.
+    """
+    name: str = Field(..., description="Name of the food", min_length=1, max_length=100)
+    ingredients: list[str] = Field(default=[], description="List of ingredients already known")
+    selected_tag_ids: list[UUID] = Field(default=[], description="Tag IDs the user already selected")

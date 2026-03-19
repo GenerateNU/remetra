@@ -1,10 +1,10 @@
-from typing import List
+from typing import Any
 
-from pdfconvert import chunk_text, convert
+from services.pdfconvert import chunk_text, convert
 from sentence_transformers import SentenceTransformer
 from sqlalchemy.orm import Session
 
-from models.KnowledgeChunk import KnowledgeChunk
+from models.knowledge_chunk import KnowledgeChunk
 from repositories.chunk_repository import ChunkRepository
 
 # all-MiniLM-L6-v2 as the embedding model
@@ -18,7 +18,7 @@ def embed(texts: list[str]) -> list[list[float]]:
     return embeddings.tolist()
 
 
-def ingest_pdf(db: Session, file, source: str) -> List[KnowledgeChunk]:
+def ingest_pdf(db: Session, file, source: str) -> list[dict[str, Any]]:
     # 1. Parse
     full_text = convert(file)
 
@@ -61,6 +61,6 @@ def ingest_pdf(db: Session, file, source: str) -> List[KnowledgeChunk]:
     """
 
 
-def similarity_search(input: str, db: Session, n: int = 5) -> List[KnowledgeChunk]:
+def similarity_search(input: str, db: Session, n: int = 5) -> list[KnowledgeChunk]:
     embedQuery = embed([input])[0]
     return chunkRepo.get_top_chunks(db, embedQuery, n)

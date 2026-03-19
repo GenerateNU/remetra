@@ -3,7 +3,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from models.KnowledgeChunk import KnowledgeChunk
+from models.knowledge_chunk import KnowledgeChunk
 
 
 class ChunkRepository:
@@ -27,5 +27,5 @@ class ChunkRepository:
         """
         logging.info("Retrieving best match chunks from the database")
 
-        distance = KnowledgeChunk.embedding.cosine_distance(query).label("distance")
-        return db.query(KnowledgeChunk, distance).order_by(distance).limit(n).all()
+        distance = KnowledgeChunk.embedding.cosine_distance(query)
+        return db.query(KnowledgeChunk).order_by(distance).limit(n).all()

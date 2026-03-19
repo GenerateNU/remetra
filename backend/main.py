@@ -7,11 +7,20 @@ This module initializes the FastAPI application and registers all route handlers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from scalar_fastapi import get_scalar_api_reference
+from sqlalchemy import text
 
+from database import Base, engine
+import models
 from middleware.logging_middleware import LoggingMiddleware
 from routers import auth
 from routers.food_router import router as food_router
 from routers.symptom_log_route import router as symptom_log_router
+
+with engine.connect() as conn:
+    conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+    conn.commit()
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Remetra API",
