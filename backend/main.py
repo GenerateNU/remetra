@@ -12,9 +12,10 @@ from sqlalchemy import text
 from database import Base, engine
 import models
 from middleware.logging_middleware import LoggingMiddleware
-from routers import auth
 from routers.food_router import router as food_router
 from routers.symptom_log_route import router as symptom_log_router
+from routers.food_log_router import router as food_log_router
+from routers.auth import router as auth_router
 
 with engine.connect() as conn:
     conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
@@ -39,9 +40,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+<<<<<<< HEAD
 app.include_router(auth.router)
 app.include_router(symptom_log_router)
+=======
+app.include_router(auth_router)
+>>>>>>> 56bccbf (WIP: 2)
 app.include_router(food_router)
+app.include_router(food_log_router)
 
 
 @app.get("/scalar", include_in_schema=False)
