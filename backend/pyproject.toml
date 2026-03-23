@@ -22,9 +22,12 @@ dependencies = [
     "sqlalchemy>=2.0.46",
     "uvicorn[standard]>=0.40.0",
     "google-generativeai>=0.8.0",
+<<<<<<< HEAD
     "torch",
     "sentence-transformers>=5.3.0",
     "pypdf>=6.9.2",
+=======
+>>>>>>> 7e10c20 (Added RAG Tagging Service)
 ]
 
 [tool.uv.sources]
