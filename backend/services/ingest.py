@@ -17,10 +17,21 @@ def embed(texts: list[str]) -> list[list[float]]:
     return embeddings.tolist()
 
 
+<<<<<<< HEAD
 def ingest_pdf(file, source: str) -> list[dict[str, Any]]:
     """Parse, chunk, and embed a PDF. Returns chunk dicts ready to persist."""
     full_text = convert(file)
     chunks = chunk_text(full_text)
+=======
+def ingest_pdf(db: Session, file, source: str, strategy: str) -> list[dict[str, Any]]:
+    # 1. Parse
+    full_text = convert(file)
+
+    # 2. Chunk
+    chunks = chunk_text(full_text, strategy)
+
+    # 3. Embed (batch for efficiency)
+>>>>>>> 936ac18 (feat: created script to run different strategies and edited existing files to check strategy string. Added create_chunks and clear_chunks to chunk repository. Haven't tested yet)
     vectors = embed(chunks)
 
     return [
