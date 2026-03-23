@@ -11,6 +11,7 @@ from scalar_fastapi import get_scalar_api_reference
 from middleware.logging_middleware import LoggingMiddleware
 from routers import auth
 from routers.food_router import router as food_router
+from routers.symptom_log_route import router as symptom_log_router
 
 app = FastAPI(
     title="Remetra API",
@@ -30,6 +31,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(symptom_log_router)
 app.include_router(food_router)
 
 
