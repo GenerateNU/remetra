@@ -1,6 +1,5 @@
 """User repository for database operations."""
 
-from datetime import date
 from typing import Optional
 
 from sqlalchemy.orm import Session

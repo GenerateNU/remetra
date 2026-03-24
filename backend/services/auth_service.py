@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from repositories.user_repository import UserRepository
-from schemas.user import UserCreate, UserUpdate, UserResponse
+from schemas.user import UserCreate, UserResponse, UserUpdate
 
 SECRET_KEY = os.getenv("SECRET_KEY", "Ch@ng31tN0W!")
 ALGORITHM = "HS256"
