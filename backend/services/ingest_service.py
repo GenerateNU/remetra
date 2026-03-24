@@ -47,4 +47,8 @@ class IngestService:
                 logger.error("Failed to ingest '%s': %s", source, e)
                 results.append({"source": source, "error": str(e)})
 
+<<<<<<< HEAD
         return {"sources_ingested": results}
+=======
+        return {"sources_ingested": results}
+>>>>>>> cd6cf96 (feat: ingest pipeline — pdf parsing, chunking, embedding, vector store endpoints)

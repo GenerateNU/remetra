@@ -1,7 +1,11 @@
 import logging
 from pathlib import Path
 
+<<<<<<< HEAD
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+=======
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+>>>>>>> cd6cf96 (feat: ingest pipeline — pdf parsing, chunking, embedding, vector store endpoints)
 from sqlalchemy.orm import Session
 
 from database import get_db
