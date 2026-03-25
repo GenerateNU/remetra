@@ -2,27 +2,34 @@
 
 import pytest
 from fastapi import HTTPException
+from fastapi.testclient import TestClient
 
+from main import app
 from repositories.user_repository import UserRepository
 from schemas.user import UserCreate
 from services.auth_service import AuthService, decode_access_token
+
+client = TestClient(app)
 
 
 class TestAuthServiceIntegration:
     """Integration tests for auth service with real database."""
 
     def test_register_user_success(self, db_session, sample_user_data):
-        """Test successful user registration."""
+        """Test successful user registration returns token response."""
         service = AuthService()
 
         user_create = UserCreate(**sample_user_data)
-        user = service.register_user(db_session, user_create)
+        token_data = service.register_user(db_session, user_create)
 
-        assert user.username == sample_user_data["username"]
-        assert user.email == sample_user_data["email"]
-        assert user.disease == sample_user_data["disease"]
-        assert user.weight == sample_user_data["weight"]
-        assert user.created_at is not None
+        assert "access_token" in token_data
+        assert token_data["token_type"] == "bearer"
+        assert token_data["username"] == sample_user_data["username"]
+
+        # Verify token is valid and contains correct subject
+        payload = decode_access_token(token_data["access_token"])
+        assert payload is not None
+        assert payload["sub"] == sample_user_data["username"]
 
     def test_register_user_duplicate_username(self, db_session, sample_user_data):
         """Test that duplicate usernames are prevented."""
@@ -101,9 +108,9 @@ class TestAuthServiceIntegration:
         service = AuthService()
 
         user_create = UserCreate(**sample_user_data)
-        registered_user = service.register_user(db_session, user_create)
+        token_data = service.register_user(db_session, user_create)
 
-        user = service.get_current_user(db_session, registered_user.username)
+        user = service.get_current_user(db_session, token_data["username"])
 
         assert user is not None
         assert user.username == sample_user_data["username"]
@@ -121,10 +128,10 @@ class TestAuthServiceIntegration:
         """Test complete user flow from registration to getting current user."""
         service = AuthService()
 
-        # 1. Register
+        # 1. Register — returns token response directly
         user_create = UserCreate(**sample_user_data)
-        registered_user = service.register_user(db_session, user_create)
-        assert registered_user.username == sample_user_data["username"]
+        register_token = service.register_user(db_session, user_create)
+        assert register_token["username"] == sample_user_data["username"]
 
         # 2. Login
         token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
@@ -202,3 +209,54 @@ class TestUserRepositoryIntegration:
         user = repo.get_by_email(db_session, "notfound@example.com")
 
         assert user is None
+
+
+class TestMeEndpoint:
+    """HTTP-level integration tests for GET /auth/me."""
+
+    def _register_and_get_token(self, username: str, email: str) -> str:
+        """Register a user via /auth/signup and return the access token."""
+        response = client.post(
+            "/auth/signup",
+            json={
+                "username": username,
+                "email": email,
+                "password": "password123",
+                "disease": ["lupus"],
+                "weight": 150.0,
+            },
+        )
+        assert response.status_code == 201
+        return response.json()["access_token"]
+
+    def test_me_success(self):
+        """Test /me returns user info for a valid token."""
+        token = self._register_and_get_token("me_test_user", "me_test@example.com")
+
+        response = client.get("/auth/me", headers={"authorization": f"Bearer {token}"})
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["username"] == "me_test_user"
+        assert data["email"] == "me_test@example.com"
+        assert "password_hash" not in data
+        assert "created_at" in data
+
+    def test_me_invalid_token(self):
+        """Test /me returns 401 for an invalid token."""
+        response = client.get("/auth/me", headers={"authorization": "Bearer invalidtoken"})
+
+        assert response.status_code == 401
+
+    def test_me_missing_bearer_prefix(self):
+        """Test /me returns 401 when Authorization header lacks 'Bearer ' prefix."""
+        token = self._register_and_get_token("me_nobearer_user", "me_nobearer@example.com")
+        response = client.get("/auth/me", headers={"authorization": token})
+
+        assert response.status_code == 401
+
+    def test_me_missing_authorization_header(self):
+        """Test /me returns 422 when Authorization header is absent."""
+        response = client.get("/auth/me")
+
+        assert response.status_code == 422

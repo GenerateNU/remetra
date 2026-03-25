@@ -102,11 +102,11 @@ def authenticated_user(db_session, sample_user_data):
     service = AuthService()
 
     user_create = UserCreate(**sample_user_data)
-    user = service.register_user(db_session, user_create)
+    register_data = service.register_user(db_session, user_create)
 
     token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
 
-    return {"user": user, "token": token_data["access_token"], "username": user.username}
+    return {"user": register_data, "token": token_data["access_token"], "username": register_data["username"]}
 
 
 @pytest.fixture
