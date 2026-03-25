@@ -2,14 +2,10 @@
 
 import pytest
 from fastapi import HTTPException
-from fastapi.testclient import TestClient
 
-from main import app
 from repositories.user_repository import UserRepository
 from schemas.user import UserCreate
 from services.auth_service import AuthService, decode_access_token
-
-client = TestClient(app)
 
 
 class TestAuthServiceIntegration:
@@ -214,7 +210,7 @@ class TestUserRepositoryIntegration:
 class TestMeEndpoint:
     """HTTP-level integration tests for GET /auth/me."""
 
-    def _register_and_get_token(self, username: str, email: str) -> str:
+    def _register_and_get_token(self, client, username: str, email: str) -> str:
         """Register a user via /auth/signup and return the access token."""
         response = client.post(
             "/auth/signup",
@@ -229,11 +225,11 @@ class TestMeEndpoint:
         assert response.status_code == 201
         return response.json()["access_token"]
 
-    def test_me_success(self):
+    def test_me_success(self, test_client):
         """Test /me returns user info for a valid token."""
-        token = self._register_and_get_token("me_test_user", "me_test@example.com")
+        token = self._register_and_get_token(test_client, "me_test_user", "me_test@example.com")
 
-        response = client.get("/auth/me", headers={"authorization": f"Bearer {token}"})
+        response = test_client.get("/auth/me", headers={"authorization": f"Bearer {token}"})
 
         assert response.status_code == 200
         data = response.json()
@@ -242,21 +238,21 @@ class TestMeEndpoint:
         assert "password_hash" not in data
         assert "created_at" in data
 
-    def test_me_invalid_token(self):
+    def test_me_invalid_token(self, test_client):
         """Test /me returns 401 for an invalid token."""
-        response = client.get("/auth/me", headers={"authorization": "Bearer invalidtoken"})
+        response = test_client.get("/auth/me", headers={"authorization": "Bearer invalidtoken"})
 
         assert response.status_code == 401
 
-    def test_me_missing_bearer_prefix(self):
+    def test_me_missing_bearer_prefix(self, test_client):
         """Test /me returns 401 when Authorization header lacks 'Bearer ' prefix."""
-        token = self._register_and_get_token("me_nobearer_user", "me_nobearer@example.com")
-        response = client.get("/auth/me", headers={"authorization": token})
+        token = self._register_and_get_token(test_client, "me_nobearer_user", "me_nobearer@example.com")
+        response = test_client.get("/auth/me", headers={"authorization": token})
 
         assert response.status_code == 401
 
-    def test_me_missing_authorization_header(self):
+    def test_me_missing_authorization_header(self, test_client):
         """Test /me returns 422 when Authorization header is absent."""
-        response = client.get("/auth/me")
+        response = test_client.get("/auth/me")
 
         assert response.status_code == 422
