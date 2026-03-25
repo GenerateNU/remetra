@@ -1,0 +1,114 @@
+{
+  "user_archetypes": {
+    "user_001": "legume_sensitive",
+    "user_002": "gluten_sensitive",
+    "user_003": "gluten_sensitive",
+    "user_004": "gluten_sensitive",
+    "user_005": "gluten_sensitive",
+    "user_006": "legume_sensitive",
+    "user_007": "healthy",
+    "user_008": "gluten_sensitive",
+    "user_009": "legume_sensitive",
+    "user_010": "healthy",
+    "user_011": "dairy_sensitive",
+    "user_012": "gluten_sensitive",
+    "user_013": "healthy",
+    "user_014": "gluten_sensitive",
+    "user_015": "legume_sensitive",
+    "user_016": "legume_sensitive",
+    "user_017": "healthy",
+    "user_018": "gluten_sensitive",
+    "user_019": "legume_sensitive",
+    "user_020": "dairy_sensitive",
+    "user_021": "gluten_sensitive",
+    "user_022": "gluten_sensitive",
+    "user_023": "dairy_sensitive",
+    "user_024": "dairy_sensitive",
+    "user_025": "gluten_sensitive",
+    "user_026": "gluten_sensitive",
+    "user_027": "dairy_sensitive",
+    "user_028": "legume_sensitive",
+    "user_029": "healthy",
+    "user_030": "legume_sensitive",
+    "user_031": "healthy",
+    "user_032": "healthy",
+    "user_033": "gluten_sensitive",
+    "user_034": "healthy",
+    "user_035": "legume_sensitive",
+    "user_036": "gluten_sensitive",
+    "user_037": "legume_sensitive",
+    "user_038": "healthy",
+    "user_039": "gluten_sensitive",
+    "user_040": "dairy_sensitive"
+  },
+  "archetype_definitions": {
+    "gluten_sensitive": {
+      "name": "gluten_sensitive",
+      "triggers": [
+        "gluten"
+      ],
+      "threshold": 0.9,
+      "lag_hours": [
+        12,
+        36
+      ],
+      "symptoms": [
+        "bloating",
+        "cramping"
+      ],
+      "severity_range": [
+        4,
+        9
+      ]
+    },
+    "dairy_sensitive": {
+      "name": "dairy_sensitive",
+      "triggers": [
+        "dairy"
+      ],
+      "threshold": 0.85,
+      "lag_hours": [
+        6,
+        24
+      ],
+      "symptoms": [
+        "bloating",
+        "gas"
+      ],
+      "severity_range": [
+        3,
+        8
+      ]
+    },
+    "legume_sensitive": {
+      "name": "legume_sensitive",
+      "triggers": [
+        "legumes"
+      ],
+      "threshold": 0.8,
+      "lag_hours": [
+        4,
+        12
+      ],
+      "symptoms": [
+        "gas",
+        "bloating"
+      ],
+      "severity_range": [
+        3,
+        7
+      ]
+    },
+    "healthy": {
+      "name": "healthy",
+      "triggers": [],
+      "threshold": null,
+      "lag_hours": null,
+      "symptoms": [],
+      "severity_range": [
+        1,
+        3
+      ]
+    }
+  }
+}
