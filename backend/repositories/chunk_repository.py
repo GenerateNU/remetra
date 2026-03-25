@@ -1,9 +1,5 @@
 import logging
-<<<<<<< HEAD
 from typing import Any
-=======
-from typing import Any, List
->>>>>>> 936ac18 (feat: created script to run different strategies and edited existing files to check strategy string. Added create_chunks and clear_chunks to chunk repository. Haven't tested yet)
 
 from sqlalchemy.orm import Session
 
@@ -21,7 +17,6 @@ class ChunkRepository:
         distance = KnowledgeChunk.embedding.cosine_distance(query)
         return db.query(KnowledgeChunk).order_by(distance).limit(n).all()
 
-<<<<<<< HEAD
     def create_chunks(self, db: Session, chunks: list[dict[str, Any]]) -> list[KnowledgeChunk]:
         """Persist a batch of chunk dicts. Each must have: content, embedding, source."""
         logger.info("Inserting %d knowledge chunks", len(chunks))
@@ -57,29 +52,3 @@ class ChunkRepository:
             db.rollback()
             logger.error("Failed to clear chunks for source='%s': %s", source, e)
             raise
-=======
-    def create_chunks(self, db: Session, source: str, chunks: list[dict[str, Any]]) -> KnowledgeChunk:
-        doc = KnowledgeChunk(source=source)
-        db.add(doc)
-        db.flush()  # get doc.id before inserting chunks
-
-        for chunk in chunks:
-            db.add(
-                KnowledgeChunk(
-                    document_id=doc.id,
-                    content=chunk["content"],
-                    chunk_index=chunk["chunk_index"],
-                    embedding=chunk["embedding"],
-                    source=source,
-                )
-            )
-
-        db.commit()
-        db.refresh(doc)
-        return doc
-
-    def clear_chunks(self, db: Session):
-        db.query(KnowledgeChunk).delete()
-        db.commit()
-        logging.info("Cleared all knowledge chunks")
->>>>>>> 936ac18 (feat: created script to run different strategies and edited existing files to check strategy string. Added create_chunks and clear_chunks to chunk repository. Haven't tested yet)
