@@ -17,6 +17,11 @@ export interface AuthResponse {
   username: string;
 }
 
+export interface MeResponse {
+  username: string;
+  email: string;
+}
+
 export class AuthError extends Error {
   constructor(message: string) {
     super(message);
@@ -43,6 +48,16 @@ export const authService = {
       return data;
     } catch (err: any) {
       throw new AuthError(err.response?.data?.detail ?? 'Incorrect username or password');
+    }
+  },
+
+  // GET /auth/me -> get_current_user()
+  async getMe(): Promise<MeResponse> {
+    try {
+      const { data } = await apiClient.get('/auth/me');
+      return data;
+    } catch (err: any) {
+      throw new AuthError(err.response?.data?.detail ?? 'Failed to fetch user profile');
     }
   },
 };

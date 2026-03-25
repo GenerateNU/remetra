@@ -11,10 +11,6 @@ export const apiClient: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// const authToken = useAuthStore.getState().accessToken;
-// const authToken = useAuthStore.login().getState();
-// console.log(authToken);
-
 // Request interceptor — attaches Bearer token when available
 apiClient.interceptors.request.use((config) => {
   const authToken = useAuthStore.getState().accessToken;
@@ -45,7 +41,6 @@ apiClient.interceptors.response.use(
 
     // (backend error payloads will appear in error.response.data)
     // eslint-disable-next-line no-console
-    console.error('API Error:', error.response?.data ?? error.message);
     return Promise.reject(error);
   }
 );

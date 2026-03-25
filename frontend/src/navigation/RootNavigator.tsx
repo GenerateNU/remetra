@@ -7,7 +7,6 @@ import { MainStack } from './stacks/MainStack';
 
 export const RootNavigator = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  console.log(isAuthenticated)
   const hasCompletedOnboarding = useAuthStore((s) => s.hasCompletedOnboarding);
 
   const renderStack = () => {

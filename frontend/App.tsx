@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { setOnUnauthenticated } from './src/api/client';
+import { useAuthStore } from './src/store/useAuthStore';
 import "./global.css";
 
-console.log('App.tsx loaded');
-
 export default function App() {
-  console.log('App rendering');
+  useEffect(() => {
+    setOnUnauthenticated(() => useAuthStore.getState().logout());
+  }, []);
   return <RootNavigator />;
 }
