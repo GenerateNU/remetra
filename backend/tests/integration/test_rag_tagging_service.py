@@ -2,8 +2,6 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from schemas.tag import SuggestedIngredientResponse, SuggestedTagsAndIngredientsResponse
 from services.RAGTaggingService import RAGTaggingService
 
@@ -17,7 +15,8 @@ class TestRAGTaggingService:
         mock_llm = MagicMock()
         mock_genai.GenerativeModel.return_value = mock_llm
         mock_llm.generate_content.return_value = MagicMock(
-            text="""{"suggested_ingredients": [{"name": "wheat flour", "buckets": ["gluten", "wheat"]}], "suggested_buckets": [{"name": "gluten", "description": "contains wheat flour"}]}"""
+            text="""{"suggested_ingredients": [{"name": "wheat flour", "buckets": ["gluten", "wheat"]}], 
+            "suggested_buckets": [{"name": "gluten", "description": "contains wheat flour"}]}"""
         )
 
         service = RAGTaggingService()
@@ -37,7 +36,8 @@ class TestRAGTaggingService:
         mock_llm = MagicMock()
         mock_genai.GenerativeModel.return_value = mock_llm
         mock_llm.generate_content.return_value = MagicMock(
-            text="""{"suggested_ingredients": [{"name": "milk", "buckets": ["dairy"]}], "suggested_buckets": [{"name": "dairy", "description": "ice cream typically contains milk"}]}"""
+            text="""{"suggested_ingredients": [{"name": "milk", "buckets": ["dairy"]}], 
+            "suggested_buckets": [{"name": "dairy", "description": "ice cream typically contains milk"}]}"""
         )
 
         service = RAGTaggingService()
@@ -57,7 +57,9 @@ class TestRAGTaggingService:
         mock_llm = MagicMock()
         mock_genai.GenerativeModel.return_value = mock_llm
         mock_llm.generate_content.return_value = MagicMock(
-            text="""{"suggested_ingredients": [{"name": "cheese", "buckets": ["dairy"]}], "suggested_buckets": [{"name": "dairy", "description": "contains cheese"}]}"""
+            text="""{"suggested_ingredients": 
+            [{"name": "cheese", "buckets": ["dairy"]}], "suggested_buckets":
+              [{"name": "dairy", "description": "contains cheese"}]}"""
         )
 
         tags_before = db_session.query(Tag).count()
@@ -102,9 +104,13 @@ class TestRAGTaggingService:
         """If LLM wraps JSON in markdown code fences, it should still parse correctly."""
         mock_llm = MagicMock()
         mock_genai.GenerativeModel.return_value = mock_llm
-        mock_llm.generate_content.return_value = MagicMock(
-            text="```json\n{\"suggested_ingredients\": [{\"name\": \"milk\", \"buckets\": [\"dairy\"]}], \"suggested_buckets\": [{\"name\": \"dairy\", \"description\": \"contains milk\"}]}\n```"
+        json_text = (
+            "```json\n"
+            "{\"suggested_ingredients\": [{\"name\": \"milk\", \"buckets\": [\"dairy\"]}],"
+            " \"suggested_buckets\": [{\"name\": \"dairy\", \"description\": \"contains milk\"}]}"
+            "\n```"
         )
+        mock_llm.generate_content.return_value = MagicMock(text=json_text)
 
         service = RAGTaggingService()
         result = service.suggest(db_session, "latte", ["milk", "espresso"])

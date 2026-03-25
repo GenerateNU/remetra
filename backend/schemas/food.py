@@ -4,7 +4,9 @@ import uuid
 from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
-from schemas.tag import SuggestedIngredientResponse, SuggestedBucketResponse
+
+from schemas.tag import SuggestedBucketResponse, SuggestedIngredientResponse
+
 
 class FoodBase(BaseModel):
     """

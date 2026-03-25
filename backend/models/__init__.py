@@ -1,1 +1,1 @@
-from models import food, food_log, symptom, symptom_log, user, tag, knowledge_chunk
+from models import food,    food_log, knowledge_chunk, symptom, symptom_log, tag, user

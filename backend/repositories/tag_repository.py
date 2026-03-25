@@ -109,4 +109,4 @@ class TagRepository:
             .join(FoodTag, FoodTag.tag_id == Tag.id)
             .filter(FoodTag.food_id == food_id)
             .all()
-        )g
+        )
