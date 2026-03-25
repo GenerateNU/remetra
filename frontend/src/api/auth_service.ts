@@ -33,9 +33,10 @@ export class AuthError extends Error {
 export const authService = {
 
   // POST /auth/signup -> register_user()
-  async register(payload: RegisterPayload): Promise<void> {
+  async register(payload: RegisterPayload): Promise<AuthResponse> {
     try {
-      await apiClient.post('/auth/signup', payload);
+      const { data } = await apiClient.post('/auth/signup', payload);
+      return data;
     } catch (err: any) {
       throw new AuthError(err.response?.data?.detail ?? 'Registration failed');
     }

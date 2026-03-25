@@ -62,12 +62,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       register: async (payload) => {
-        await authService.register(payload);
-        // Registration doesn't return a token, so log them in right after
-        const response = await authService.login({
-          username: payload.username,
-          password: payload.password,
-        });
+        const response = await authService.register(payload);
         set({
           isAuthenticated: true,
           accessToken: response.access_token,

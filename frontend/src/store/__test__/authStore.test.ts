@@ -39,8 +39,12 @@ describe("AuthStore navigation states", () => {
       username: "testuser",
     });
 
-    // Default mock: successful registration
-    mockRegister.mockResolvedValue(undefined);
+    // Default mock: successful registration (now returns a token directly)
+    mockRegister.mockResolvedValue({
+      access_token: "valid-token-123",
+      token_type: "bearer",
+      username: "testuser",
+    });
 
     // Default mock: successful getMe
     mockGetMe.mockResolvedValue({
@@ -96,7 +100,13 @@ describe("AuthStore navigation states", () => {
     expect(getInitialScreen()).toBe("auth");
   });
 
-  test("register calls signup then auto-logs in (no extra getMe call)", async () => {
+  test("register issues token directly — no separate login call", async () => {
+    mockRegister.mockResolvedValue({
+      access_token: "reg-token-456",
+      token_type: "bearer",
+      username: "newuser",
+    });
+
     await useAuthStore.getState().register({
       username: "newuser",
       email: "new@example.com",
@@ -108,14 +118,10 @@ describe("AuthStore navigation states", () => {
       email: "new@example.com",
       password: "password123",
     });
-    // register chains directly into login (not via store.login, so getMe is not called)
-    expect(mockLogin).toHaveBeenCalledWith({
-      username: "newuser",
-      password: "password123",
-    });
+    expect(mockLogin).not.toHaveBeenCalled();
     expect(mockGetMe).not.toHaveBeenCalled();
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(useAuthStore.getState().accessToken).toBe("valid-token-123");
+    expect(useAuthStore.getState().accessToken).toBe("reg-token-456");
     expect(useAuthStore.getState().user.email).toBe("new@example.com");
   });
 
