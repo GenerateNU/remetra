@@ -21,7 +21,11 @@ def embed(texts: list[str], model_type: str = "all-MiniLM-L6-v2") -> list[list[f
     elif model_type in ["text-embedding-ada-002", "text-embedding-3-large"]:
         response = openai.Embedding.create(
             input=texts,
+<<<<<<< HEAD
             model=model_type
+=======
+            model= model_type
+>>>>>>> dbde7b9 (testing? potentially?)
         )
         return [item['embedding'] for item in response['data']]
 
@@ -32,7 +36,11 @@ def embed(texts: list[str], model_type: str = "all-MiniLM-L6-v2") -> list[list[f
 def ingest_pdf(file, source: str, strategy: str = "semantic", model_type: str = "all-MiniLM-L6-v2") -> list[dict[str, Any]]:
     """Parse, chunk, and embed a PDF. Returns chunk dicts ready to persist."""
     full_text = convert(file)
+<<<<<<< HEAD
     chunks = chunk_text(full_text, strategy=strategy)
+=======
+    chunks = chunk_text(full_text,strategy=strategy)
+>>>>>>> dbde7b9 (testing? potentially?)
     vectors = embed(chunks, model_type)
 
     return [
