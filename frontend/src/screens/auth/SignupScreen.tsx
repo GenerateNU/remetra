@@ -1,5 +1,6 @@
 import { View, Text, Pressable, TextInput } from 'react-native';
 import { useFonts } from 'expo-font';
+import { useState } from 'react'
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
@@ -23,11 +24,32 @@ export function SignupScreen() {
     const [fontsLoaded] = useFonts({
       PTSerif_400Regular,
     });
-  
-    if (!fontsLoaded) return null;
-  
-    const handleSignup = () => {
-      navigation.navigate('UserGoals');
+
+    const validate = (): boolean => {
+      const newErrors: typeof errors = {};
+
+      if (!username.trim()) {
+        newErrors.username = 'Username is required';
+      } else if (username.trim().length < 3) {
+        newErrors.username = 'Username must be at least 3 characters';
+      } else if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) {
+        newErrors.username = 'Username can only contain letters, numbers, and underscores';
+      }
+
+      if (!email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        newErrors.email = 'Please enter a valid email address';
+      }
+
+      if (!password) {
+        newErrors.password = 'Password is required';
+      } else if (password.length < 6) {
+        newErrors.password = 'Password must be at least 6 characters';
+      }
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
     };
   
     // calls when user presses signup
@@ -40,7 +62,7 @@ export function SignupScreen() {
         await register({username, email, password});
     } catch (err) {
       if (err instanceof AuthError) {
-        if (err.message.includes('already exists')) { 
+        if (err.message.includes('already registered')) { 
           setErrors({ username: 'Username already taken' });
         } else {
           setErrors({ general: err.message });
@@ -52,7 +74,7 @@ export function SignupScreen() {
       setLoading(false); 
     }
   };
-  
+  if (!fontsLoaded) return null;
     return (
       <View className="flex-1">
         <BackgroundGradient />
@@ -82,14 +104,12 @@ export function SignupScreen() {
             placeholder="Username"
             placeholderTextColor='#B8624F'
             value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            className="border-b border-white text-white py-3 pl-2 mb-2"
-            style={{
-              borderColor: '#B8624F',
-              borderWidth: 1,
-              color: '#B8624F',
+            onChangeText={(text) => {
+              setUsername(text);
+              if (errors.username) setErrors(prev => ({ ...prev, username: undefined }));
             }}
+            autoCapitalize="none"
+            className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
           />
           {/* if username field is error, then box turns red*/}
 
@@ -103,15 +123,13 @@ export function SignupScreen() {
             placeholder="Email"
             placeholderTextColor='#B8624F'
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(text) => {
+              setEmail(text);
+              if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
+            }}
             keyboardType="email-address"
             autoCapitalize="none"
-            className="border-b border-white text-white py-3 pl-2 mb-2"
-            style={{
-              borderColor: '#B8624F',
-              borderWidth: 1,
-              color: '#B8624F',
-            }}
+            className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
           />
           {/* if username field is error, then box turns red*/}
           {errors.email && (
@@ -121,32 +139,30 @@ export function SignupScreen() {
           {/* password field */}
 
           <TextInput
-          placeholder="Password"
-          placeholderTextColor='#B8624F'
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          autoCapitalize="none"
-          className="border-b border-white text-white py-3 pl-2 mb-2"
-          style={{
-            borderColor: '#B8624F',
-            borderWidth: 1,
-            color: '#B8624F',
-          }}
-        />
-        {errors.password && (
-          <Text className="text-red-400 mb-2">{errors.password}</Text>
-        )}
-
+            placeholder="Password"
+            placeholderTextColor='#B8624F'
+            secureTextEntry
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+            }}
+            autoCapitalize="none"
+            className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
+          />
+          {errors.password && (
+            <Text className="text-red-400 mb-2">{errors.password}</Text>
+          )}
           </View>
   
           <View className="w-full items-center mt-10">
             <Pressable
               onPress={handleSignup}
-              className="border-2 border-white rounded-none py-2.5 px-[60px] mb-4"
+              disabled={loading}
+              className={`border-2 border-white rounded-none py-2.5 px-[60px] mb-4 ${loading ? 'opacity-50' : ''}`}
             >
               <Text className="text-white text-2xl font-medium">
-                Sign Up
+                {loading ? 'Signing up...' : 'Sign Up'}
               </Text>
             </Pressable>
   

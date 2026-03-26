@@ -1,6 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
-import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
@@ -11,7 +10,6 @@ import { useBankStore } from '../../store/bankStore';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export function SymptomFoodBankScreen() {
-  const navigation = useAppNavigation();
   const { completeOnboarding } = useAuthStore()
 
   const { foods, symptoms, removeFood, removeSymptom } = useBankStore();

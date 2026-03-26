@@ -40,7 +40,6 @@ apiClient.interceptors.response.use(
     }
 
     // (backend error payloads will appear in error.response.data)
-    // eslint-disable-next-line no-console
     return Promise.reject(error);
   }
 );

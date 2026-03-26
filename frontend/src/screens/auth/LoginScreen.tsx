@@ -23,17 +23,27 @@ export function LoginScreen() {
     PTSerif_400Regular,
   });
 
-  if (!fontsLoaded) return null;
-
   // checks if inputd are valid before calling API 
-  const validate = (): boolean => {
-    const newErrors: typeof errors = {}
-    if (!username.trim()) newErrors.username = 'Username is required';
-    if (!password) newErrors.password = 'Password is required';
-    else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    const validate = (): boolean => {
+      const newErrors: typeof errors = {};
+
+      if (!username.trim()) {
+        newErrors.username = 'Username is required';
+      } else if (username.trim().length < 3) {
+        newErrors.username = 'Username must be at least 3 characters';
+      } else if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) {
+        newErrors.username = 'Username can only contain letters, numbers, and underscores';
+      }
+
+      if (!password) {
+        newErrors.password = 'Password is required';
+      } else if (password.length < 6) {
+        newErrors.password = 'Password must be at least 6 characters';
+      }
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
 
   // calls when user presses login
   const handleLogin = async () => {
@@ -56,6 +66,8 @@ export function LoginScreen() {
     }
   };
 
+  if (!fontsLoaded) return null;
+
   return (
     <View className="flex-1">
       <BackgroundGradient />
@@ -77,44 +89,42 @@ export function LoginScreen() {
           </View>
         </View>
 
-        {/* username field — turns red border if there's an error */}
-
         <View className="w-full px-4">
-          <TextInput
-            placeholder="Username"
-            placeholderTextColor="#B8624F"
-            autoCapitalize="none"
-            value={username}
-            onChangeText={setUsername}
-            className={`border-b py-3 mb-2 pl-2 text-white ${errors.username ? 'border-red-400' : 'border-white'}`}
-            // Manually insert custom colors with style (we should update this to use nativewind in future)
-            style={{
-              borderColor: '#B8624F',
-              borderWidth: 1,
-              color: '#B8624F',
-            }}
-          />
-         {/* show username error if it exists */}
-          {errors.username && <Text className="text-red-400 text-sm mb-4">{errors.username}</Text>}
+          
+        {/* username field — turns red border if there's an error */}
+        <TextInput
+          placeholder="Username"
+          placeholderTextColor='#B8624F'
+          value={username}
+          onChangeText={(text) => {
+            setUsername(text);
+            if (errors.username) setErrors(prev => ({ ...prev, username: undefined }));
+          }}
+          autoCapitalize="none"
+          className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
+        />
+        {/* if username field is error, then box turns red*/}
+        {errors.username && (
+          <Text className="text-red-400 mb-2">{errors.username}</Text>
+        )}
 
-         {/* password field — turns red border if there's an error */}
-          <TextInput
-            placeholder="Password"
-            placeholderTextColor="#B8624F"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            // condition: if there's a error for password, its red, if none, white 
-            className={`border-b py-3 mb-2 pl-2 text-white ${errors.password ? 'border-red-400' : 'border-white'}`}
-            // Manually insert custom colors with style (we should update this to use nativewind in future)
-            style={{
-              borderColor: '#B8624F',
-              borderWidth: 1,
-              color: '#B8624F',
-            }}
-          />
-          {errors.password && <Text className="text-red-400 text-sm mb-4">{errors.password}</Text>}
-          {errors.general && <Text className="text-red-400 text-sm mb-4">{errors.general}</Text>}
+        {/* password field — turns red border if there's an error */}
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor='#B8624F'
+          secureTextEntry
+          value={password}
+          onChangeText={(text) => {
+            setPassword(text);
+            if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+          }}
+          autoCapitalize="none"
+          className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
+        />
+        {errors.password && (
+          <Text className="text-red-400 mb-2">{errors.password}</Text>
+        )}
+        {errors.general && <Text className="text-red-400 text-sm mb-4">{errors.general}</Text>}
         </View>
 
         {/* buttons */}
