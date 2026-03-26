@@ -65,7 +65,7 @@ async def update_food(
 ) -> FoodResponse:
     """Update an existing food by ID."""
     food_service = FoodService()
-    updated_food = food_service.update_food_by_id(db, food_id, food.model_dump())
+    updated_food = food_service.update_food_by_id(db, food_id, food)
     if not updated_food:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
