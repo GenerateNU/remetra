@@ -8,6 +8,7 @@ dependencies = [
     "bcrypt>=4.0.0,<5.0.0",
     "fastapi>=0.128.0",
     "passlib[bcrypt]>=1.7.4",
+    "pgvector>=0.4.2",
     "psycopg2-binary>=2.9.11",
     "pydantic[email]>=2.12.5",
     "pytest>=9.0.2",
@@ -19,7 +20,19 @@ dependencies = [
     "scalar-fastapi>=1.6.0",
     "sqlalchemy>=2.0.46",
     "uvicorn[standard]>=0.40.0",
+    "google-generativeai>=0.8.0",
+    "torch",
+    "sentence-transformers>=5.3.0",
+    "pypdf>=6.9.2",
 ]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 line-length = 120
@@ -33,6 +46,7 @@ commit = [
     "pre-commit>=4.5.1",
 ]
 dev = [
+    "fpdf2>=2.8.0",
     "httpx>=0.28.1",
     "pytest-cov>=7.0.0",
 ]

@@ -190,3 +190,18 @@ def multiple_symptoms_data():
         {"name": "itchyelbow", "location": "elbow", "sensation": "itchy", "username": "testuser"},
         {"name": "lala", "location": "lele", "sensation": "looloo", "username": "testuser"},
     ]
+
+
+@pytest.fixture
+def created_food(db_session, sample_food_data):
+    """
+    Create a Food row in the DB and return the FoodResponse.
+
+    Used as an FK dependency in food-log and tag tests.
+    Food.username has no FK constraint so no user is needed.
+    """
+    from schemas.food import FoodCreate
+    from services.food_service import FoodService
+
+    service = FoodService()
+    return service.create_food(db_session, FoodCreate(**sample_food_data))

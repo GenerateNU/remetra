@@ -1,5 +1,4 @@
 import { View, Text, Pressable, TextInput } from 'react-native';
-import { useState } from 'react';
 import { useFonts } from 'expo-font';
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
@@ -27,17 +26,8 @@ export function SignupScreen() {
   
     if (!fontsLoaded) return null;
   
-    // checks if inputd are valid before calling API 
-    const validate = (): boolean => {
-      const newErrors: typeof errors = {};
-      if (!username.trim()) newErrors.username = 'Username is required';
-      if (!email.trim()) {newErrors.email = 'Email is required';} 
-      else if (!/\S+@\S+\.\S+/.test(email)) {newErrors.email = 'Enter a valid email';}
-
-      if (!password) newErrors.password = 'Password is required';
-      else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
-      setErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
+    const handleSignup = () => {
+      navigation.navigate('UserGoals');
     };
   
     // calls when user presses signup
@@ -83,7 +73,7 @@ export function SignupScreen() {
               </Text>
             </View>
           </View>
-
+  
           <View className="w-full px-4">
 
           {/* username field */}
@@ -149,8 +139,7 @@ export function SignupScreen() {
         )}
 
           </View>
-          
-          {/* buttons */}
+  
           <View className="w-full items-center mt-10">
             <Pressable
               onPress={handleSignup}

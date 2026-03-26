@@ -264,6 +264,28 @@ Run `just --list` to see all available commands.
 
 ---
 
+## pgAdmin (Database GUI)
+
+Once you run `just dev`, pgAdmin is available at http://localhost:5050.
+
+**One-time server setup (do this once after first `just dev`):**
+
+1. Go to http://localhost:5050
+2. Log in with:
+   - Email: `admin@remetra.com`
+   - Password: `admin`
+3. Right-click "Servers" in the left panel → "Register" → "Server"
+4. Under the **General** tab: Name it anything (e.g. `Remetra Test DB`)
+5. Under the **Connection** tab fill in:
+   - Host: `test-db`
+   - Port: `5432`
+   - Database: `test_remetra`
+   - Username: `test_user`
+   - Password: `test_password`
+6. Click Save
+
+You should now be able to browse tables, run queries, and inspect data directly. pgAdmin saves this config so you only need to do this once.
+
 ## Understanding the Codebase
 
 ### What is an API?
@@ -567,6 +589,7 @@ Please reach out to a TL (It's our job to help)!
 - [ ] `just setup` completed successfully
 - [ ] `just dev` starts server successfully
 - [ ] Can access http://localhost:8000/docs
+- [ ] Can access http://localhost:5050 (pgAdmin)
 
 ### Before Every Commit
 

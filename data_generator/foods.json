@@ -1,0 +1,64 @@
+{
+    "foods": [
+        {
+            "food_name": "margherita pizza",
+            "ingredients": ["wheat flour", "tomato sauce", "mozzarella", "fresh basil", "olive oil", "yeast", "salt"],
+            "tags": ["gluten", "dairy"]
+        },
+        {
+            "food_name": "beef tacos",
+            "ingredients": ["corn tortilla", "ground beef", "cheddar cheese", "sour cream", "lettuce", "tomato", "jalapeño", "lime juice"],
+            "tags": ["dairy"]
+        },
+        {
+            "food_name": "shrimp stir fry",
+            "ingredients": ["shrimp", "soy sauce", "ginger", "garlic", "bell pepper", "broccoli", "sesame oil", "cornstarch", "green onion"],
+            "tags": ["shellfish", "soy", "gluten"]
+        },
+        {
+            "food_name": "classic cheeseburger",
+            "ingredients": ["ground beef", "brioche bun", "american cheese", "lettuce", "tomato", "onion", "pickles", "ketchup", "mustard"],
+            "tags": ["gluten", "dairy"]
+        },
+        {
+            "food_name": "chicken caesar salad",
+            "ingredients": ["romaine lettuce", "grilled chicken", "parmesan", "croutons", "caesar dressing", "lemon juice", "anchovies", "garlic"],
+            "tags": ["gluten", "dairy", "fish", "egg"]
+        },
+        {
+            "food_name": "peanut butter banana smoothie",
+            "ingredients": ["banana", "peanut butter", "whole milk", "honey", "greek yogurt", "oats", "vanilla extract"],
+            "tags": ["peanuts", "dairy", "gluten"]
+        },
+        {
+            "food_name": "mushroom risotto",
+            "ingredients": ["arborio rice", "cremini mushrooms", "parmesan", "white wine", "shallots", "garlic", "butter", "vegetable broth", "thyme"],
+            "tags": ["dairy"]
+        },
+        {
+            "food_name": "salmon sushi roll",
+            "ingredients": ["sushi rice", "nori", "raw salmon", "avocado", "cucumber", "rice vinegar", "soy sauce", "wasabi", "sesame seeds"],
+            "tags": ["fish", "soy", "gluten"]
+        },
+        {
+            "food_name": "lentil soup",
+            "ingredients": ["red lentils", "carrot", "celery", "onion", "garlic", "cumin", "turmeric", "tomato", "vegetable broth", "lemon juice"],
+            "tags": ["legumes"]
+        },
+        {
+            "food_name": "mango chicken lettuce wraps",
+            "ingredients": ["chicken breast", "butter lettuce", "mango", "red onion", "cilantro", "lime juice", "fish sauce", "chili flakes", "sesame oil"],
+            "tags": ["fish"]
+        },
+        {
+            "food_name": "black bean and sweet potato tacos",
+            "ingredients": ["corn tortilla", "black beans", "sweet potato", "avocado", "red cabbage", "cumin", "smoked paprika", "lime juice", "cilantro"],
+            "tags": ["legumes"]
+        },
+        {
+            "food_name": "herb roasted vegetables",
+            "ingredients": ["zucchini", "bell pepper", "red onion", "cherry tomatoes", "asparagus", "garlic", "rosemary", "thyme", "olive oil", "black pepper"],
+            "tags": []
+        }
+    ]
+}

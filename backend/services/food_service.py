@@ -54,7 +54,7 @@ class FoodService:
         if not existing_food:
             return None
 
-        updated_food = self.food_repo.update_food_by_id(db, food_id, food_data)
+        updated_food = self.food_repo.update_food_by_id(db, food_id, food_data.model_dump())
 
         return FoodResponse.model_validate(updated_food)
 
