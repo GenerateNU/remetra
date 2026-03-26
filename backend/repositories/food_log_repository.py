@@ -4,7 +4,6 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from repositories.food_log_repository import FoodLogRepository
 from schemas.food_log import FoodLogCreate, FoodLogResponse
 
 
