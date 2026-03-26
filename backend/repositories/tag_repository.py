@@ -4,7 +4,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from models.tag import Tag, FoodTag
+from models.tag import FoodTag, Tag
 from schemas.tag import TagCreate
 
 

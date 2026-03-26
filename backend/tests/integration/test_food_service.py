@@ -44,7 +44,7 @@ class TestFoodService:
     def test_update_food_not_there(self, db_session, sample_food_data):
         """Test updating a food that does not exist"""
         service = FoodService()
-        food = service.update_food_by_id(db_session, uuid.UUID(int=0), sample_food_data)
+        food = service.update_food_by_id(db_session, uuid.UUID(int=0), FoodCreate(**sample_food_data))
         assert food is None
 
     def test_delete_food_success(self, db_session, sample_food_data):

@@ -3,11 +3,11 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from services.food_log_service import FoodLogService
 from sqlalchemy.orm import Session
 
 from database import get_db
 from schemas.food_log import FoodLogCreate, FoodLogResponse
+from services.food_log_service import FoodLogService
 
 router = APIRouter(prefix="/food-log")
 

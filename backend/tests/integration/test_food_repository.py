@@ -69,7 +69,7 @@ class TestFoodRepository:
             "name": "updated pizza",
             "ingredients": ["flour", "cheese", "tomato", "pepperoni"],
         }
-        updated_food = repo.update_food_by_id(db_session, result.id, FoodCreate(**updated_data))
+        updated_food = repo.update_food_by_id(db_session, result.id, updated_data)
         assert updated_food is not None
         assert updated_food.id == result.id
         assert updated_food.name == updated_data["name"]

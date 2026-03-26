@@ -11,11 +11,11 @@ from sqlalchemy import text
 
 from database import Base, engine
 from middleware.logging_middleware import LoggingMiddleware
-from routers.symptom_log_router import router as symptom_log_router
 from routers.auth import router as auth_router
 from routers.food_log_router import router as food_log_router
 from routers.food_router import router as food_router
 from routers.ingest_router import router as ingest_router
+from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
 
