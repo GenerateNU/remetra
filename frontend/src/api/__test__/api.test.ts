@@ -1,15 +1,11 @@
 import { apiClient } from "../client";
 import { useAuthStore } from "../../store/useAuthStore";
 
-test('attach JWT middleware', async () => {
-  // Set up auth state before making the request
-  useAuthStore.getState().login('test-jwt-token-123', {
-    id: 'user-1',
-    email: 'test@example.com',
-  });
+test('attaches Authorization header when token is present', async () => {
+  // Directly set auth state — avoids making a real network call to /auth/login
+  useAuthStore.setState({ isAuthenticated: true, accessToken: 'test-jwt-token-123' });
 
   let capturedConfig: any;
-  // Add temporary intercept middleware to capture the request info
   const id = apiClient.interceptors.request.use((config) => {
     capturedConfig = config;
     return config;
@@ -18,16 +14,31 @@ test('attach JWT middleware', async () => {
   try {
     await apiClient.get('/health');
   } catch {
-    // Ignore network errors in test
+    // Ignore network errors — we only care about the request config
   }
 
   expect(capturedConfig.headers.Authorization).toMatch(/^Bearer .+/);
 
-  // Clean up the spy interceptor
   apiClient.interceptors.request.eject(id);
-
-  // Clean up auth state
   useAuthStore.getState().logout();
 });
 
-// future to ensure no authorization header if no bearer token provided
+test('omits Authorization header when no token is present', async () => {
+  useAuthStore.setState({ isAuthenticated: false, accessToken: null });
+
+  let capturedConfig: any;
+  const id = apiClient.interceptors.request.use((config) => {
+    capturedConfig = config;
+    return config;
+  });
+
+  try {
+    await apiClient.get('/health');
+  } catch {
+    // Ignore network errors
+  }
+
+  expect(capturedConfig.headers.Authorization).toBeUndefined();
+
+  apiClient.interceptors.request.eject(id);
+});

@@ -11,24 +11,23 @@ from services.auth_service import AuthService, decode_access_token
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
     """
-    Register a new user.
+    Register a new user and return an access token.
 
     Args:
         user_data: User registration data (username, email, password, etc.)
         db: Database session (injected by FastAPI)
 
     Returns:
-        UserResponse: The created user without password
+        TokenResponse: Access token issued immediately after registration
 
     Raises:
         HTTPException 400: If username or email already exists
     """
     service = AuthService()
-    user = service.register_user(db, user_data)
-    return user
+    return service.register_user(db, user_data)
 
 
 @router.post("/login", response_model=TokenResponse)

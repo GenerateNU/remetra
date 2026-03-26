@@ -358,29 +358,62 @@ def sample_user_data():
     }
 ```
 
-**Example - Database session fixture:**
+**Example - Database session fixture (direct service/repo tests):**
 ```python
 @pytest.fixture(scope="function")
 def db_session(db_engine):
     """Fresh database session for each test."""
     connection = db_engine.connect()
     transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
-    
+    session = TestingSessionLocal()
+    session.bind = connection
+
     yield session
-    
+
     session.close()
     transaction.rollback()  # Automatic cleanup
     connection.close()
 ```
 
+**Example - HTTP test client fixture (endpoint tests):**
+```python
+@pytest.fixture(scope="function")
+def test_client(db_session):
+    """TestClient with get_db overridden to use the test session."""
+    from database import get_db
+    from main import app
+
+    def override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = override_get_db
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()
+```
+
+**Which fixture to use:**
+
+| Fixture | Use when... |
+|---------|-------------|
+| `db_session` | Testing service or repository methods directly |
+| `test_client` | Testing HTTP endpoints (status codes, response shapes, auth) |
+
+Use `db_session` for service/repo logic. Use `test_client` when you want to test the full stack including routing, request validation, response serialization, and middleware — exactly what the frontend depends on.
+
 **Using fixtures in tests:**
 ```python
+# Direct service test — use db_session
 def test_create_user(db_session, sample_user_data):
-    # db_session and sample_user_data are injected automatically
     repo = UserRepository()
     user = repo.create(db_session, **sample_user_data)
     assert user.username == sample_user_data["username"]
+
+# HTTP endpoint test — use test_client
+def test_signup_endpoint(test_client, sample_user_data):
+    response = test_client.post("/auth/signup", json=sample_user_data)
+    assert response.status_code == 201
+    assert "access_token" in response.json()
 ```
 
 **Fixture scopes:**
