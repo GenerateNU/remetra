@@ -4,73 +4,50 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from schemas.food_log import FoodLogCreate, FoodLogResponse
+from models.food_log import FoodLog
+from schemas.food_log import FoodLogCreate
+
+logger = logging.getLogger(__name__)
 
 
-class FoodLogService:
-    """
-    Service for handling food log business logic.
-    """
+class FoodLogRepository:
+    """Repository for database interactions related to food logs."""
 
-    def __init__(self):
-        self.food_log_repo = FoodLogRepository()
+    def create_food_log(self, db: Session, food_log_data: FoodLogCreate) -> FoodLog:
+        """Create a new food log entry."""
+        logger.info("Creating food log for user: %s", food_log_data.username)
+        try:
+            food_log = FoodLog(**food_log_data.model_dump())
+            db.add(food_log)
+            db.commit()
+            db.refresh(food_log)
+            return food_log
+        except Exception as e:
+            db.rollback()
+            logger.error("Error creating food log: %s", e)
+            raise
 
-    def create_food_log(self, db: Session, food_log_data: FoodLogCreate) -> FoodLogResponse:
-        """
-        Create a new food log entry.
+    def get_food_log_by_id(self, db: Session, food_log_id: UUID) -> Optional[FoodLog]:
+        """Retrieve a food log by its ID."""
+        logger.info("Retrieving food log with ID %s", food_log_id)
+        return db.query(FoodLog).filter(FoodLog.id == food_log_id).first()
 
-        Args:
-            food_log_data: Validated data from FoodLogCreate model
+    def get_food_logs_by_username(self, db: Session, username: str) -> list[FoodLog]:
+        """Retrieve all food logs for a given user."""
+        logger.info("Retrieving food logs for user: %s", username)
+        return db.query(FoodLog).filter(FoodLog.username == username).all()
 
-        Returns:
-            The created food log
-
-        Raises:
-            ValueError: If validation fails
-        """
-        logging.info(f"Creating food log for user: {food_log_data.username}")
-        created_food_log = self.food_log_repo.create_food_log(db, food_log_data)
-        return FoodLogResponse.model_validate(created_food_log)
-
-    def get_food_log_by_id(self, db: Session, food_log_id: UUID) -> Optional[FoodLogResponse]:
-        """
-        Retrieve a food log by its ID.
-
-        Args:
-            food_log_id: The ID of the food log to retrieve
-
-        Returns:
-            The food log with the specified ID, or None if not found
-        """
-        food_log = self.food_log_repo.get_food_log_by_id(db, food_log_id)
+    def delete_food_log_by_id(self, db: Session, food_log_id: UUID) -> Optional[FoodLog]:
+        """Delete a food log by its ID. Returns the deleted log or None if not found."""
+        logger.info("Deleting food log with ID %s", food_log_id)
+        food_log = self.get_food_log_by_id(db, food_log_id)
         if not food_log:
             return None
-        return FoodLogResponse.model_validate(food_log)
-
-    def get_food_logs_by_username(self, db: Session, username: str) -> list[FoodLogResponse]:
-        """
-        Retrieve all food logs for a given user.
-
-        Args:
-            username: The username to retrieve food logs for
-
-        Returns:
-            List of food logs for the specified user
-        """
-        food_logs = self.food_log_repo.get_food_logs_by_username(db, username)
-        return [FoodLogResponse.model_validate(log) for log in food_logs]
-
-    def delete_food_log_by_id(self, db: Session, food_log_id: UUID) -> Optional[FoodLogResponse]:
-        """
-        Delete a food log by its ID.
-
-        Args:
-            food_log_id: The ID of the food log to delete
-
-        Returns:
-            The deleted food log, or None if not found
-        """
-        deleted_food_log = self.food_log_repo.delete_food_log_by_id(db, food_log_id)
-        if not deleted_food_log:
-            return None
-        return FoodLogResponse.model_validate(deleted_food_log)
+        try:
+            db.delete(food_log)
+            db.commit()
+            return food_log
+        except Exception as e:
+            db.rollback()
+            logger.error("Error deleting food log %s: %s", food_log_id, e)
+            raise

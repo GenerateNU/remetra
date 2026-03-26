@@ -24,4 +24,3 @@ class FoodLog(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     food = relationship("Food", back_populates="food_logs")
-    food_log_tags = relationship("FoodLogTag", back_populates="food_log")

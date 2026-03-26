@@ -1,5 +1,7 @@
 """Authentication routes for food CRUD."""
 
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -36,7 +38,7 @@ async def suggest_tags(
 
 
 @router.get("/{food_id}", response_model=FoodResponse)
-async def get_food(food_id: int, db: Session = Depends(get_db)) -> FoodResponse:
+async def get_food(food_id: UUID, db: Session = Depends(get_db)) -> FoodResponse:
     """Get a specific food by ID."""
     food_service = FoodService()
     food = food_service.get_food_by_id(db, food_id)
@@ -59,7 +61,7 @@ async def get_all_foods(db: Session = Depends(get_db)) -> list[FoodResponse]:
 # put route - update food
 @router.put("/{food_id}", response_model=FoodResponse)
 async def update_food(
-    food_id: int, food: FoodCreate, db: Session = Depends(get_db)
+    food_id: UUID, food: FoodCreate, db: Session = Depends(get_db)
 ) -> FoodResponse:
     """Update an existing food by ID."""
     food_service = FoodService()
@@ -74,7 +76,7 @@ async def update_food(
 
 # delete route - delete food
 @router.delete("/{food_id}", response_model=FoodResponse)
-async def delete_food(food_id: int, db: Session = Depends(get_db)) -> FoodResponse:
+async def delete_food(food_id: UUID, db: Session = Depends(get_db)) -> FoodResponse:
     """Delete an existing food by ID."""
     food_service = FoodService()
     deleted_food = food_service.delete_food_by_id(db, food_id)

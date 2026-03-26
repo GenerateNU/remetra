@@ -16,6 +16,7 @@ from routers.auth import router as auth_router
 from routers.food_log_router import router as food_log_router
 from routers.food_router import router as food_router
 from routers.ingest_router import router as ingest_router
+from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
 
 with engine.connect() as conn:
@@ -41,8 +42,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
+app.include_router(auth_router)
 app.include_router(symptom_log_router)
+app.include_router(symptom_router)
 app.include_router(food_router)
 app.include_router(ingest_router)
 app.include_router(food_log_router)
