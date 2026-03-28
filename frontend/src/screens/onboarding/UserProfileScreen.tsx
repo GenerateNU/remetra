@@ -1,9 +1,10 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
 import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+import { authService } from '../../api/auth_service';
 
 const GENDER_OPTIONS = ['Female', 'Male', 'Other'];
 
@@ -16,11 +17,12 @@ export function UserProfileScreen() {
   const [medication, setMedication] = useState('');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
 
   const [fontsLoaded] = useFonts({ PTSerif_400Regular });
   if (!fontsLoaded) return null;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const newErrors: Record<string, string> = {};
     if (!dob) {
       newErrors.dob = 'Required';
@@ -40,7 +42,27 @@ export function UserProfileScreen() {
     if (!weight) newErrors.weight = 'Required';
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    navigation.navigate('UserGoals');
+
+    const [mm, dd, yyyy] = dob.split('/').map(Number);
+    const isoDate = `${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+
+    setLoading(true);
+    try {
+      await authService.updateProfile({
+        dob: isoDate,
+        gender,
+        weight: parseFloat(weight),
+        disease: disease ? [disease] : undefined,
+        medication: medication
+          ? medication.split('\n').map((m) => m.trim()).filter(Boolean)
+          : undefined,
+      });
+      navigation.navigate('UserGoals');
+    } catch {
+      Alert.alert('Error', 'Failed to save profile. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -162,9 +184,10 @@ export function UserProfileScreen() {
         <TouchableOpacity
           className="bg-white py-4 rounded-[25px] items-center shadow-md"
           onPress={handleNext}
+          disabled={loading}
         >
           <Text className="text-[#C85A4A] font-ptserif text-lg font-semibold">
-            Next
+            {loading ? 'Saving...' : 'Next'}
           </Text>
         </TouchableOpacity>
       </View>
