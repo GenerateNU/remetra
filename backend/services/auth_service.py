@@ -90,16 +90,16 @@ class AuthService:
     def __init__(self):
         self.user_repo = UserRepository()
 
-    def register_user(self, db: Session, user_data: UserCreate) -> UserResponse:
+    def register_user(self, db: Session, user_data: UserCreate) -> dict:
         """
-        Register a new user.
+        Register a new user and return an access token.
 
         Args:
             db: Database session
             user_data: User registration data including username, email, password, and optional fields
 
         Returns:
-            UserResponse: The created user object without password hash
+            dict: access_token, token_type, and username (same shape as authenticate_user)
 
         Raises:
             HTTPException 400: If username or email already exists in the database
@@ -122,7 +122,11 @@ class AuthService:
             weight=user_data.weight,
         )
 
-        return UserResponse.model_validate(user)
+        access_token = create_access_token(
+            data={"sub": user.username},
+            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        )
+        return {"access_token": access_token, "token_type": "bearer", "username": user.username}
 
     def authenticate_user(self, db: Session, username: str, password: str) -> Optional[dict]:
         """

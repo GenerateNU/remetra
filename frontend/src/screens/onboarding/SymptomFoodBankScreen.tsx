@@ -1,6 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import { useState } from 'react';
-import { useAppNavigation } from '../../navigation/hooks';
 import { useFonts } from 'expo-font';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
@@ -8,9 +7,11 @@ import { ItemBank } from '../../components/ItemBank';
 import { AddSymptomModal } from '../../components/AddSymptomModal';
 import { AddFoodModal } from '../../components/AddFoodModal';
 import { useBankStore } from '../../store/bankStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export function SymptomFoodBankScreen() {
-  const navigation = useAppNavigation();
+  const { completeOnboarding } = useAuthStore()
+
   const { foods, symptoms, removeFood, removeSymptom } = useBankStore();
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
@@ -24,7 +25,7 @@ export function SymptomFoodBankScreen() {
   }
 
   const handleDone = () => {
-    navigation.navigate('Summary');
+    completeOnboarding()
   };
 
   return (

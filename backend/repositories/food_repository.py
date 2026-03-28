@@ -101,20 +101,20 @@ class FoodRepository:
         logging.info("Retrieving all food from the database")
         return db.query(Food).all()
 
-    def update_food_by_id(self, db: Session, food_id: UUID, food_data: FoodCreate) -> Optional[Food]:
+    def update_food_by_id(self, db: Session, food_id: UUID, food_data: dict) -> Optional[Food]:
         """
         Update a food product from the database by its ID.
 
         Args:
             food_id (UUID): The ID of the food to retrieve
+            food_data (dict): The updated field values
 
         Returns:
             Food: the newly updated food with all fields, or None if not found
         """
         logging.info(f"Updating food with ID {food_id} in database")
 
-        food_dict = food_data.model_dump()
-        db.query(Food).filter(Food.id == food_id).update(food_dict)
+        db.query(Food).filter(Food.id == food_id).update(food_data)
         db.commit()
         food = db.query(Food).filter(Food.id == food_id).first()
         return food

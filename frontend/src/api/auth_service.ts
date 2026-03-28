@@ -4,6 +4,9 @@ export interface RegisterPayload {
   username: string;
   email: string;
   password: string;
+  dob?: string;
+  disease?: string;
+  weight?: number;
 }
 
 export interface LoginPayload {
@@ -17,6 +20,11 @@ export interface AuthResponse {
   username: string;
 }
 
+export interface MeResponse {
+  username: string;
+  email: string;
+}
+
 export class AuthError extends Error {
   constructor(message: string) {
     super(message);
@@ -28,9 +36,10 @@ export class AuthError extends Error {
 export const authService = {
 
   // POST /auth/signup -> register_user()
-  async register(payload: RegisterPayload): Promise<void> {
+  async register(payload: RegisterPayload): Promise<AuthResponse> {
     try {
-      await apiClient.post('/auth/signup', payload);
+      const { data } = await apiClient.post('/auth/signup', payload);
+      return data;
     } catch (err: any) {
       throw new AuthError(err.response?.data?.detail ?? 'Registration failed');
     }
@@ -43,6 +52,16 @@ export const authService = {
       return data;
     } catch (err: any) {
       throw new AuthError(err.response?.data?.detail ?? 'Incorrect username or password');
+    }
+  },
+
+  // GET /auth/me -> get_current_user()
+  async getMe(): Promise<MeResponse> {
+    try {
+      const { data } = await apiClient.get('/auth/me');
+      return data;
+    } catch (err: any) {
+      throw new AuthError(err.response?.data?.detail ?? 'Failed to fetch user profile');
     }
   },
 };

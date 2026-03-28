@@ -1,99 +1,194 @@
-import { useAuthStore } from "../useAuthStore"
+import { useAuthStore } from "../useAuthStore";
+import { authService } from "../../api/auth_service";
 
-// Helper to reset store to initial state between tests
+// Mock the entire auth service module
+jest.mock("../../api/auth_service", () => ({
+  ...jest.requireActual("../../api/auth_service"),
+  authService: {
+    login: jest.fn(),
+    register: jest.fn(),
+    getMe: jest.fn(),
+  },
+}));
+
+const mockLogin = authService.login as jest.Mock;
+const mockRegister = authService.register as jest.Mock;
+const mockGetMe = authService.getMe as jest.Mock;
+
 const resetStore = () => {
   useAuthStore.getState().logout();
   useAuthStore.setState({ hasCompletedOnboarding: false });
 };
 
-// Helper to determine which screen the user should see
 const getInitialScreen = () => {
   const { isAuthenticated, hasCompletedOnboarding } = useAuthStore.getState();
-  
-  if (!isAuthenticated) return 'auth';
-  if (!hasCompletedOnboarding) return 'onboarding';
-  return 'main';
+  if (!isAuthenticated) return "auth";
+  if (!hasCompletedOnboarding) return "onboarding";
+  return "main";
 };
 
-describe('AuthStore navigation states', () => {
+describe("AuthStore navigation states", () => {
   beforeEach(() => {
     resetStore();
+    jest.clearAllMocks();
+
+    // Default mock: successful login
+    mockLogin.mockResolvedValue({
+      access_token: "valid-token-123",
+      token_type: "bearer",
+      username: "testuser",
+    });
+
+    // Default mock: successful registration (now returns a token directly)
+    mockRegister.mockResolvedValue({
+      access_token: "valid-token-123",
+      token_type: "bearer",
+      username: "testuser",
+    });
+
+    // Default mock: successful getMe
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+    });
   });
 
-  test('cold start with no stored state — user should land on auth screen', () => {
-    // Store is in initial state (simulating fresh install)
-    const { isAuthenticated, accessToken, hasCompletedOnboarding } = useAuthStore.getState();
+  test("cold start with no stored state", () => {
+    const { isAuthenticated, accessToken, hasCompletedOnboarding } =
+      useAuthStore.getState();
 
     expect(isAuthenticated).toBe(false);
     expect(accessToken).toBeNull();
     expect(hasCompletedOnboarding).toBe(false);
-    expect(getInitialScreen()).toBe('auth');
+    expect(getInitialScreen()).toBe("auth");
   });
 
-  test('cold start with valid tokens but onboarding incomplete — user should land on onboarding flow', () => {
-    // Simulate rehydrated state: logged in but hasn't completed onboarding
-    useAuthStore.getState().login('valid-token-123', {
-      id: 'user-1',
-      email: 'test@example.com',
+  test("login sets auth state and fetches profile on success", async () => {
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
     });
 
-    const { isAuthenticated, accessToken, hasCompletedOnboarding } = useAuthStore.getState();
+    const { isAuthenticated, accessToken, hasCompletedOnboarding, user } =
+      useAuthStore.getState();
 
+    expect(mockLogin).toHaveBeenCalledWith({
+      username: "testuser",
+      password: "password123",
+    });
+    expect(mockGetMe).toHaveBeenCalledTimes(1);
     expect(isAuthenticated).toBe(true);
-    expect(accessToken).toBe('valid-token-123');
+    expect(accessToken).toBe("valid-token-123");
+    expect(user.name).toBe("testuser");
+    expect(user.email).toBe("testuser@example.com");
     expect(hasCompletedOnboarding).toBe(false);
-    expect(getInitialScreen()).toBe('onboarding');
+    expect(getInitialScreen()).toBe("onboarding");
   });
 
-  test('cold start with valid tokens and onboarding complete — user should land on main app', () => {
-    // Simulate rehydrated state: logged in and completed onboarding
-    useAuthStore.getState().login('valid-token-123', {
-      id: 'user-1',
-      email: 'test@example.com',
-    });
-    useAuthStore.getState().completeOnboarding();
+  test("login failure does not update state", async () => {
+    mockLogin.mockRejectedValue(new Error("Invalid credentials"));
 
-    const { isAuthenticated, accessToken, hasCompletedOnboarding } = useAuthStore.getState();
+    await expect(
+      useAuthStore.getState().login({
+        username: "bad",
+        password: "wrong",
+      })
+    ).rejects.toThrow("Invalid credentials");
 
-    expect(isAuthenticated).toBe(true);
-    expect(accessToken).toBe('valid-token-123');
-    expect(hasCompletedOnboarding).toBe(true);
-    expect(getInitialScreen()).toBe('main');
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().accessToken).toBeNull();
+    expect(getInitialScreen()).toBe("auth");
   });
 
-  test('logout — all persisted state should be cleared; reopening app should show auth screen', () => {
-    // Set up a fully authenticated user
-    useAuthStore.getState().login('valid-token-123', {
-      id: 'user-1',
-      email: 'test@example.com',
-      name: 'Test User',
+  test("register issues token directly — no separate login call", async () => {
+    mockRegister.mockResolvedValue({
+      access_token: "reg-token-456",
+      token_type: "bearer",
+      username: "newuser",
     });
-    useAuthStore.getState().completeOnboarding();
 
-    // Verify user is fully set up
+    await useAuthStore.getState().register({
+      username: "newuser",
+      email: "new@example.com",
+      password: "password123",
+    });
+
+    expect(mockRegister).toHaveBeenCalledWith({
+      username: "newuser",
+      email: "new@example.com",
+      password: "password123",
+    });
+    expect(mockLogin).not.toHaveBeenCalled();
+    expect(mockGetMe).not.toHaveBeenCalled();
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
+    expect(useAuthStore.getState().accessToken).toBe("reg-token-456");
+    expect(useAuthStore.getState().user.email).toBe("new@example.com");
+  });
 
-    // Perform logout
+  test("register failure does not update state", async () => {
+    mockRegister.mockRejectedValue(new Error("Email already exists"));
+
+    await expect(
+      useAuthStore.getState().register({
+        username: "existing",
+        email: "taken@example.com",
+        password: "password123",
+      })
+    ).rejects.toThrow("Email already exists");
+
+    expect(mockLogin).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  test("full flow: login, complete onboarding, reach main", async () => {
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+    useAuthStore.getState().completeOnboarding();
+
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(useAuthStore.getState().accessToken).toBe("valid-token-123");
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
+    expect(getInitialScreen()).toBe("main");
+  });
+
+  test("logout clears auth state but not onboarding flag", async () => {
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+    useAuthStore.getState().completeOnboarding();
     useAuthStore.getState().logout();
 
-    // Verify all auth state is cleared
-    const { isAuthenticated, accessToken, user, hasCompletedOnboarding } = useAuthStore.getState();
+    const { isAuthenticated, accessToken, hasCompletedOnboarding, user } =
+      useAuthStore.getState();
 
     expect(isAuthenticated).toBe(false);
     expect(accessToken).toBeNull();
+    // hasCompletedOnboarding is intentionally preserved so re-login skips onboarding
+    expect(hasCompletedOnboarding).toBe(true);
     expect(user).toEqual({
       id: null,
       email: null,
       name: null,
       avatarUrl: null,
     });
-    
-    // Note: Depending on your requirements, onboarding may or may not reset on logout
-    // Current implementation preserves it; uncomment below if logout should reset it
-    // expect(hasCompletedOnboarding).toBe(false);
+    // isAuthenticated=false always lands on auth stack regardless of onboarding flag
+    expect(getInitialScreen()).toBe("auth");
+  });
 
-    // Simulate app reopen — user should see auth screen
-    expect(getInitialScreen()).toBe('auth');
+  test("re-login after logout skips onboarding when already completed", async () => {
+    await useAuthStore.getState().login({ username: "testuser", password: "password123" });
+    useAuthStore.getState().completeOnboarding();
+    useAuthStore.getState().logout();
+
+    jest.clearAllMocks();
+    mockLogin.mockResolvedValue({ access_token: "new-token", token_type: "bearer", username: "testuser" });
+    mockGetMe.mockResolvedValue({ username: "testuser", email: "testuser@example.com" });
+
+    await useAuthStore.getState().login({ username: "testuser", password: "password123" });
+
+    expect(getInitialScreen()).toBe("main");
   });
 });

@@ -61,13 +61,36 @@ def db_session(db_engine):
     """
     connection = db_engine.connect()
     transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
+    session = TestingSessionLocal()
+    session.bind = connection
 
     yield session
 
     session.close()
     transaction.rollback()
     connection.close()
+
+
+@pytest.fixture(scope="function")
+def test_client(db_session):
+    """
+    TestClient with get_db dependency overridden to use the test session.
+
+    Use this in HTTP-level tests (e.g. TestMeEndpoint) so requests hit
+    the same isolated, rolled-back test database as direct service tests.
+    """
+    from fastapi.testclient import TestClient
+
+    from database import get_db
+    from main import app
+
+    def override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = override_get_db
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
@@ -102,11 +125,11 @@ def authenticated_user(db_session, sample_user_data):
     service = AuthService()
 
     user_create = UserCreate(**sample_user_data)
-    user = service.register_user(db_session, user_create)
+    register_data = service.register_user(db_session, user_create)
 
     token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
 
-    return {"user": user, "token": token_data["access_token"], "username": user.username}
+    return {"user": register_data, "token": token_data["access_token"], "username": register_data["username"]}
 
 
 @pytest.fixture
@@ -167,3 +190,18 @@ def multiple_symptoms_data():
         {"name": "itchyelbow", "location": "elbow", "sensation": "itchy", "username": "testuser"},
         {"name": "lala", "location": "lele", "sensation": "looloo", "username": "testuser"},
     ]
+
+
+@pytest.fixture
+def created_food(db_session, sample_food_data):
+    """
+    Create a Food row in the DB and return the FoodResponse.
+
+    Used as an FK dependency in food-log and tag tests.
+    Food.username has no FK constraint so no user is needed.
+    """
+    from schemas.food import FoodCreate
+    from services.food_service import FoodService
+
+    service = FoodService()
+    return service.create_food(db_session, FoodCreate(**sample_food_data))

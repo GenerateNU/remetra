@@ -2,6 +2,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authService, LoginPayload, RegisterPayload, AuthError } from '../api/auth_service';
 
 interface UserProfile {
   id: string | null;
@@ -18,7 +19,8 @@ interface AuthState {
 }
 
 interface AuthActions {
-  login: (accessToken: string, user?: Partial<UserProfile>) => void;
+  login: (payload: LoginPayload) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
   completeOnboarding: () => void;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
@@ -45,14 +47,31 @@ export const useAuthStore = create<AuthStore>()(
     (set) => ({
       ...initialState,
 
-      login: (accessToken, user) =>
+      login: async (payload) => {
+        const response = await authService.login(payload);
+        // Set token first so the getMe interceptor can attach it
         set({
           isAuthenticated: true,
-          accessToken: accessToken,
-          user: user ? { ...initialUserProfile, ...user } : initialUserProfile,
-        }),
+          accessToken: response.access_token,
+          user: { ...initialUserProfile, name: response.username },
+        });
+        const me = await authService.getMe();
+        set((state) => ({
+          user: { ...state.user, email: me.email },
+        }));
+      },
+
+      register: async (payload) => {
+        const response = await authService.register(payload);
+        set({
+          isAuthenticated: true,
+          accessToken: response.access_token,
+          user: { ...initialUserProfile, name: response.username, email: payload.email },
+        });
+      },
 
       logout: () =>
+
         set({
           isAuthenticated: false,
           accessToken: null,

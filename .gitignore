@@ -267,3 +267,5 @@ yarn-error.*
 
 # test coverage
 coverage/
+
+CLAUDE.md

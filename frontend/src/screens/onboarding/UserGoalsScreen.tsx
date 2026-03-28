@@ -36,7 +36,7 @@ export function UserGoalsScreen() {
   };
 
   const handleDone = () => {
-    navigation.navigate('SymptomFoodBank');
+    navigation.navigate('SymptomFoodBank'); 
   };
 
  return (
