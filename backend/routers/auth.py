@@ -1,6 +1,7 @@
 """Authentication routes for user registration and login."""
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -9,6 +10,32 @@ from schemas.user import UserCreate, UserResponse, UserUpdate
 from services.auth_service import AuthService, decode_access_token
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+) -> UserResponse:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    payload = decode_access_token(token)
+    if not payload:
+        raise credentials_exception
+    username = payload.get("sub")
+    if not username:
+        raise credentials_exception
+    user = AuthService().get_current_user(db, username)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
 
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
@@ -58,114 +85,16 @@ async def login(credentials: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user(authorization: str = Header(...), db: Session = Depends(get_db)):
-    """
-    Get current authenticated user.
-
-    Args:
-        authorization: Authorization header with Bearer token (e.g., "Bearer <token>")
-        db: Database session (injected by FastAPI)
-
-    Returns:
-        UserResponse: Current user data
-
-    Raises:
-        HTTPException 401: If token is invalid or user not found
-    """
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    token = authorization.replace("Bearer ", "")
-
-    payload = decode_access_token(token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    username = payload.get("sub")
-    if not username:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    service = AuthService()
-    user = service.get_current_user(db, username)
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return user
+async def get_me(current_user: UserResponse = Depends(get_current_user)):
+    return current_user
 
 @router.put("/me", response_model=UserResponse)
 async def update_profile(
     user_update: UserUpdate,
-    authorization: str = Header(...),
-    db: Session = Depends(get_db)
+    current_user: UserResponse = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    """
-    Update current authenticated user's profile.
-
-    Args:
-        user_update: UserUpdate schema containing fields to update
-        authorization: Authorization header with Bearer token
-        db: Database session 
-
-    Returns:
-        UserResponse: The updated user data 
-
-    Raises:
-        HTTPException 401: If token is invalid or user not found
-        HTTPException 404: If the user with the given username does not exist
-    """
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    token = authorization.replace("Bearer ", "")
-
-    payload = decode_access_token(token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    username = payload.get("sub")
-    if not username:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    service = AuthService()
-    user = service.get_current_user(db, username)
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
     try:
-        return service.update_user(db, username, user_update)
+        return AuthService().update_user(db, current_user.username, user_update)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

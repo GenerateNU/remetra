@@ -262,7 +262,7 @@ class TestMeEndpoint:
         assert response.status_code == 401
 
     def test_me_missing_authorization_header(self, test_client):
-        """Test /me returns 422 when Authorization header is absent."""
+        """Test /me returns 401 when Authorization header is absent."""
         response = test_client.get("/auth/me")
 
-        assert response.status_code == 422
+        assert response.status_code == 401
