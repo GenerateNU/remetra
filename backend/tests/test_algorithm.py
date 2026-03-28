@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
+from analysis.algorithm import get_analysis
 from analysis.models import FoodLogEntry, SymptomLogEntry
-from analysis.algorithm import get_analysis, get_food_symptom_counts
 
 
 def food(ts: str, ingredients: list[str]) -> FoodLogEntry:
@@ -239,8 +239,9 @@ def test_overlapping_ingredients_different_trigger_rates():
 
 
 def test_ingredient_in_window_from_different_foods():
-    """Garlic appears in two different foods eaten before the same symptom.
-    It should still only count once for that symptom event."""
+    """Garlic appears in two different food events eaten before the same symptom.
+    Exposures = 2 because there were two distinct food events containing garlic,
+    both of which preceded the symptom. Each food event is its own exposure."""
     food_logs = [
         food("2024-01-01T08:00", ["garlic", "olive oil", "chicken"]),
         food("2024-01-01T11:00", ["garlic", "tomato", "pasta"]),
@@ -253,6 +254,32 @@ def test_ingredient_in_window_from_different_foods():
     result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
     nausea = result.get("nausea", {})
     assert nausea["garlic"].exposures == 2
+
+
+def test_overlapping_symptom_windows_food_counted_once():
+    """A food event that falls inside two overlapping symptom windows (e.g.
+    nausea at 10:00 and again at 11:00, both with a 6-hour window) must only
+    count as one exposure. trigger_rate must stay <= 1.0."""
+    food_logs = [
+        food("2024-01-01T08:00", ["garlic"]),  # in both windows
+        food("2024-01-01T09:00", ["garlic"]),  # in both windows
+        food("2024-01-02T08:00", ["rice"]),  # control — no symptom follows
+    ]
+    symptom_logs = [
+        symptom("2024-01-01T10:00", "nausea", 5),
+        symptom("2024-01-01T11:00", "nausea", 7),
+    ]
+    result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
+    nausea = result.get("nausea", {})
+
+    garlic = nausea["garlic"]
+    # 2 distinct garlic food events, each counted once despite overlapping windows
+    assert garlic.exposures == 2
+    # trigger_rate must never exceed 1.0
+    assert garlic.trigger_rate <= 1.0
+    assert garlic.trigger_rate == pytest.approx(1.0)
+    # intensities from both symptom events are collected
+    assert garlic.average_intensity == pytest.approx(6.0)  # mean of [5, 7, 5, 7]
 
 
 # ---------------------------------------------------------------------------

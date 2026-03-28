@@ -34,11 +34,6 @@ def get_analysis(
             c = total_in_window - a
             d = (total_food_events - ingredient_total) - c
 
-            # guard against edge cases from overlapping windows
-            b = max(b, 0)
-            c = max(c, 0)
-            d = max(d, 0)
-
             # ── metrics ──
             # trigger_rate: "when you eat X, how often does symptom follow?"
             trigger_rate = a / ingredient_total
@@ -70,7 +65,7 @@ def get_food_symptom_counts(
     """
     Returns:
         counts: symptom_name -> ingredient -> [co_occurrence_count, [intensities]]
-        foods_in_windows: symptom_name -> total food events found across all windows
+        foods_in_windows: symptom_name -> distinct food events found across all windows
                           (needed for computing c in the contingency table)
     """
     counts: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(lambda: [0, []]))
@@ -80,16 +75,31 @@ def get_food_symptom_counts(
         food_logs, symptom_logs, time_window_hours
     )
 
+    # symptom_name -> food_object_id -> (ingredients_set, [intensities])
+    # Python list slicing returns references to the same objects, so id() is a
+    # stable, unique key for each food log entry within this call even if two
+    # entries share the same timestamp (e.g. three dishes logged at 18:00).
+    seen: dict[str, dict[int, tuple[set, list]]] = defaultdict(dict)
+
     for window_result in window_results:
         symp = window_result.symptom_log
         s_name = symp.symptom_name
 
-        foods_in_windows[s_name] += len(window_result.food_logs)
-
         for food in window_result.food_logs:
-            for ingredient in set(food.ingredients):
+            key = id(food)
+            if key not in seen[s_name]:
+                seen[s_name][key] = (set(food.ingredients), [])
+            seen[s_name][key][1].append(symp.intensity)
+
+    counts: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(lambda: [0, []]))
+    foods_in_windows: dict[str, int] = defaultdict(int)
+
+    for s_name, food_map in seen.items():
+        foods_in_windows[s_name] = len(food_map)
+        for _ts, (ingredients, intensities) in food_map.items():
+            for ingredient in ingredients:
                 entry = counts[s_name][ingredient]
                 entry[0] += 1
-                entry[1].append(symp.intensity)
+                entry[1].extend(intensities)
 
     return counts, foods_in_windows

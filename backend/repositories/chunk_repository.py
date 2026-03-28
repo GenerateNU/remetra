@@ -44,11 +44,7 @@ class ChunkRepository:
         """Delete all chunks for a given source. Returns number of rows deleted."""
         logger.info("Clearing chunks for source='%s'", source)
         try:
-            deleted = (
-                db.query(KnowledgeChunk)
-                .filter(KnowledgeChunk.source == source)
-                .delete(synchronize_session=False)
-            )
+            deleted = db.query(KnowledgeChunk).filter(KnowledgeChunk.source == source).delete(synchronize_session=False)
             db.commit()
             logger.info("Deleted %d chunks for source='%s'", deleted, source)
             return deleted

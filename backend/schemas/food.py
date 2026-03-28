@@ -50,13 +50,12 @@ class FoodResponse(FoodBase):
 
     id: uuid.UUID = Field(..., description="Unique ID for this food product")
     suggested_ingredients: list[SuggestedIngredientResponse] = Field(
-        default=[],
-        description="LLM-suggested ingredients with their trigger buckets"
+        default=[], description="LLM-suggested ingredients with their trigger buckets"
     )
     suggested_buckets: list[SuggestedBucketResponse] = Field(
-        default=[],
-        description="LLM-suggested trigger bucket tags for this food"
+        default=[], description="LLM-suggested trigger bucket tags for this food"
     )
+
 
 class FoodSuggestionRequest(BaseModel):
     """
@@ -64,6 +63,7 @@ class FoodSuggestionRequest(BaseModel):
     Accepts draft food info and optional pre-selected tags,
     returns LLM/RAG suggested ingredients and buckets without persisting anything.
     """
+
     name: str = Field(..., description="Name of the food", min_length=1, max_length=100)
     ingredients: list[str] = Field(default=[], description="List of ingredients already known")
     selected_tag_ids: list[uuid.UUID] = Field(default=[], description="Tag IDs the user already selected")
