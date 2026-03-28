@@ -17,5 +17,7 @@ class User(Base):
     dob = Column(Date, nullable=True)
     disease = Column(ARRAY(String), nullable=True)
     weight = Column(Float, nullable=True)
+    gender = Column(String, nullable=True)
+    medication = Column(ARRAY(String), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

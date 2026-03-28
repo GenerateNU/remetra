@@ -4,7 +4,7 @@ import pytest
 from fastapi import HTTPException
 
 from repositories.user_repository import UserRepository
-from schemas.user import UserCreate
+from schemas.user import UserCreate, UserUpdate
 from services.auth_service import AuthService, decode_access_token
 
 
@@ -120,6 +120,21 @@ class TestAuthServiceIntegration:
 
         assert user is None
 
+    def test_update_user_success(self, db_session, sample_user_data):
+        """Test updating user profile fields after registration."""
+        service = AuthService()
+
+        user_create = UserCreate(**sample_user_data)
+        service.register_user(db_session, user_create)
+
+        user_update = UserUpdate(disease=["lupus"], weight=150.0, gender="Female")
+        updated_user = service.update_user(db_session, sample_user_data["username"], user_update)
+
+        assert updated_user.disease == ["lupus"]
+        assert updated_user.weight == 150.0
+        assert updated_user.gender == "Female"
+
+
     def test_complete_registration_and_login_flow(self, db_session, sample_user_data):
         """Test complete user flow from registration to getting current user."""
         service = AuthService()
@@ -153,30 +168,26 @@ class TestUserRepositoryIntegration:
             db=db_session,
             username="repotest",
             email="repo@test.com",
-            password_hash="hashed_password",
-            dob="2000-01-01",
-            disease=["celiac"],
-            weight=160.0,
+            password_hash="hashed_password"
         )
 
         assert user.username == "repotest"
         assert user.email == "repo@test.com"
-        assert user.disease == ["celiac"]
-        assert user.weight == 160.0
+
 
     def test_get_by_username(self, db_session):
         """Test retrieving user by username."""
         repo = UserRepository()
 
-        repo.create(db=db_session, username="findme", email="findme@test.com", password_hash="hash", disease=["lupus"])
+        repo.create(db=db_session, username="findme", email="findme@test.com", password_hash="hash")
 
         user = repo.get_by_username(db_session, "findme")
 
-        assert user is not None
+        assert user is not None      
         assert user.username == "findme"
-        assert user.email == "findme@test.com"
+        assert user.email == "findme@test.com" 
 
-    def test_get_by_username_not_found(self, db_session):
+    def test_get_by_username_not_found(self, db_session):     
         """Test get_by_username returns None when user doesn't exist."""
         repo = UserRepository()
 
@@ -189,8 +200,7 @@ class TestUserRepositoryIntegration:
         repo = UserRepository()
 
         repo.create(
-            db=db_session, username="emailtest", email="find@email.com", password_hash="hash", disease=["celiac"]
-        )
+            db=db_session, username="emailtest", email="find@email.com", password_hash="hash")
 
         user = repo.get_by_email(db_session, "find@email.com")
 
@@ -252,7 +262,7 @@ class TestMeEndpoint:
         assert response.status_code == 401
 
     def test_me_missing_authorization_header(self, test_client):
-        """Test /me returns 422 when Authorization header is absent."""
+        """Test /me returns 401 when Authorization header is absent."""
         response = test_client.get("/auth/me")
 
-        assert response.status_code == 422
+        assert response.status_code == 401

@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from repositories.user_repository import UserRepository
-from schemas.user import UserCreate, UserResponse
+from schemas.user import UserCreate, UserResponse, UserUpdate
 
 SECRET_KEY = os.getenv("SECRET_KEY", "Ch@ng31tN0W!")
 ALGORITHM = "HS256"
@@ -116,10 +116,7 @@ class AuthService:
             db=db,
             username=user_data.username,
             email=user_data.email,
-            password_hash=password_hash,
-            dob=user_data.dob,
-            disease=user_data.disease,
-            weight=user_data.weight,
+            password_hash=password_hash
         )
 
         access_token = create_access_token(
@@ -169,3 +166,21 @@ class AuthService:
             return None
 
         return UserResponse.model_validate(user)
+
+    def update_user(self, db: Session, username: str, user_update: UserUpdate) -> UserResponse:
+        """
+        Update user's profile.
+
+        Args:
+            db: database session
+            username: The username of the user to update
+            user_update: UserUpdate schema containing fields to update
+
+        Returns:
+            UserResponse: The updated user data without password hash
+
+        Raises:
+            HTTPException 404: If the user with the given username does not exist
+        """
+        updated_user = self.user_repo.update_user(db, username, user_update)
+        return UserResponse.model_validate(updated_user)
