@@ -52,9 +52,7 @@ class RAGTaggingService:
         context = "\n\n".join(chunk.content for chunk in chunks) if chunks else ""
 
         # 2. Build prompt
-        ingredients_str = (
-            ", ".join(str(i) for i in ingredients) if ingredients else "not specified"
-        )
+        ingredients_str = ", ".join(str(i) for i in ingredients) if ingredients else "not specified"
 
         prompt = f"""You are a nutrition and food sensitivity expert.
 Given a food item and its ingredients, identify which ingredients are likely trigger ingredients
@@ -102,22 +100,14 @@ Rules:
 
             return SuggestedTagsAndIngredientsResponse(
                 suggested_ingredients=[
-                    SuggestedIngredientResponse(**item)
-                    for item in data.get("suggested_ingredients", [])
+                    SuggestedIngredientResponse(**item) for item in data.get("suggested_ingredients", [])
                 ],
-                suggested_buckets=[
-                    SuggestedBucketResponse(**item)
-                    for item in data.get("suggested_buckets", [])
-                ],
+                suggested_buckets=[SuggestedBucketResponse(**item) for item in data.get("suggested_buckets", [])],
             )
 
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             logging.error(f"Failed to parse LLM response for food '{food_name}': {e}")
-            return SuggestedTagsAndIngredientsResponse(
-                suggested_ingredients=[], suggested_buckets=[]
-            )
+            return SuggestedTagsAndIngredientsResponse(suggested_ingredients=[], suggested_buckets=[])
         except Exception as e:
             logging.error(f"LLM call failed for food '{food_name}': {e}")
-            return SuggestedTagsAndIngredientsResponse(
-                suggested_ingredients=[], suggested_buckets=[]
-            )
+            return SuggestedTagsAndIngredientsResponse(suggested_ingredients=[], suggested_buckets=[])

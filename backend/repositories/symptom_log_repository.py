@@ -7,7 +7,6 @@ from models.symptom_log import SymptomLog
 
 
 class SymptomLogRepository:
-   
     def get_by_id(self, db: Session, log_id: UUID):
         query = sa.select(SymptomLog).where(SymptomLog.id == log_id)
         result = db.execute(query)

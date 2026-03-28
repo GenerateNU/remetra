@@ -1,19 +1,18 @@
 """
-This is where you will define the functions for getting the food/symptom
-Log entry DTOsw from joining the food/symptom table with the food/symptom log table
+Fetch food and symptom log DTOs from the database for use by the analysis algorithm.
 """
 
-from backend.models.food import Food
-from backend.models.food_log import FoodLog
-from backend.models.symptom import Symptom
-from backend.models.symptom_log import SymptomLog
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from analysis.models import FoodLogEntry, SymptomLogEntry
+from models.food import Food
+from models.food_log import FoodLog
+from models.symptom import Symptom
+from models.symptom_log import SymptomLog
 
 
-async def fetch_food_logs(db: AsyncSession, username: str) -> list[FoodLogEntry]:
+def fetch_food_logs(db: Session, username: str) -> list[FoodLogEntry]:
     stmt = (
         select(FoodLog, Food)
         .join(Food, FoodLog.food_id == Food.id)
@@ -21,20 +20,20 @@ async def fetch_food_logs(db: AsyncSession, username: str) -> list[FoodLogEntry]
         .order_by(FoodLog.timestamp.asc())
     )
 
-    result = await db.execute(stmt)
-    rows = result.all()
+    rows = db.execute(stmt).all()
 
     return [
         FoodLogEntry(
             timestamp=food_log.timestamp,
-            ingredients=food.ingredients,
-            # servings = food_log.quantity
+            # When a food has no ingredients (e.g. "orange"), treat the food
+            # name itself as the ingredient so it still surfaces in analysis.
+            ingredients=food.ingredients if food.ingredients else [food.name],
         )
         for food_log, food in rows
     ]
 
 
-async def fetch_symptom_logs(db: AsyncSession, username: str) -> list[SymptomLogEntry]:
+def fetch_symptom_logs(db: Session, username: str) -> list[SymptomLogEntry]:
     stmt = (
         select(
             Symptom.name,
@@ -50,8 +49,7 @@ async def fetch_symptom_logs(db: AsyncSession, username: str) -> list[SymptomLog
         .order_by(SymptomLog.timestamp.asc())
     )
 
-    results = await db.execute(stmt)
-    rows = results.all()
+    rows = db.execute(stmt).all()
 
     return [
         SymptomLogEntry(

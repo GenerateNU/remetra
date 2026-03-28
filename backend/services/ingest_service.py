@@ -12,7 +12,6 @@ RAW_DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
 
 
 class IngestService:
-
     def ingest_pdf_file(self, db: Session, file, source: str) -> dict:
         """Parse, embed, and persist a single PDF file."""
         logger.info("Ingesting PDF: %s", source)
@@ -37,11 +36,13 @@ class IngestService:
                     chunk_dicts = ingest_pdf(f, source=source)
                 cleared = chunk_repo.clear_chunks(db, source=source)
                 created = chunk_repo.create_chunks(db, chunk_dicts)
-                results.append({
-                    "source": source,
-                    "chunks_cleared": cleared,
-                    "chunks_created": len(created),
-                })
+                results.append(
+                    {
+                        "source": source,
+                        "chunks_cleared": cleared,
+                        "chunks_created": len(created),
+                    }
+                )
             except Exception as e:
                 logger.error("Failed to ingest '%s': %s", source, e)
                 results.append({"source": source, "error": str(e)})

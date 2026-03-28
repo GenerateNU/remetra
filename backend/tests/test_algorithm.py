@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
+from analysis.algorithm import get_analysis
 from analysis.models import FoodLogEntry, SymptomLogEntry
-from analysis.algorithm import get_analysis, get_food_symptom_counts
 
 
 def food(ts: str, ingredients: list[str]) -> FoodLogEntry:
@@ -24,13 +24,14 @@ def symptom(ts: str, name: str, intensity: int) -> SymptomLogEntry:
 # Basic metrics
 # ---------------------------------------------------------------------------
 
+
 def test_trigger_rate_base_rate_and_rr():
     # gluten appears before 2 of 3 bloating events, and in 3 of 4 total food logs
     food_logs = [
         food("2024-01-01T08:00", ["gluten"]),  # within window of symptom 1
         food("2024-01-02T08:00", ["gluten"]),  # within window of symptom 2
         food("2024-01-03T08:00", ["gluten"]),  # NOT within any symptom window
-        food("2024-01-04T08:00", ["rice"]),    # within window of symptom 3
+        food("2024-01-04T08:00", ["rice"]),  # within window of symptom 3
     ]
     symptom_logs = [
         symptom("2024-01-01T10:00", "bloating", 7),
@@ -82,6 +83,7 @@ def test_fishers_p_value_high_for_no_association():
 # Edge cases
 # ---------------------------------------------------------------------------
 
+
 def test_ingredient_never_before_symptom_is_absent_from_result():
     food_logs = [
         food("2024-01-01T08:00", ["safe"]),
@@ -117,9 +119,11 @@ def test_multiple_symptoms_independent():
     assert "dairy" not in result["bloating"]
     assert "gluten" not in result["cramps"]
 
+
 # ---------------------------------------------------------------------------
 # Multi-ingredient foods
 # ---------------------------------------------------------------------------
+
 
 def test_multi_ingredient_food_all_ingredients_counted():
     """A single food with 4 ingredients before a symptom should create
@@ -147,7 +151,7 @@ def test_shared_ingredient_across_foods_counted_once_per_symptom():
     twice, a (count) would exceed S and c = S - a would go negative."""
     food_logs = [
         food("2024-01-01T08:00", ["wheat flour", "yeast", "salt"]),  # bread
-        food("2024-01-01T10:00", ["eggs", "butter", "salt"]),        # eggs
+        food("2024-01-01T10:00", ["eggs", "butter", "salt"]),  # eggs
         # day without symptom
         food("2024-01-02T08:00", ["rice", "chicken"]),
     ]
@@ -196,6 +200,7 @@ def test_confounded_ingredients_both_surface():
 # Overlapping ingredient sets — credit assignment
 # ---------------------------------------------------------------------------
 
+
 def test_overlapping_ingredients_different_trigger_rates():
     """Meals A (gluten + dairy) and B (dairy + rice) both contain dairy.
     Only meal A precedes symptoms. Gluten should have a higher trigger
@@ -234,8 +239,9 @@ def test_overlapping_ingredients_different_trigger_rates():
 
 
 def test_ingredient_in_window_from_different_foods():
-    """Garlic appears in two different foods eaten before the same symptom.
-    It should still only count once for that symptom event."""
+    """Garlic appears in two different food events eaten before the same symptom.
+    Exposures = 2 because there were two distinct food events containing garlic,
+    both of which preceded the symptom. Each food event is its own exposure."""
     food_logs = [
         food("2024-01-01T08:00", ["garlic", "olive oil", "chicken"]),
         food("2024-01-01T11:00", ["garlic", "tomato", "pasta"]),
@@ -250,9 +256,36 @@ def test_ingredient_in_window_from_different_foods():
     assert nausea["garlic"].exposures == 2
 
 
+def test_overlapping_symptom_windows_food_counted_once():
+    """A food event that falls inside two overlapping symptom windows (e.g.
+    nausea at 10:00 and again at 11:00, both with a 6-hour window) must only
+    count as one exposure. trigger_rate must stay <= 1.0."""
+    food_logs = [
+        food("2024-01-01T08:00", ["garlic"]),  # in both windows
+        food("2024-01-01T09:00", ["garlic"]),  # in both windows
+        food("2024-01-02T08:00", ["rice"]),  # control — no symptom follows
+    ]
+    symptom_logs = [
+        symptom("2024-01-01T10:00", "nausea", 5),
+        symptom("2024-01-01T11:00", "nausea", 7),
+    ]
+    result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
+    nausea = result.get("nausea", {})
+
+    garlic = nausea["garlic"]
+    # 2 distinct garlic food events, each counted once despite overlapping windows
+    assert garlic.exposures == 2
+    # trigger_rate must never exceed 1.0
+    assert garlic.trigger_rate <= 1.0
+    assert garlic.trigger_rate == pytest.approx(1.0)
+    # intensities from both symptom events are collected
+    assert garlic.average_intensity == pytest.approx(6.0)  # mean of [5, 7, 5, 7]
+
+
 # ---------------------------------------------------------------------------
 # Intensity tracking with multi-ingredient foods
 # ---------------------------------------------------------------------------
+
 
 def test_intensity_tracked_per_ingredient_across_events():
     """Different symptom events have different intensities. Each ingredient
@@ -281,6 +314,7 @@ def test_intensity_tracked_per_ingredient_across_events():
 # ---------------------------------------------------------------------------
 # Multiple symptoms from same multi-ingredient meal
 # ---------------------------------------------------------------------------
+
 
 def test_one_food_triggers_multiple_symptom_types():
     """A single multi-ingredient meal precedes two different symptom types.
@@ -313,6 +347,7 @@ def test_one_food_triggers_multiple_symptom_types():
 # Null ingredients handling
 # ---------------------------------------------------------------------------
 
+
 def test_food_with_no_ingredients_is_skipped():
     """Foods like 'Banana' have ingredients=None or []. They should not
     crash the algorithm or contribute phantom ingredients."""
@@ -333,12 +368,13 @@ def test_food_with_no_ingredients_is_skipped():
 # Window boundary precision with multi-ingredient meals
 # ---------------------------------------------------------------------------
 
+
 def test_window_boundary_includes_exact_edge():
     """A food eaten exactly 6 hours before a symptom should be included
     in a 6-hour window. A food at 6h01m should not."""
     food_logs = [
-        food("2024-01-01T05:59", ["soy", "rice"]),        # 6h01m before — outside
-        food("2024-01-01T06:00", ["gluten", "dairy"]),   # exactly 6hrs before
+        food("2024-01-01T05:59", ["soy", "rice"]),  # 6h01m before — outside
+        food("2024-01-01T06:00", ["gluten", "dairy"]),  # exactly 6hrs before
     ]
     symptom_logs = [
         symptom("2024-01-01T12:00", "bloating", 5),
@@ -356,6 +392,7 @@ def test_window_boundary_includes_exact_edge():
 # Realistic multi-food meal scenario
 # ---------------------------------------------------------------------------
 
+
 def test_realistic_meal_with_shared_base_ingredients():
     """Simulate a realistic dinner: pasta (gluten, water, salt), marinara
     (tomato, garlic, olive oil, salt), and salad (lettuce, olive oil, salt).
@@ -363,7 +400,7 @@ def test_realistic_meal_with_shared_base_ingredients():
     once per symptom event."""
     food_logs = [
         # dinner on day 1 — three dishes
-        food("2024-01-01T18:00", ["gluten", "water", "salt"]),       # pasta
+        food("2024-01-01T18:00", ["gluten", "water", "salt"]),  # pasta
         food("2024-01-01T18:00", ["tomato", "garlic", "olive oil", "salt"]),  # sauce
         food("2024-01-01T18:00", ["lettuce", "olive oil", "salt"]),  # salad
         # lunch on day 2 — safe meal

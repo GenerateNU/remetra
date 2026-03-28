@@ -78,10 +78,7 @@ class TagRepository:
         try:
             food_tags = []
             for tag_id in tag_ids:
-                existing = db.query(FoodTag).filter(
-                    FoodTag.food_id == food_id,
-                    FoodTag.tag_id == tag_id
-                ).first()
+                existing = db.query(FoodTag).filter(FoodTag.food_id == food_id, FoodTag.tag_id == tag_id).first()
                 if not existing:
                     food_tag = FoodTag(food_id=food_id, tag_id=tag_id)
                     db.add(food_tag)
@@ -104,9 +101,4 @@ class TagRepository:
             List of tags associated with the food
         """
         logging.info(f"Retrieving tags for food {food_id}")
-        return (
-            db.query(Tag)
-            .join(FoodTag, FoodTag.tag_id == Tag.id)
-            .filter(FoodTag.food_id == food_id)
-            .all()
-        )
+        return db.query(Tag).join(FoodTag, FoodTag.tag_id == Tag.id).filter(FoodTag.food_id == food_id).all()

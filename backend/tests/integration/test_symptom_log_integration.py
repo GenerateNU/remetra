@@ -65,6 +65,7 @@ class TestSymptomLogRepository:
     def test_get_symptom_log_not_found(self, db_session):
         """Test that get_by_id returns None for a non-existent log."""
         from uuid import uuid4
+
         repo = SymptomLogRepository()
         result = repo.get_by_id(db_session, uuid4())
         assert result is None
@@ -83,6 +84,7 @@ class TestSymptomLogRepository:
     def test_delete_symptom_log_not_found(self, db_session):
         """Test that deleting a non-existent log returns False."""
         from uuid import uuid4
+
         repo = SymptomLogRepository()
         result = repo.delete(db_session, uuid4())
         assert result is False
@@ -118,6 +120,7 @@ class TestSymptomLogService:
     def test_get_symptom_log_not_found(self, db_session):
         """Test that getting a non-existent log returns None."""
         from uuid import uuid4
+
         service = SymptomLogService()
         result = service.get_symptom_log(db_session, uuid4())
         assert result is None
@@ -136,6 +139,7 @@ class TestSymptomLogService:
     def test_delete_symptom_log_not_found(self, db_session):
         """Test that deleting a non-existent log returns False."""
         from uuid import uuid4
+
         service = SymptomLogService()
         result = service.delete_symptom_log(db_session, uuid4())
         assert result is False
