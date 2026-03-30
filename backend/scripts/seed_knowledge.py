@@ -23,7 +23,7 @@ def main():
         for pdf_path in Path("backend/data/raw/").glob("*.pdf"):
             source = pdf_path.name
             with open(pdf_path, "rb") as file:
-                chunks = ingest_pdf( file, source, strat, model_type="all-MiniLM-L6-v2")
+                chunks = ingest_pdf(file, source, strat, model_type="all-MiniLM-L6-v2")
                 chunkRepo.create_chunks(dbSession, source, chunks)
     finally:
         dbSession.close()

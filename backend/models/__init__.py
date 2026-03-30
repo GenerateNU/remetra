@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from models import (
     food as food,
 )
@@ -23,6 +22,3 @@ from models import (
 from models import (
     user as user,
 )
-=======
-from models import food, food_log, symptom, symptom_log, user, tag, knowledge_chunk
->>>>>>> cc74836 (WIP)

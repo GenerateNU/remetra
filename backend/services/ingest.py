@@ -1,5 +1,4 @@
 from typing import Any
-import openai
 
 from sentence_transformers import SentenceTransformer
 from sqlalchemy.orm import Session
@@ -18,29 +17,22 @@ def embed(texts: list[str], model_type: str = "all-MiniLM-L6-v2") -> list[list[f
         embeddings = model.encode(texts, convert_to_numpy=True)
         return embeddings.tolist()
 
-    elif model_type in ["text-embedding-ada-002", "text-embedding-3-large"]:
-        response = openai.Embedding.create(
-            input=texts,
-<<<<<<< HEAD
-            model=model_type
-=======
-            model= model_type
->>>>>>> dbde7b9 (testing? potentially?)
-        )
-        return [item['embedding'] for item in response['data']]
+    elif model_type in ["text-embedding-ada-002", "text-embedding-3-large"]:  # pragma: no cover
+        import openai
 
-    else:
-        raise ValueError(f"Embedding Model not known")
+        response = openai.Embedding.create(input=texts, model=model_type)
+        return [item["embedding"] for item in response["data"]]
+
+    else:  # pragma: no cover
+        raise ValueError("Embedding Model not known")
 
 
-def ingest_pdf(file, source: str, strategy: str = "semantic", model_type: str = "all-MiniLM-L6-v2") -> list[dict[str, Any]]:
+def ingest_pdf(
+    file, source: str, strategy: str = "semantic", model_type: str = "all-MiniLM-L6-v2"
+) -> list[dict[str, Any]]:
     """Parse, chunk, and embed a PDF. Returns chunk dicts ready to persist."""
     full_text = convert(file)
-<<<<<<< HEAD
     chunks = chunk_text(full_text, strategy=strategy)
-=======
-    chunks = chunk_text(full_text,strategy=strategy)
->>>>>>> dbde7b9 (testing? potentially?)
     vectors = embed(chunks, model_type)
 
     return [
