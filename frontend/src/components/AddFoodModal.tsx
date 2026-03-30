@@ -14,13 +14,19 @@ export function AddFoodModal({ visible, onClose }: Props) {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [error, setError] = useState('');
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!foodName.trim()) {
       setError('Please enter a food name.');
       return;
     }
+
     setError('');
-    addFood(foodName, ingredients);
+    const id = await addFood(foodName, ingredients);
+    if (!id) {
+      setError('Failed to add food. Please try again.');
+      return;
+    }
+
     setFoodName('');
     setIngredients([]);
   };

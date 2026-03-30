@@ -50,7 +50,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     const clearError = (field: string) =>
     setErrors({});
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isCustom) {
       const newErrors: Record<string, string> = {};
       if (!customLocation.trim()) newErrors.location = "Location is required.";
@@ -64,17 +64,17 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     setErrors({});
 
     const symptomId = isCustom
-      ? addSymptom(customName, customLocation, customSensation)
+      ? await addSymptom(customName, customLocation, customSensation)
       : selectedSymptom?.id ?? null;
 
     if (!symptomId) {
-      console.error("How the hell did this happen");
+      console.error("Could not resolve symptom ID for log entry");
       return;
     }
 
     const entry: SymptomLogEntry = {
       type: "symptom",
-      symptomId,
+      symptomId: symptomId,
       name: isCustom ? customName : selectedSymptom?.name ?? "",
       location: isCustom ? customLocation : selectedSymptom?.location ?? "",
       sensation: isCustom ? customSensation : selectedSymptom?.sensation ?? "",
