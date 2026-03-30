@@ -41,11 +41,13 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
     setCustomName(searchQuery);
   };
 
-  const handleSubmit = () => {
-    const foodId = isCustom ? addFood(customName, customIngredients) : selectedFood?.id;
+  const handleSubmit = async () => {
+    const foodId = isCustom
+      ? await addFood(customName, customIngredients)
+      : selectedFood?.id;
 
     if (!foodId) {
-      console.error("How the hell did this happen");
+      console.error("Could not resolve food ID for log entry");
       return;
     }
 

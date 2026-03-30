@@ -84,32 +84,32 @@ export const foodService = {
   },
 
   // get_food()
-  async getFoodById(foodId: string): Promise<FoodResponse> {
+  async getFoodById(food_id: string): Promise<FoodResponse> {
     try {
-      const { data } = await apiClient.get<FoodResponse>(`/food/${foodId}`);
+      const { data } = await apiClient.get<FoodResponse>(`/food/${food_id}`);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? `Failed to fetch food ${foodId}`);
+      throw new FoodError(err.response?.data?.detail ?? `Failed to fetch food ${food_id}`);
     }
   },
 
   // update_food()
-  async updateFood(foodId: string, payload: UpdateFoodPayload): Promise<FoodResponse> {
+  async updateFood(food_id: string, payload: UpdateFoodPayload): Promise<FoodResponse> {
     try {
-      const { data } = await apiClient.put<FoodResponse>(`/food/${foodId}`, payload);
+      const { data } = await apiClient.put<FoodResponse>(`/food/${food_id}`, payload);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? `Failed to update food ${foodId}`);
+      throw new FoodError(err.response?.data?.detail ?? `Failed to update food ${food_id}`);
     }
   },
 
   // delete_food()
-  async deleteFood(foodId: string): Promise<FoodResponse> {
+  async deleteFood(food_id: string): Promise<FoodResponse> {
     try {
-      const { data } = await apiClient.delete<FoodResponse>(`/food/${foodId}`);
+      const { data } = await apiClient.delete<FoodResponse>(`/food/${food_id}`);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? `Failed to delete food ${foodId}`);
+      throw new FoodError(err.response?.data?.detail ?? `Failed to delete food ${food_id}`);
     }
   },
 };
