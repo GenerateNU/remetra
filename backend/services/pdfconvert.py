@@ -1,6 +1,7 @@
 import re
 
 from pypdf import PdfReader
+from semantic_text_splitter import TextSplitter
 
 
 def convert(data) -> str:
@@ -14,7 +15,9 @@ def convert(data) -> str:
     return "\n".join(pages_text)
 
 
-def chunk_text(text: str, strategy: str = "fixed", size: int = 512, overlap: int = 50, sentence_group: int = 3) -> list[str]:
+def chunk_text(
+    text: str, strategy: str = "fixed", size: int = 512, overlap: int = 50, sentence_group: int = 3
+) -> list[str]:
     """Split text into overlapping word-level chunks."""
     words = text.split()
     chunks = []
@@ -27,8 +30,10 @@ def chunk_text(text: str, strategy: str = "fixed", size: int = 512, overlap: int
                 chunks.append(chunk)
 
     elif strategy == "semantic":
-        paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
-        chunks.extend(paragraphs)
+        # paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+        # chunks.extend(paragraphs)
+        splitter = TextSplitter.from_tiktoken_model("gpt-3.5-turbo", size)
+        chunks = splitter.chunks(text)
 
     elif strategy == "sentence":  # pragma: no cover
         sentences = re.split(r"(?<=[.!?]) +", text)
