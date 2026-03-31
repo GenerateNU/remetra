@@ -11,6 +11,7 @@ services:
       - ./data_generator:/seed_data:ro
     environment:
       - ENVIRONMENT=development
+      - GEMINI_API_KEY={$GEMINI_API_KEY}
       - DATABASE_URL=postgresql://test_user:test_password@test-db:5432/test_remetra
     env_file:
       - path: .env
