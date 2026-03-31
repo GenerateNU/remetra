@@ -1,6 +1,8 @@
 import { FoodLogEntry, FoodItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
 import { Chips } from "./GenericChipComponent";
+import { foodLogService } from "../api/food_log_service";
+import { useAuthStore } from "../store/useAuthStore";
 
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -12,6 +14,7 @@ interface FoodLogFormProps {
 }
 
 export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
+  const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,6 +27,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
   const [servings, setServings] = useState("1");
   const [timestamp, setTimestamp] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [notes, setNotes] = useState("");
 
   const filtered = foods.filter((f) =>
     f.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -49,6 +53,20 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
     if (!foodId) {
       console.error("Could not resolve food ID for log entry");
       return;
+    }
+
+    try {
+      await foodLogService.createFoodLog({
+        food_id: foodId,
+        quantity: `${servings} serving(s)`,
+        timestamp: timestamp.toISOString(),
+        notes: notes.trim() || undefined,
+        username, 
+      });
+    } catch (error) {
+      console.error("Failed to create food log entry:", error);
+      return;
+
     }
 
     const entry: FoodLogEntry = {
@@ -190,7 +208,16 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
               }}
             />
           )}
-
+          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
+              Notes (optional)
+            </Text>
+            <TextInput
+              style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
+              placeholder="Any additional notes..."
+              value={notes}
+              onChangeText={setNotes}
+              multiline
+            />
           <TouchableOpacity
             style={{
               borderWidth: 1,
