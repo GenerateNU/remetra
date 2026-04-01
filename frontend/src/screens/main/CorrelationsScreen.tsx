@@ -107,8 +107,8 @@ export function CorrelationsScreen() {
                 style={{
                   fontSize: 13,
                   fontWeight: '600',
+                  fontFamily: undefined,
                   color: activeSymptomId === symptom.id ? 'white' : '#444',
-                  includeFontPadding: false,
                 }}
               >
                 {symptom.name}
