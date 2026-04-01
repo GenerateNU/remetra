@@ -1,5 +1,5 @@
 import { VictoryChart, VictoryScatter, VictoryAxis, VictoryTheme, VictoryLabel } from 'victory-native';
-import { View, Text } from 'react-native';
+import { View, Text, useWindowDimensions } from 'react-native';
 
 export interface ScatterPoint {
   food_name: string;
@@ -12,6 +12,10 @@ interface Props {
 }
 
 export function FrequencyIntensityChart({ data }: Props) {
+  const { width } = useWindowDimensions();
+  // 32px horizontal padding on the card (p-4 = 16 each side)
+  const chartWidth = width - 32;
+
   return (
     <View className="bg-white rounded-2xl p-4 my-4">
       <Text className="text-center text-lg font-semibold mb-1">Frequency vs. Severity</Text>
@@ -20,8 +24,9 @@ export function FrequencyIntensityChart({ data }: Props) {
       </Text>
       <VictoryChart
         theme={VictoryTheme.material}
+        width={chartWidth}
         height={240}
-        padding={{ left: 50, right: 30, top: 30, bottom: 50 }}
+        padding={{ left: 55, right: 60, top: 30, bottom: 50 }}
       >
         <VictoryAxis
           label="Exposures"

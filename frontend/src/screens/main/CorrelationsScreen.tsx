@@ -10,7 +10,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 
 export function CorrelationsScreen() {
   const navigation = useAppNavigation();
-  const userId = useAuthStore.getState().user.name ?? '';
+  const userId = useAuthStore.getState().user.name ?? 'user_001';
   const { associationsBySymptom, symptoms, fetchAssociations } = useAlgorithmStore();
 
   useEffect(() => {
@@ -59,10 +59,12 @@ export function CorrelationsScreen() {
               }}
             >
               <Text
+                numberOfLines={1}
                 style={{
                   fontSize: 13,
                   fontWeight: '600',
                   color: activeSymptomId === symptom.id ? 'white' : '#444',
+                  includeFontPadding: false,
                 }}
               >
                 {symptom.name}
