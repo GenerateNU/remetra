@@ -3,11 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MainTabs } from '../MainTabs';
 import { BarcodeScannerScreen } from '../../components/BarcodeScannerScreen';
 import { SymptomDetailScreen } from '../../screens/main/SymptomDetailScreen';
+import { CorrelationsScreen } from '../../screens/main/CorrelationsScreen';
 
 export type MainStackParamList = {
   Tabs: undefined;
   BarcodeScanner: { onScanned?: (food: { name: string; ingredients: string[] }) => void };
   SymptomDetail: { symptomId: string; symptomName: string };
+  Correlations: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -17,5 +19,6 @@ export const MainStack = () => (
     <Stack.Screen name="Tabs" component={MainTabs} />
     <Stack.Screen name="BarcodeScanner" component={BarcodeScannerScreen} />
     <Stack.Screen name="SymptomDetail" component={SymptomDetailScreen} />
+    <Stack.Screen name="Correlations" component={CorrelationsScreen} />
   </Stack.Navigator>
 );
