@@ -1,29 +1,35 @@
 
 import { View, Button, Text, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { TriggerRateChart } from '../../components/TriggerRateChart';
 import LogEntryModal from '../../components/LogEntryModal'
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAppNavigation } from '../../navigation/hooks';
-
-// Placeholder — replace with top associations from algorithmStore once API is wired
-const SUMMARY_PLACEHOLDER = {
-  symptomName: 'bloating',
-  foodName: 'dairy',
-  exposures: 7,
-  totalOccurrences: 10,
-  chartData: [
-    { food_name: 'Dairy',      trigger_rate: 0.78 },
-    { food_name: 'Gluten',     trigger_rate: 0.62 },
-    { food_name: 'Spicy Food', trigger_rate: 0.55 },
-    { food_name: 'Alcohol',    trigger_rate: 0.40 },
-  ],
-};
+import { useAlgorithmStore } from '../../store/useAlgorithmStore';
 
 export function SummaryScreen() {
   const navigation = useAppNavigation();
-  const { logout } = useAuthStore()
+  const { logout } = useAuthStore();
+  const userId = useAuthStore.getState().user.name ?? '';
+  const { associationsBySymptom, symptoms, fetchAssociations } = useAlgorithmStore();
+
+  useEffect(() => {
+    if (userId) fetchAssociations(userId);
+  }, [userId]);
+
+  // Find top association across all symptoms by trigger_rate
+  const allAssociations = Object.values(associationsBySymptom).flat();
+  const topAssoc = allAssociations.sort((a, b) => b.trigger_rate - a.trigger_rate)[0] ?? null;
+  const topSymptom = topAssoc ? (symptoms.find(s => s.id === topAssoc.symptom_id)?.name ?? '') : '';
+
+  // Chart data: top associations for the symptom of the top association, or all top entries
+  const topSymptomId = topAssoc?.symptom_id ?? null;
+  const chartData = (topSymptomId ? (associationsBySymptom[topSymptomId] ?? []) : allAssociations)
+    .slice()
+    .sort((a, b) => b.trigger_rate - a.trigger_rate)
+    .slice(0, 5)
+    .map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }));
 
   const [showModal, setShowModal] = useState(false);
 
@@ -42,16 +48,18 @@ export function SummaryScreen() {
           YOUR SUMMARY
         </Text>
         <Text className="text-center text-black my-[10%] text-lg">
-          {GetPersonalizedIntro(
-            useAuthStore.getState().user.name ?? 'there',
-            SUMMARY_PLACEHOLDER.symptomName,
-            SUMMARY_PLACEHOLDER.foodName,
-            SUMMARY_PLACEHOLDER.exposures,
-            SUMMARY_PLACEHOLDER.totalOccurrences,
-          )}
+          {topAssoc
+            ? GetPersonalizedIntro(
+                useAuthStore.getState().user.name ?? 'there',
+                topSymptom,
+                topAssoc.food_name,
+                topAssoc.exposures,
+                allAssociations.length,
+              )
+            : `${useAuthStore.getState().user.name ?? 'there'}, no associations found yet. Log some meals and symptoms to get started.`}
         </Text>
 
-        <TriggerRateChart data={SUMMARY_PLACEHOLDER.chartData} />
+        <TriggerRateChart data={chartData} />
 
         <View className="m-[10%]">
           <Button
