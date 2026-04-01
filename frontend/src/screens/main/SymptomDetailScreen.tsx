@@ -45,7 +45,7 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
     async function load() {
       try {
         await fetchFoods();
-        const results: AlgorithmAssociationResponse[] = await algorithmService.getCorrelations(
+        const results: AlgorithmAssociationResponse[] = await algorithmService.getAssociations(
           username!,
           symptomId
         );

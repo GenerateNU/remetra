@@ -30,7 +30,7 @@ export interface AlgorithmRunResponse {
 
 export const algorithmService = {
   // GET /algorithm/user/{user_id}?symptom_id=...
-  async getCorrelations(
+  async getAssociations(
     userId: string,
     symptomId?: string
   ): Promise<AlgorithmAssociationResponse[]> {
