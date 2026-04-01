@@ -81,6 +81,7 @@ export function CorrelationsScreen() {
             })
           )
         }
+        </ScrollView>
         {/* Symptom selector */}
         <ScrollView
           horizontal
@@ -119,38 +120,48 @@ export function CorrelationsScreen() {
 
         {/* Main content */}
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}>
-          {associations.length === 0 ? (
+          {symptoms.length === 0 ? (
             <Text style={{ textAlign: 'center', color: '#888', marginTop: 40 }}>
-              No correlations found for {selectedName}.
+              No symptoms found. Log some symptoms to get started.
             </Text>
           ) : (
-            <>
-              {/* Chart 1: Trigger rate bar */}
-              <TriggerRateChart
-                data={associations.map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }))}
-                title={`${selectedName} — Trigger Rates`}
-              />
-
-              {/* Chart 2: Frequency vs intensity scatter */}
-              <FrequencyIntensityChart
-                data={associations.map(a => ({
-                  food_name: a.food_name,
-                  exposures: a.exposures,
-                  average_intensity: a.average_intensity,
-                }))}
-              />
-
-              {/* Detail cards */}
-              <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 8, marginBottom: 4, color: '#333' }}>
-                Breakdown
-              </Text>
-              {associations
+            symptoms.map(symptom => {
+              const associations = (associationsBySymptom[symptom.id] ?? [])
                 .slice()
-                .sort((a, b) => b.trigger_rate - a.trigger_rate)
-                .map(assoc => (
-                  <AssociationCard key={assoc.food_name} {...assoc} />
-                ))}
-            </>
+                .sort((a, b) => b.trigger_rate - a.trigger_rate);
+
+              return (
+                <View key={symptom.id} style={{ marginBottom: 40 }}>
+                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#b2939b', marginBottom: 12 }}>
+                    {symptom.name}
+                  </Text>
+
+                  {associations.length === 0 ? (
+                    <Text style={{ color: '#888' }}>No correlations found for {symptom.name}.</Text>
+                  ) : (
+                    <>
+                      <TriggerRateChart
+                        data={associations.map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }))}
+                        title={`${symptom.name} — Trigger Rates`}
+                      />
+                      <FrequencyIntensityChart
+                        data={associations.map(a => ({
+                          food_name: a.food_name,
+                          exposures: a.exposures,
+                          average_intensity: a.average_intensity,
+                        }))}
+                      />
+                      <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 8, marginBottom: 4, color: '#333' }}>
+                        Breakdown
+                      </Text>
+                      {associations.map(assoc => (
+                        <AssociationCard key={assoc.food_name} {...assoc} />
+                      ))}
+                    </>
+                  )}
+                </View>
+              );
+            })
           )}
         </ScrollView>
       </View>
