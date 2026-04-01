@@ -1,5 +1,5 @@
 
-import { View, Button, Text, TouchableOpacity } from 'react-native';
+import { View, Button, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { TriggerRateChart } from '../../components/TriggerRateChart';
@@ -11,7 +11,7 @@ import { useAlgorithmStore } from '../../store/useAlgorithmStore';
 export function SummaryScreen() {
   const navigation = useAppNavigation();
   const { logout } = useAuthStore();
-  const userId = useAuthStore.getState().user.name ?? '';
+  const userId = useAuthStore.getState().user.name ?? 'user_001';
   const { associationsBySymptom, symptoms, fetchAssociations } = useAlgorithmStore();
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export function SummaryScreen() {
           }}
       />
       <BackgroundGradient />
-      <View className="flex-1 p-6">
+      <ScrollView className="flex-1" contentContainerStyle={{ padding: 24, paddingBottom: 48 }}>
         <Text className="text-[28px] font-semibold text-center text-[#b2939b] italic">
           YOUR SUMMARY
         </Text>
@@ -116,7 +116,7 @@ export function SummaryScreen() {
             <Text className="text-white text-center text-xs font-semibold">RESET ONBOARD</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
