@@ -103,10 +103,12 @@ export function CorrelationsScreen() {
               }}
             >
               <Text
+                numberOfLines={1}
                 style={{
                   fontSize: 13,
                   fontWeight: '600',
                   color: activeSymptomId === symptom.id ? 'white' : '#444',
+                  includeFontPadding: false,
                 }}
               >
                 {symptom.name}
