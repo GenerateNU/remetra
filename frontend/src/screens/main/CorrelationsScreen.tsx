@@ -1,47 +1,27 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { TriggerRateChart } from '../../components/TriggerRateChart';
 import { FrequencyIntensityChart } from '../../components/FrequencyIntensityChart';
-import { AssociationCard, Association } from '../../components/AssociationCard';
+import { AssociationCard } from '../../components/AssociationCard';
 import { useAppNavigation } from '../../navigation/hooks';
-
-// ---------------------------------------------------------------------------
-// Placeholder data — replace with algorithmStore data once API is wired
-// ---------------------------------------------------------------------------
-
-const MOCK_SYMPTOMS = [
-  { id: 'sym-1', name: 'Bloating' },
-  { id: 'sym-2', name: 'Cramps' },
-  { id: 'sym-3', name: 'Headache' },
-];
-
-const MOCK_ASSOCIATIONS: Record<string, Association[]> = {
-  'sym-1': [
-    { food_name: 'Dairy',      trigger_rate: 0.78, base_rate: 0.22, exposures: 9,  average_intensity: 7.8, fishers_p_value: 0.01  },
-    { food_name: 'Gluten',     trigger_rate: 0.62, base_rate: 0.28, exposures: 7,  average_intensity: 6.2, fishers_p_value: 0.04  },
-    { food_name: 'Spicy Food', trigger_rate: 0.55, base_rate: 0.30, exposures: 6,  average_intensity: 5.5, fishers_p_value: 0.08  },
-    { food_name: 'Alcohol',    trigger_rate: 0.40, base_rate: 0.25, exposures: 4,  average_intensity: 4.8, fishers_p_value: 0.15  },
-  ],
-  'sym-2': [
-    { food_name: 'Dairy',  trigger_rate: 0.65, base_rate: 0.20, exposures: 6,  average_intensity: 8.1, fishers_p_value: 0.03  },
-    { food_name: 'Coffee', trigger_rate: 0.50, base_rate: 0.25, exposures: 8,  average_intensity: 5.5, fishers_p_value: 0.09  },
-  ],
-  'sym-3': [
-    { food_name: 'Alcohol', trigger_rate: 0.80, base_rate: 0.15, exposures: 5,  average_intensity: 8.5, fishers_p_value: 0.008 },
-    { food_name: 'Coffee',  trigger_rate: 0.60, base_rate: 0.30, exposures: 10, average_intensity: 6.0, fishers_p_value: 0.04  },
-    { food_name: 'Sugar',   trigger_rate: 0.35, base_rate: 0.20, exposures: 7,  average_intensity: 4.2, fishers_p_value: 0.18  },
-  ],
-};
-
-// ---------------------------------------------------------------------------
+import { useAlgorithmStore } from '../../store/useAlgorithmStore';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export function CorrelationsScreen() {
   const navigation = useAppNavigation();
-  const [selectedSymptomId, setSelectedSymptomId] = useState(MOCK_SYMPTOMS[0].id);
+  const userId = useAuthStore.getState().user.name ?? '';
+  const { associationsBySymptom, symptoms, fetchAssociations } = useAlgorithmStore();
 
-  const associations = MOCK_ASSOCIATIONS[selectedSymptomId] ?? [];
-  const selectedName = MOCK_SYMPTOMS.find(s => s.id === selectedSymptomId)?.name ?? '';
+  useEffect(() => {
+    if (userId) fetchAssociations(userId);
+  }, [userId]);
+
+  const [selectedSymptomId, setSelectedSymptomId] = useState<string | null>(null);
+
+  const activeSymptomId = selectedSymptomId ?? symptoms[0]?.id ?? null;
+  const associations = activeSymptomId ? (associationsBySymptom[activeSymptomId] ?? []) : [];
+  const selectedName = symptoms.find(s => s.id === activeSymptomId)?.name ?? '';
 
   return (
     <View style={{ flex: 1 }}>
@@ -63,7 +43,7 @@ export function CorrelationsScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, gap: 8 }}
         >
-          {MOCK_SYMPTOMS.map(symptom => (
+          {symptoms.map(symptom => (
             <TouchableOpacity
               key={symptom.id}
               onPress={() => setSelectedSymptomId(symptom.id)}
@@ -71,7 +51,7 @@ export function CorrelationsScreen() {
                 paddingHorizontal: 16,
                 paddingVertical: 8,
                 borderRadius: 20,
-                backgroundColor: selectedSymptomId === symptom.id ? '#ca5e5e' : 'white',
+                backgroundColor: activeSymptomId === symptom.id ? '#ca5e5e' : 'white',
                 shadowColor: '#000',
                 shadowOpacity: 0.08,
                 shadowRadius: 3,
@@ -82,7 +62,7 @@ export function CorrelationsScreen() {
                 style={{
                   fontSize: 13,
                   fontWeight: '600',
-                  color: selectedSymptomId === symptom.id ? 'white' : '#444',
+                  color: activeSymptomId === symptom.id ? 'white' : '#444',
                 }}
               >
                 {symptom.name}
