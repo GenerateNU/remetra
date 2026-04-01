@@ -4,7 +4,7 @@ import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 export function BackgroundGradient () {
 
   return   (    
-    <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
+    <Svg height="100%" width="100%" style={StyleSheet.absoluteFill} pointerEvents="none">
       <Defs>
         <RadialGradient id="grad" cx="50%" cy="100%" r="80%">
           <Stop offset="0%" stopColor="#fd9055" stopOpacity="1" />
