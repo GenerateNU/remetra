@@ -2,12 +2,27 @@
 import { View, Button, Text, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
-import { GenericCorrelationChart } from '../../components/GenericCorrelationChart'
+import { TriggerRateChart } from '../../components/TriggerRateChart';
 import LogEntryModal from '../../components/LogEntryModal'
 import { useAuthStore } from '../../store/useAuthStore';
+import { useAppNavigation } from '../../navigation/hooks';
+
+// Placeholder — replace with top associations from algorithmStore once API is wired
+const SUMMARY_PLACEHOLDER = {
+  symptomName: 'bloating',
+  foodName: 'dairy',
+  exposures: 7,
+  totalOccurrences: 10,
+  chartData: [
+    { food_name: 'Dairy',      trigger_rate: 0.78 },
+    { food_name: 'Gluten',     trigger_rate: 0.62 },
+    { food_name: 'Spicy Food', trigger_rate: 0.55 },
+    { food_name: 'Alcohol',    trigger_rate: 0.40 },
+  ],
+};
 
 export function SummaryScreen() {
-  //const navigation = useAppNavigation();
+  const navigation = useAppNavigation();
   const { logout } = useAuthStore()
 
   const [showModal, setShowModal] = useState(false);
@@ -27,16 +42,22 @@ export function SummaryScreen() {
           YOUR SUMMARY
         </Text>
         <Text className="text-center text-black my-[10%] text-lg">
-          {GetPersonalizedIntro("Nicole", "stomache pain", "pizza", 5, 10)}
+          {GetPersonalizedIntro(
+            useAuthStore.getState().user.name ?? 'there',
+            SUMMARY_PLACEHOLDER.symptomName,
+            SUMMARY_PLACEHOLDER.foodName,
+            SUMMARY_PLACEHOLDER.exposures,
+            SUMMARY_PLACEHOLDER.totalOccurrences,
+          )}
         </Text>
-        
-        <GenericCorrelationChart />
+
+        <TriggerRateChart data={SUMMARY_PLACEHOLDER.chartData} />
 
         <View className="m-[10%]">
-          <Button 
-            color="#ca5e5e" 
-            title="VIEW ALL CORRELATIONS -->" 
-            onPress={() => {}} 
+          <Button
+            color="#ca5e5e"
+            title="VIEW ALL CORRELATIONS -->"
+            onPress={() => navigation.navigate('Correlations')}
           />
         </View>
         
