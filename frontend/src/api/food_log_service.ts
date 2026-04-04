@@ -8,6 +8,12 @@ export interface CreateFoodLogPayload {
   username: string;
 }
 
+export interface UpdateFoodLogPayload {
+  quantity?: string;
+  timestamp?: string;
+  notes?: string;
+}
+
 export interface FoodLogResponse {
   id: string; 
   food_id: string;
@@ -46,6 +52,16 @@ export const foodLogService = {
       return data;
     } catch (err: any) {
       throw new FoodLogError(err.response?.data?.detail ?? 'Failed to fetch food logs');
+    }
+  },
+
+  // update_food_log()
+  async updateFoodLog(foodLogId: string, payload: UpdateFoodLogPayload): Promise<FoodLogResponse> {
+    try {
+      const { data } = await apiClient.put<FoodLogResponse>(`/food-log/${foodLogId}`, payload);
+      return data;
+    } catch (err: any) {
+      throw new FoodLogError(err.response?.data?.detail ?? `Failed to update food log ${foodLogId}`);
     }
   },
 

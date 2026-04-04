@@ -11,7 +11,7 @@ from schemas.tag import SuggestedTagsAndIngredientsResponse
 from services.food_service import FoodService
 from services.RAGTaggingService import RAGTaggingService
 
-router = APIRouter(prefix="/food")
+router = APIRouter(prefix="/food", tags=["Food"])
 
 
 # create food

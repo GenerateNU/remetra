@@ -11,7 +11,7 @@ from schemas.symptom import SymptomCreate, SymptomResponse
 from schemas.user import UserResponse
 from services.symptom_service import SymptomService
 
-router = APIRouter(prefix="/symptom")
+router = APIRouter(prefix="/symptom", tags=["Symptom"],)
 
 
 # create symptom

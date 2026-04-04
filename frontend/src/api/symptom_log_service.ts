@@ -9,6 +9,13 @@ export interface CreateSymptomLogPayload {
   username: string;
 }
 
+export interface UpdateSymptomLogPayload {
+  intensity?: number;
+  timestamp?: string;
+  duration?: number;
+  notes?: string;
+}
+
 export interface SymptomLogResponse {
   id: string;
   symptom_id: string; 
@@ -46,6 +53,16 @@ export const symptomLogService = {
       return data;
     } catch (err: any) {
       throw new SymptomLogError(err.response?.data?.detail ?? 'Failed to fetch symptom logs');
+    }
+  },
+
+  // update_symptom_log()
+  async updateSymptomLog(logId: string, payload: UpdateSymptomLogPayload): Promise<SymptomLogResponse> {
+    try {
+      const { data } = await apiClient.put<SymptomLogResponse>(`/symptom-logs/${logId}`, payload);
+      return data;
+    } catch (err: any) {
+      throw new SymptomLogError(err.response?.data?.detail ?? `Failed to update symptom log ${logId}`);
     }
   },
 

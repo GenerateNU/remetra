@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from models.food_log import FoodLog
-from schemas.food_log import FoodLogCreate
+from schemas.food_log import FoodLogCreate, FoodLogUpdate
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,22 @@ class FoodLogRepository:
         """Retrieve all food logs for a given user."""
         logger.info("Retrieving food logs for user: %s", username)
         return db.query(FoodLog).filter(FoodLog.username == username).all()
+
+    def update_food_log_by_id(self, db: Session, food_log_id: UUID, data: FoodLogUpdate) -> Optional[FoodLog]:
+        """Update a food log by its ID. Returns the updated log or None if not found."""
+        food_log = self.get_food_log_by_id(db, food_log_id)
+        if not food_log:
+            return None
+        try:
+            for field, value in data.model_dump(exclude_unset=True).items():
+                setattr(food_log, field, value)
+            db.commit()
+            db.refresh(food_log)
+            return food_log
+        except Exception as e:
+            db.rollback()
+            logger.error("Error updating food log %s: %s", food_log_id, e)
+            raise
 
     def delete_food_log_by_id(self, db: Session, food_log_id: UUID) -> Optional[FoodLog]:
         """Delete a food log by its ID. Returns the deleted log or None if not found."""
