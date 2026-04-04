@@ -230,6 +230,7 @@ node_modules/
 
 # Expo
 .expo/
+.expo-export-check/
 dist/
 web-build/
 expo-env.d.ts
