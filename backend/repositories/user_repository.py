@@ -37,13 +37,7 @@ class UserRepository:
         """
         return db.query(User).filter(User.email == email).first()
 
-    def create(
-        self,
-        db: Session,
-        username: str,
-        email: str,
-        password_hash: str
-    ) -> User:
+    def create(self, db: Session, username: str, email: str, password_hash: str) -> User:
         """
         Create a new user in the database.
 
@@ -59,11 +53,7 @@ class UserRepository:
         Raises:
             IntegrityError: If username or email already exists
         """
-        user = User(
-            username=username,
-            email=email,
-            password_hash=password_hash
-        )
+        user = User(username=username, email=email, password_hash=password_hash)
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -90,9 +80,8 @@ class UserRepository:
 
         update_data = user_update.model_dump(exclude_unset=True)
         for field, value in update_data.items():
-           setattr(user, field, value)
+            setattr(user, field, value)
 
         db.commit()
         db.refresh(user)
         return user
-            

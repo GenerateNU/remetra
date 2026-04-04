@@ -4,6 +4,7 @@ import uuid
 
 from sqlalchemy import Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from database import Base
@@ -20,3 +21,5 @@ class Symptom(Base):
     location = Column(String, nullable=True)
     sensation = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    symptom_logs = relationship("SymptomLog", back_populates="symptom")
