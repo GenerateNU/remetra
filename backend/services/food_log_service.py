@@ -7,7 +7,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from repositories.food_log_repository import FoodLogRepository
-from schemas.food_log import FoodLogCreate, FoodLogResponse
+from schemas.food_log import FoodLogCreate, FoodLogResponse, FoodLogUpdate
 
 
 class FoodLogService:
@@ -30,6 +30,12 @@ class FoodLogService:
     def get_food_logs_by_username(self, db: Session, username: str) -> list[FoodLogResponse]:
         food_logs = self.food_log_repo.get_food_logs_by_username(db, username)
         return [FoodLogResponse.model_validate(log) for log in food_logs]
+
+    def update_food_log(self, db: Session, food_log_id: UUID, data: FoodLogUpdate) -> Optional[FoodLogResponse]:
+        updated = self.food_log_repo.update_food_log_by_id(db, food_log_id, data)
+        if not updated:
+            return None
+        return FoodLogResponse.model_validate(updated)
 
     def delete_food_log_by_id(self, db: Session, food_log_id: UUID) -> Optional[FoodLogResponse]:
         deleted = self.food_log_repo.delete_food_log_by_id(db, food_log_id)

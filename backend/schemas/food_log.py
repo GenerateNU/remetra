@@ -25,6 +25,14 @@ class FoodLogCreate(FoodLogBase):
     username: str = Field(..., description="Username of the user logging the food")
 
 
+class FoodLogUpdate(BaseModel):
+    """Schema for updating a food log entry (all fields optional)."""
+
+    quantity: Optional[str] = Field(default=None, description="Quantity consumed")
+    timestamp: Optional[datetime] = Field(default=None, description="When the food was consumed")
+    notes: Optional[str] = Field(default=None, description="Optional notes")
+
+
 class FoodLogResponse(FoodLogBase):
     """Schema for returning a food log entry."""
 

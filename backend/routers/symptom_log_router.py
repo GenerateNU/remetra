@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from routers.auth import get_current_user
-from schemas.symptom_log import SymptomLogCreate, SymptomLogResponse
+from schemas.symptom_log import SymptomLogCreate, SymptomLogResponse, SymptomLogUpdate
 from schemas.user import UserResponse
 from services.symptom_log_service import SymptomLogService
 
@@ -62,6 +62,22 @@ async def get_symptom_log(log_id: UUID, db: Session = Depends(get_db)) -> Sympto
             detail=f"Symptom log with ID {log_id} not found",
         )
     return log
+
+
+@router.put(
+    "/{log_id}",
+    response_model=SymptomLogResponse,
+)
+async def update_symptom_log(log_id: UUID, payload: SymptomLogUpdate, db: Session = Depends(get_db)) -> SymptomLogResponse:
+    """Update a symptom log."""
+    service = SymptomLogService()
+    updated = service.update_symptom_log(db, log_id, payload)
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Symptom log with ID {log_id} not found",
+        )
+    return updated
 
 
 @router.delete(

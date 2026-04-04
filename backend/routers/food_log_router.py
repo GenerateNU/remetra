@@ -7,11 +7,11 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from routers.auth import get_current_user
-from schemas.food_log import FoodLogCreate, FoodLogResponse
+from schemas.food_log import FoodLogCreate, FoodLogResponse, FoodLogUpdate
 from schemas.user import UserResponse
 from services.food_log_service import FoodLogService
 
-router = APIRouter(prefix="/food-log")
+router = APIRouter(prefix="/food-log", tags=["Food Logs"],)
 
 
 @router.post("/", response_model=FoodLogResponse, status_code=status.HTTP_201_CREATED)
@@ -49,6 +49,19 @@ async def get_food_log(food_log_id: UUID, db: Session = Depends(get_db)) -> Food
             detail=f"Food log with ID {food_log_id} not found",
         )
     return food_log
+
+
+@router.put("/{food_log_id}", response_model=FoodLogResponse)
+async def update_food_log(food_log_id: UUID, payload: FoodLogUpdate, db: Session = Depends(get_db)) -> FoodLogResponse:
+    """Update a food log by ID."""
+    food_log_service = FoodLogService()
+    updated = food_log_service.update_food_log(db, food_log_id, payload)
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Food log with ID {food_log_id} not found",
+        )
+    return updated
 
 
 @router.delete("/{food_log_id}", response_model=FoodLogResponse)
