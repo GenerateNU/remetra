@@ -69,8 +69,8 @@ async def get_symptom_log(log_id: UUID, db: Session = Depends(get_db)) -> Sympto
     response_model=SymptomLogResponse,
 )
 async def update_symptom_log(
-    log_id: UUID, payload: SymptomLogUpdate, 
-    db: Session = Depends(get_db)) -> SymptomLogResponse:
+    log_id: UUID, payload: SymptomLogUpdate, db: Session = Depends(get_db)
+) -> SymptomLogResponse:
     """Update a symptom log."""
     service = SymptomLogService()
     updated = service.update_symptom_log(db, log_id, payload)

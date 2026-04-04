@@ -11,7 +11,10 @@ from schemas.food_log import FoodLogCreate, FoodLogResponse, FoodLogUpdate
 from schemas.user import UserResponse
 from services.food_log_service import FoodLogService
 
-router = APIRouter(prefix="/food-log", tags=["Food Logs"],)
+router = APIRouter(
+    prefix="/food-log",
+    tags=["Food Logs"],
+)
 
 
 @router.post("/", response_model=FoodLogResponse, status_code=status.HTTP_201_CREATED)

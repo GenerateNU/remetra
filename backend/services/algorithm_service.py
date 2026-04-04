@@ -153,8 +153,10 @@ class AlgorithmService:
     def _serialize_metrics_rows(
         self,
         metrics_rows: list[Metrics],
-        food_ingredient_map: dict[str, list[str]],
+        food_ingredient_map: dict[str, list[str]] | None = None,
     ) -> list[AlgorithmAssociationResponse]:
+        if food_ingredient_map is None:
+            food_ingredient_map = {}
         response_rows: list[AlgorithmAssociationResponse] = []
         for row in metrics_rows:
             try:
