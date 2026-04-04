@@ -162,7 +162,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
 
       {/* Custom food entry */}
       {isCustom && (
-        <View style={{ maxWidth: '75%' }}>
+        <View style={{width: '75%' }}>
           
           <TextInput
             style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
@@ -175,6 +175,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
             Ingredients
           </Text>
         )}
+        <View>
           <Chips
             items={customIngredients}
             itemName="Ingredients"
@@ -182,6 +183,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
             onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
             onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
           />
+        </View>
           <TouchableOpacity onPress={() => { setIsCustom(false); setSearchQuery(""); }}>
             <Text className="text-sm font-medium font-ptserif text-[#eea487] mt-2">
               Search bank instead

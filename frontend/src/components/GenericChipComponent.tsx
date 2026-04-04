@@ -9,7 +9,7 @@ import {
 interface ChipsProps {
   items: string[];
   itemName: string;
-  placeholder: string;
+  placeholder?: string;
   onAdd: (item: string) => void;
   onRemove: (index: number) => void;
 }
@@ -45,14 +45,22 @@ export const Chips: React.FC<ChipsProps> = ({
           </View>
         ))}
       </View>
-      <TextInput
-        className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50 mb-2"
-        placeholder={`Add ${itemName.toLowerCase()}...`}
-        value={input}
-        onChangeText={setInput}
-        onSubmitEditing={handleSubmit}
-        returnKeyType="done"
-      />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <TextInput
+          style={{ flex: 1, borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 8, padding: 10, fontSize: 13, backgroundColor: '#fafafa' }}
+          placeholder={placeholder ?? `Add ${itemName.toLowerCase()}...`}
+          value={input}
+          onChangeText={setInput}
+          onSubmitEditing={handleSubmit}
+          returnKeyType="done"
+        />
+        <TouchableOpacity
+          onPress={handleSubmit}
+          style={{ backgroundColor: '#eea487', borderRadius: 8, padding: 10 }}
+        >
+          <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>Add</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
