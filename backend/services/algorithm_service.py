@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from analysis.algorithm import get_analysis
 from analysis.models import FoodLogEntry, SymptomLogEntry
+from models.food import Food
 from models.food_log import FoodLog
 from models.metrics import Metrics
 from models.symptom_log import SymptomLog
@@ -55,7 +56,8 @@ class AlgorithmService:
         else:
             metrics_rows = self.repo.get_by_user(username=user_id)
 
-        return self._serialize_metrics_rows(metrics_rows)
+        food_ingredient_map = self._get_food_ingredient_map(db, metrics_rows)
+        return self._serialize_metrics_rows(metrics_rows, food_ingredient_map)
 
     def _get_food_logs_for_user(self, db: Session, user_id: str) -> list[FoodLog]:
         query = select(FoodLog).where(FoodLog.username == user_id).order_by(FoodLog.timestamp.asc())
@@ -101,6 +103,21 @@ class AlgorithmService:
             time_window_hours=time_window_hours,
         )
 
+    def _get_food_ingredient_map(self, db: Session, metrics_rows: list[Metrics]) -> dict[str, list[str]]:
+        """Return a map of food_id_str -> ingredients for all food IDs found in metrics rows."""
+        food_ids: list[UUID] = []
+        for row in metrics_rows:
+            try:
+                food_ids.append(UUID(row.ingredient))
+            except ValueError:
+                continue
+
+        if not food_ids:
+            return {}
+
+        foods = db.execute(select(Food).where(Food.id.in_(food_ids))).scalars().all()
+        return {str(food.id): food.ingredients or [] for food in foods}
+
     def _build_association_rows(
         self,
         user_id: str,
@@ -136,6 +153,7 @@ class AlgorithmService:
     def _serialize_metrics_rows(
         self,
         metrics_rows: list[Metrics],
+        food_ingredient_map: dict[str, list[str]],
     ) -> list[AlgorithmAssociationResponse]:
         response_rows: list[AlgorithmAssociationResponse] = []
         for row in metrics_rows:
@@ -152,6 +170,7 @@ class AlgorithmService:
                         "user_id": row.username,
                         "symptom_id": row.symptom_id,
                         "associated_food_id": associated_food_id,
+                        "ingredients": food_ingredient_map.get(str(associated_food_id), []),
                         "key_metrics": {
                             "exposures": row.exposures,
                             "trigger_rate": row.trigger_rate,

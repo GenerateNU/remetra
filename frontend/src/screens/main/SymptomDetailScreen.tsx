@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from 'victory-native';
@@ -19,6 +20,12 @@ type Props = NativeStackScreenProps<MainStackParamList, 'SymptomDetail'>;
 interface FoodCorrelation {
   foodId: string;
   name: string;
+  ingredients: string[];
+  triggerRate: number;
+}
+
+interface IngredientCorrelation {
+  name: string;
   triggerRate: number;
 }
 
@@ -26,9 +33,11 @@ const CHART_LIMIT = 5;
 
 export function SymptomDetailScreen({ route, navigation }: Props) {
   const { symptomId, symptomName } = route.params;
+  const { width: screenWidth } = useWindowDimensions();
   const { fetchFoods } = useBankStore();
   const username = useAuthStore((s) => s.user.name);
   const [correlations, setCorrelations] = useState<FoodCorrelation[]>([]);
+  const [ingredientCorrelations, setIngredientCorrelations] = useState<IngredientCorrelation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,11 +58,24 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
           .map((r) => ({
             foodId: r.associated_food_id,
             name: foodMap.get(r.associated_food_id) ?? `Food ${r.associated_food_id}`,
+            ingredients: r.ingredients,
             triggerRate: r.key_metrics.trigger_rate,
           }))
           .sort((a, b) => b.triggerRate - a.triggerRate);
 
         setCorrelations(mapped);
+
+        // Flatten to ingredient level, keeping the highest trigger rate per ingredient
+        const ingMap = new Map<string, number>();
+        for (const food of mapped) {
+          for (const ing of food.ingredients) {
+            ingMap.set(ing, Math.max(ingMap.get(ing) ?? 0, food.triggerRate));
+          }
+        }
+        const ingList: IngredientCorrelation[] = Array.from(ingMap.entries())
+          .map(([name, triggerRate]) => ({ name, triggerRate }))
+          .sort((a, b) => b.triggerRate - a.triggerRate);
+        setIngredientCorrelations(ingList);
       } catch (err: any) {
         setError(err.message ?? 'Failed to load data');
       } finally {
@@ -64,7 +86,7 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
     load();
   }, []);
 
-  const chartData = correlations.slice(0, CHART_LIMIT).map((c) => ({
+  const chartData = ingredientCorrelations.slice(0, CHART_LIMIT).map((c) => ({
     x: c.name.length > 10 ? c.name.slice(0, 9) + '…' : c.name,
     y: c.triggerRate,
   }));
@@ -102,7 +124,7 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
           <ActivityIndicator color="#b2939b" style={{ marginTop: 32 }} />
         ) : error ? (
           <Text style={{ color: '#B8624F', textAlign: 'center', marginTop: 24 }}>{error}</Text>
-        ) : correlations.length === 0 ? (
+        ) : ingredientCorrelations.length === 0 ? (
           <Text style={{ color: '#aaa', textAlign: 'center', marginTop: 24, fontSize: 14 }}>
             No correlation data yet. Log more food and symptoms to see results.
           </Text>
@@ -127,11 +149,12 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
                   marginBottom: 4,
                 }}
               >
-                TOP FOOD CORRELATIONS
+                TOP INGREDIENT CORRELATIONS
               </Text>
               <VictoryChart
                 theme={VictoryTheme.material}
                 domainPadding={20}
+                width={screenWidth - 64}
                 height={220}
                 padding={{ top: 16, bottom: 48, left: 40, right: 16 }}
               >
@@ -152,10 +175,10 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
             </View>
 
             {/* List */}
-            <SectionDivider label="All Related Foods" />
+            <SectionDivider label="Related Ingredients" />
             <View style={{ gap: 10 }}>
-              {correlations.map((item, index) => (
-                <CorrelationRow key={item.foodId} rank={index + 1} item={item} />
+              {ingredientCorrelations.map((item, index) => (
+                <IngredientRow key={item.name} rank={index + 1} item={item} />
               ))}
             </View>
           </>
@@ -176,7 +199,7 @@ function SectionDivider({ label }: { label: string }) {
   );
 }
 
-function CorrelationRow({ rank, item }: { rank: number; item: FoodCorrelation }) {
+function IngredientRow({ rank, item }: { rank: number; item: IngredientCorrelation }) {
   const pct = Math.round(item.triggerRate * 100);
   const barColor = pct >= 60 ? '#B8624F' : pct >= 30 ? '#F8B4A8' : '#D4E8D4';
 
