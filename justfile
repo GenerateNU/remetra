@@ -23,6 +23,18 @@ down:
 clean:
     docker compose down -v
 
+# Seed the database with mock data from data_generator/ (idempotent)
+seed:
+    docker compose run --rm backend python scripts/seed.py
+
+# Wipe all seed data and reseed from scratch
+seed-clear:
+    docker compose run --rm backend python scripts/seed.py --clear
+
+# Ingest all PDFs from backend/data/raw/ into the RAG knowledge base
+seed-rag:
+    curl -X POST http://localhost:8000/ingest/folder
+
 test:
     docker compose up -d test-db
     sleep 3

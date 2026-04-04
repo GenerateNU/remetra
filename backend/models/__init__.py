@@ -19,3 +19,6 @@ from models import (
 from models import (
     user as user,
 )
+from models import (
+    metrics as metrics,
+)
