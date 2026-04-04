@@ -134,7 +134,6 @@ class TestAuthServiceIntegration:
         assert updated_user.weight == 150.0
         assert updated_user.gender == "Female"
 
-
     def test_complete_registration_and_login_flow(self, db_session, sample_user_data):
         """Test complete user flow from registration to getting current user."""
         service = AuthService()
@@ -164,16 +163,10 @@ class TestUserRepositoryIntegration:
         """Test creating a user through repository."""
         repo = UserRepository()
 
-        user = repo.create(
-            db=db_session,
-            username="repotest",
-            email="repo@test.com",
-            password_hash="hashed_password"
-        )
+        user = repo.create(db=db_session, username="repotest", email="repo@test.com", password_hash="hashed_password")
 
         assert user.username == "repotest"
         assert user.email == "repo@test.com"
-
 
     def test_get_by_username(self, db_session):
         """Test retrieving user by username."""
@@ -183,11 +176,11 @@ class TestUserRepositoryIntegration:
 
         user = repo.get_by_username(db_session, "findme")
 
-        assert user is not None      
+        assert user is not None
         assert user.username == "findme"
-        assert user.email == "findme@test.com" 
+        assert user.email == "findme@test.com"
 
-    def test_get_by_username_not_found(self, db_session):     
+    def test_get_by_username_not_found(self, db_session):
         """Test get_by_username returns None when user doesn't exist."""
         repo = UserRepository()
 
@@ -199,8 +192,7 @@ class TestUserRepositoryIntegration:
         """Test retrieving user by email."""
         repo = UserRepository()
 
-        repo.create(
-            db=db_session, username="emailtest", email="find@email.com", password_hash="hash")
+        repo.create(db=db_session, username="emailtest", email="find@email.com", password_hash="hash")
 
         user = repo.get_by_email(db_session, "find@email.com")
 

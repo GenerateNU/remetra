@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -34,3 +34,5 @@ class FoodTag(Base):
 
     food = relationship("Food", back_populates="food_tags")
     tag = relationship("Tag", back_populates="food_tags")
+
+    __table_args__ = (UniqueConstraint("food_id", "tag_id"),)

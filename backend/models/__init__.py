@@ -8,6 +8,9 @@ from models import (
     knowledge_chunk as knowledge_chunk,
 )
 from models import (
+    metrics as metrics,
+)
+from models import (
     symptom as symptom,
 )
 from models import (

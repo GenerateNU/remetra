@@ -61,8 +61,7 @@ def db_session(db_engine):
     """
     connection = db_engine.connect()
     transaction = connection.begin()
-    session = TestingSessionLocal()
-    session.bind = connection
+    session = TestingSessionLocal(bind=connection)
 
     yield session
 
@@ -101,11 +100,7 @@ def sample_user_data():
     Any test can use this by adding 'sample_user_data' as a parameter.
     Keeps test data consistent across all tests.
     """
-    return {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "password123"
-    }
+    return {"username": "testuser", "email": "test@example.com", "password": "password123"}
 
 
 @pytest.fixture
@@ -139,7 +134,7 @@ def sample_food_data():
     return {
         "name": "test pizza",
         "ingredients": list(["flour", "cheese", "tomato"]),
-        "username": "test user",
+        "username": "testuser",
     }
 
 
@@ -190,13 +185,15 @@ def multiple_symptoms_data():
 
 
 @pytest.fixture
-def created_food(db_session, sample_food_data):
+def created_food(db_session, request, sample_food_data):
     """
     Create a Food row in the DB and return the FoodResponse.
 
     Used as an FK dependency in food-log and tag tests.
-    Food.username has no FK constraint so no user is needed.
+    Pulls in authenticated_user to satisfy the Food.username FK constraint.
     """
+    request.getfixturevalue("authenticated_user")
+
     from schemas.food import FoodCreate
     from services.food_service import FoodService
 
