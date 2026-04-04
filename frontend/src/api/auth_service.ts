@@ -25,6 +25,14 @@ export interface MeResponse {
   email: string;
 }
 
+export interface UserUpdatePayload {
+  dob?: string;
+  gender?: string;
+  weight?: number;
+  disease?: string[];
+  medication?: string[];
+}
+
 export class AuthError extends Error {
   constructor(message: string) {
     super(message);
@@ -62,6 +70,15 @@ export const authService = {
       return data;
     } catch (err: any) {
       throw new AuthError(err.response?.data?.detail ?? 'Failed to fetch user profile');
+    }
+  },
+
+  // PUT /auth/me -> update_profile()
+  async updateProfile(payload: UserUpdatePayload): Promise<void> {
+    try {
+      await apiClient.put('/auth/me', payload);
+    } catch (err: any) {
+      throw new AuthError(err.response?.data?.detail ?? 'Failed to update profile');
     }
   },
 };

@@ -12,10 +12,16 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
+
+
+class UserUpdate(BaseModel):
+    """Schema for updating user information."""
+
     dob: Optional[date] = None
     disease: Optional[list[str]] = None
     weight: Optional[float] = None
-
+    gender: Optional[str] = None
+    medication: Optional[list[str]] = None
 
 class UserResponse(BaseModel):
     """Public user data (excludes password_hash). Not sure if this will be useful atm"""
@@ -25,7 +31,10 @@ class UserResponse(BaseModel):
     dob: Optional[date] = None
     disease: Optional[list[str]] = None
     weight: Optional[float] = None
+    gender: Optional[str] = None
+    medication: Optional[list[str]] = None
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True  # Allow conversion from ORM models (e.g., SQLAlchemy User) to Pydantic schema

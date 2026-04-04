@@ -381,7 +381,6 @@ def test_window_boundary_includes_exact_edge():
     ]
     result = get_analysis(food_logs, symptom_logs, time_window_hours=6)
     bloating = result.get("bloating", {})
-
     assert "gluten" in bloating
     assert "dairy" in bloating
     assert "soy" not in bloating

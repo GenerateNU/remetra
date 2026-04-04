@@ -104,10 +104,7 @@ def sample_user_data():
     return {
         "username": "testuser",
         "email": "test@example.com",
-        "password": "password123",
-        "dob": "2000-01-01",
-        "disease": ["lupus"],
-        "weight": 150.0,
+        "password": "password123"
     }
 
 

@@ -31,6 +31,7 @@ test:
 
 lint:
     docker compose run --rm backend ruff check .
+    cd frontend && npm run lint
 
 format:
     docker compose run --rm backend ruff check --fix .
@@ -44,3 +45,25 @@ logs:
 
 logs-backend:
     docker compose logs -f backend
+
+logs-db:
+    docker compose logs -f test-db
+
+# Frontend commands (run locally, not in Docker)
+fe:
+    cd frontend && npm start
+
+fe-ios:
+    cd frontend && npm run ios
+
+fe-android:
+    cd frontend && npm run android
+
+fe-install:
+    cd frontend && npm install
+
+fe-test:
+    cd frontend && npm test
+
+fe-test-coverage:
+    cd frontend && npm run test:coverage

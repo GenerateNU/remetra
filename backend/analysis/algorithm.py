@@ -68,6 +68,9 @@ def get_food_symptom_counts(
     from every overlapping symptom are still collected so the average reflects all
     associated symptom events.
     """
+    counts: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(lambda: [0, []]))
+    foods_in_windows: dict[str, int] = defaultdict(int)
+
     window_results: list[SymptomFoodWindowResult] = get_food_logs_within_time_window_before_symptoms(
         food_logs, symptom_logs, time_window_hours
     )
