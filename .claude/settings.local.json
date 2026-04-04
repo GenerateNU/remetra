@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"f:/ADriveStuff/Generate/remetra\" diff HEAD -- backend/services/pdfconvert.py)"
+    ]
+  }
+}

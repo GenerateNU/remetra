@@ -13,6 +13,7 @@ class TagBase(BaseModel):
     name: str
     description: Optional[str] = None
     is_system: bool = False
+    llm_suggested: bool = False
 
 
 class TagCreate(TagBase):

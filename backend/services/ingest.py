@@ -11,17 +11,29 @@ from services.pdfconvert import chunk_text, convert
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 
-def embed(texts: list[str]) -> list[list[float]]:
-    """Embed a list of strings using all-MiniLM-L6-v2."""
-    embeddings = model.encode(texts, convert_to_numpy=True)
-    return embeddings.tolist()
+def embed(texts: list[str], model_type: str = "all-MiniLM-L6-v2") -> list[list[float]]:
+    """Embed a list of strings using all-MiniLM-L6-v2 as the default"""
+    if model_type == "all-MiniLM-L6-v2":
+        embeddings = model.encode(texts, convert_to_numpy=True)
+        return embeddings.tolist()
+
+    elif model_type in ["text-embedding-ada-002", "text-embedding-3-large"]:  # pragma: no cover
+        import openai
+
+        response = openai.Embedding.create(input=texts, model=model_type)
+        return [item["embedding"] for item in response["data"]]
+
+    else:  # pragma: no cover
+        raise ValueError("Embedding Model not known")
 
 
-def ingest_pdf(file, source: str) -> list[dict[str, Any]]:
+def ingest_pdf(
+    file, source: str, strategy: str = "semantic", model_type: str = "all-MiniLM-L6-v2"
+) -> list[dict[str, Any]]:
     """Parse, chunk, and embed a PDF. Returns chunk dicts ready to persist."""
     full_text = convert(file)
-    chunks = chunk_text(full_text)
-    vectors = embed(chunks)
+    chunks = chunk_text(full_text, strategy=strategy)
+    vectors = embed(chunks, model_type)
 
     return [
         {

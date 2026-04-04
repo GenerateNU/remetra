@@ -21,10 +21,11 @@ dependencies = [
     "scipy>=1.17.1",
     "sqlalchemy>=2.0.46",
     "uvicorn[standard]>=0.40.0",
-    "google-generativeai>=0.8.0",
+    "google-genai>=1.0.0",
     "torch",
     "sentence-transformers>=5.3.0",
     "pypdf>=6.9.2",
+    "semantic-text-splitter>=0.29.0",
 ]
 
 [tool.uv.sources]
