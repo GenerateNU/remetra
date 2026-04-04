@@ -36,6 +36,7 @@ export interface AlgorithmAssociationResponse {
   user_id: string;
   symptom_id: string;
   associated_food_id: string;
+  ingredients: string[];
   key_metrics: KeyMetrics;
   updated_at: string;
 }
