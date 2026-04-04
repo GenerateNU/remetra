@@ -18,7 +18,8 @@ interface FoodLogFormProps {
 export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
@@ -136,7 +137,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
            {/* Scan barcode button */}
           <TouchableOpacity
             style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 14, alignItems: 'center', marginTop: 8 }}
-           /* onPress={() => navigation.navigate('BarcodeScanner')} */
+            onPress={() => navigation.navigate('BarcodeScanner')} 
           >
             <Text className="text-lg font-ptserif text-[#eea487]">Scan Barcode</Text>
           </TouchableOpacity>
