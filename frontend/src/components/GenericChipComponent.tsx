@@ -9,6 +9,7 @@ import {
 interface ChipsProps {
   items: string[];
   itemName: string;
+  placeholder: string;
   onAdd: (item: string) => void;
   onRemove: (index: number) => void;
 }
@@ -16,6 +17,7 @@ interface ChipsProps {
 export const Chips: React.FC<ChipsProps> = ({
   items,
   itemName,
+  placeholder,
   onAdd,
   onRemove,
 }) => {

@@ -178,6 +178,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
           <Chips
             items={customIngredients}
             itemName="Ingredients"
+            placeholder="Add Ingredients..."
             onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
             onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
           />
