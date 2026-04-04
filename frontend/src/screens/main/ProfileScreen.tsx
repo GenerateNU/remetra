@@ -1,10 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { useAuthStore } from '../../store/useAuthStore';
+import type { MainStackParamList } from '../../navigation/stacks/MainStack';
 
 export function ProfileScreen() {
   const { user, logout } = useAuthStore();
+  const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
   return (
     <View style={{ flex: 1 }}>
@@ -61,11 +65,6 @@ export function ProfileScreen() {
 
           <SectionDivider label="App" />
 
-          <ActionRow
-            emoji="🔔"
-            label="Notifications"
-            onPress={() => {}}
-          />
           <ActionRow
             emoji="ℹ️"
             label="About Remetra"
