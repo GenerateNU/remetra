@@ -23,5 +23,9 @@ class SymptomLogService:
         log = self.repo.create(db, data)
         return SymptomLogResponse.model_validate(log)
 
+    def get_symptom_logs_by_username(self, db: Session, username: str) -> list[SymptomLogResponse]:
+        logs = self.repo.get_by_username(db, username)
+        return [SymptomLogResponse.model_validate(log) for log in logs]
+
     def delete_symptom_log(self, db: Session, log_id: UUID) -> bool:
         return self.repo.delete(db, log_id)

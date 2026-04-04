@@ -39,13 +39,13 @@ export const foodLogService = {
     }
   },
 
-  // get_food_logs_by_username()
-  async getFoodLogsByUsername(username: string): Promise<FoodLogResponse[]> {
+  // get_my_food_logs()
+  async getMyFoodLogs(): Promise<FoodLogResponse[]> {
     try {
-      const { data } = await apiClient.get<FoodLogResponse[]>(`/food-log/user/${username}`);
+      const { data } = await apiClient.get<FoodLogResponse[]>('/food-log/user/me');
       return data;
     } catch (err: any) {
-      throw new FoodLogError(err.response?.data?.detail ?? `Failed to fetch food logs for ${username}`);
+      throw new FoodLogError(err.response?.data?.detail ?? 'Failed to fetch food logs');
     }
   },
 
