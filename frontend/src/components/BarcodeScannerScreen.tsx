@@ -1,79 +1,87 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useBankStore } from "../store/bankStore";
 
 export const BarcodeScannerScreen = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const onScanned = route.params?.onScanned;
 
-  const [permission, requestPermission] = useCameraPermissions();
-  const [scanned, setScanned] = useState(false);
+  const [barcode, setBarcode] = useState("");
+  const [result, setResult] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const { setScannedFood } = useBankStore();
 
-  useEffect(() => {
-    if (!permission?.granted) requestPermission();
-  }, []);
 
-  const handleBarCodeScanned = async ({ data }: { data: string }) => {
-    if (scanned) return;
-    setScanned(true);
+  const handleLookup = async () => {
+    if (!barcode.trim()) return;
+    setLoading(true);
+    setResult(null);
 
     try {
       const res = await fetch(
-        `https://world.openfoodfacts.org/api/v0/product/${data}.json`
+        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
       );
       const json = await res.json();
       const product = json.product;
 
-      const name = product?.product_name ?? "Unknown Food";
-      const ingredients = product?.ingredients_text
-        ? product.ingredients_text.split(",").map((i: string) => i.trim())
+      if (!product) {
+        setResult("Product not found");
+        return;
+      }
+
+      const name = product.product_name ?? "Unknown";
+      const ingredients = product.ingredients
+        ? product.ingredients.map((i: any) => 
+            i.id.replace(/^en:/, '').replace(/-/g, ' ')
+            ).filter(Boolean)
         : [];
 
-      onScanned?.({ name, ingredients });
-      navigation.goBack();
+
+      setScannedFood({ name, ingredients });
+      navigation.navigate('Summary');
     } catch (err) {
-      console.error("Barcode lookup failed:", err);
-      setScanned(false);
+      setResult("Lookup failed");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!permission?.granted) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.msg}>Camera access is needed to scan barcodes.</Text>
-        <TouchableOpacity style={styles.btn} onPress={requestPermission}>
-          <Text style={styles.btnText}>Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
   return (
-    <View style={StyleSheet.absoluteFill}>
-      <CameraView
-        style={StyleSheet.absoluteFill}
-        facing="back"
-        onBarcodeScanned={handleBarCodeScanned}
-        barcodeScannerSettings={{ barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e", "code128"] }}
-      />
-      <TouchableOpacity
-        style={{ position: "absolute", top: 60, left: 20 }}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={{ color: "white", fontSize: 18 }}>← Cancel</Text>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Text style={styles.back}>← Cancel</Text>
       </TouchableOpacity>
-      <Text style={{ position: "absolute", bottom: 80, alignSelf: "center", color: "white", fontSize: 16 }}>
-        Point camera at barcode
-      </Text>
+
+      <Text style={styles.title}>Test Barcode Lookup</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Enter barcode number..."
+        value={barcode}
+        onChangeText={setBarcode}
+        keyboardType="numeric"
+      />
+
+      <TouchableOpacity style={styles.btn} onPress={handleLookup}>
+        <Text style={styles.btnText}>{loading ? "Looking up..." : "Look Up"}</Text>
+      </TouchableOpacity>
+
+      {result && (
+        <Text style={styles.result}>{result}</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
-  msg: { textAlign: "center", marginBottom: 16, color: "#555" },
-  btn: { backgroundColor: "#C85A4A", paddingHorizontal: 24, paddingVertical: 12, borderRadius: 20 },
-  btnText: { color: "#fff", fontWeight: "600" },
+  container: { flex: 1, padding: 24, paddingTop: 60, backgroundColor: '#fff' },
+  back: { color: '#eea487', fontSize: 16, marginBottom: 24 },
+  title: { fontSize: 22, fontWeight: '600', color: '#eea487', marginBottom: 20 },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12, fontSize: 16 },
+  btn: { backgroundColor: '#C85A4A', borderRadius: 25, paddingVertical: 14, alignItems: 'center' },
+  btnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  result: { marginTop: 24, fontSize: 14, color: '#333', lineHeight: 22 },
 });

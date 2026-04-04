@@ -5,8 +5,7 @@ import { foodLogService } from "../api/food_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNavigation } from '@react-navigation/native';
 
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 
@@ -21,6 +20,8 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
   const { foods, addFood } = useBankStore();
   const navigation = useNavigation<any>();
 
+  
+
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
@@ -28,6 +29,16 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
 
   const [customName, setCustomName] = useState("");
   const [customIngredients, setCustomIngredients] = useState<string[]>([]);
+  const { scannedFood, setScannedFood } = useBankStore();
+
+  useEffect(() => {
+  if (scannedFood) {
+    setCustomName(scannedFood.name);
+    setCustomIngredients(scannedFood.ingredients);
+    setIsCustom(true);
+    setScannedFood(null);
+  }
+}, []);
 
 
   const [servings, setServings] = useState("1");
@@ -84,6 +95,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
     };
     onSubmit(entry);
   };
+
 
   const isValid = isCustom ? customName.trim().length > 0 : selectedFood !== null;
 
