@@ -102,6 +102,38 @@ class AlgorithmService:
             time_window_hours=time_window_hours,
         )
 
+    def _build_association_rows(
+        self,
+        user_id: str,
+        food_logs: list[FoodLog],
+        symptom_logs: list[SymptomLog],
+        time_window_hours: float,
+    ) -> list[dict]:
+        metrics_by_symptom = self._build_metrics_by_symptom(
+            food_logs=food_logs,
+            symptom_logs=symptom_logs,
+            time_window_hours=time_window_hours,
+        )
+
+        rows = []
+        for symptom_id_str, metrics_by_food in metrics_by_symptom.items():
+            for food_id_str, metrics in metrics_by_food.items():
+                rows.append(
+                    {
+                        "user_id": user_id,
+                        "symptom_id": UUID(symptom_id_str),
+                        "associated_food_id": UUID(food_id_str),
+                        "key_metrics": {
+                            "exposures": metrics.exposures,
+                            "trigger_rate": metrics.trigger_rate,
+                            "base_rate": metrics.base_rate,
+                            "fishers_p_value": metrics.fishers_p_value,
+                            "average_intensity": metrics.average_intensity,
+                        },
+                    }
+                )
+        return rows
+
     def _serialize_metrics_rows(
         self,
         metrics_rows: list[Metrics],
