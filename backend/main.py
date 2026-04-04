@@ -45,6 +45,7 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     from fastapi.openapi.utils import get_openapi
+
     schema = get_openapi(
         title=app.title,
         version=app.version,

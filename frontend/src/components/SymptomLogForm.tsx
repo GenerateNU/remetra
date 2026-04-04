@@ -4,8 +4,8 @@ import { symptomLogService } from "../api/symptom_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 
 import { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { LogDateTimePicker } from "./LogDateTimePicker";
 
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
@@ -27,7 +27,6 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
 
   const [intensity, setIntensity] = useState(5);
   const [timestamp, setTimestamp] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDuration, setShowDuration] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState("");
   const [notes, setNotes] = useState("");
@@ -35,9 +34,6 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const filtered = symptoms.filter((sy) =>
     sy.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999);
 
   const handleSelectSymptom = (symptom: SymptomItem) => {
     setSelectedSymptom(symptom);
@@ -228,28 +224,11 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
           <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
             Time
           </Text>
-          <TouchableOpacity
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, backgroundColor: '#fafafa', marginBottom: 8 }}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text>
-              {timestamp.toLocaleDateString()}{" "}
-              {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </Text>
-          </TouchableOpacity>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={timestamp}
-              mode="datetime"
-              display="spinner"
-              maximumDate={endOfDay}
-              onChange={(_, date) => {
-                setShowDatePicker(false);
-                if (date) setTimestamp(date);
-              }}
-            />
-          )}
+          <LogDateTimePicker
+            value={timestamp}
+            onChange={setTimestamp}
+            accentColor="#eea487"
+          />
 
           {!showDuration ? (
             <TouchableOpacity onPress={() => setShowDuration(true)}>

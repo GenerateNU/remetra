@@ -12,7 +12,7 @@ services:
     environment:
       - ENVIRONMENT=development
       - GEMINI_API_KEY=${GEMINI_API_KEY}
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://test_user:test_password@test-db:5432/test_remetra}
     env_file:
       - path: .env
         required: false

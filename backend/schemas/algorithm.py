@@ -25,6 +25,7 @@ class AlgorithmAssociationResponse(BaseModel):
     user_id: str
     symptom_id: UUID
     associated_food_id: UUID
+    ingredients: list[str]
     key_metrics: KeyMetrics
     updated_at: datetime
 
