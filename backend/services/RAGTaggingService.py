@@ -5,7 +5,7 @@ import logging
 import os
 from typing import Optional
 
-import google.generativeai as genai
+from google import genai
 from sqlalchemy.orm import Session
 
 from schemas.tag import (
@@ -25,8 +25,7 @@ class RAGTaggingService:
     """
 
     def __init__(self):
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        self.llm = genai.GenerativeModel("gemini-1.5-flash")
+        self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
     def suggest(
         self,
@@ -86,7 +85,7 @@ Rules:
 
         # 3. Call LLM
         try:
-            response = self.llm.generate_content(prompt)
+            response = self.client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
             raw_text = response.text.strip()
 
             # Strip markdown code fences if the model wraps the JSON

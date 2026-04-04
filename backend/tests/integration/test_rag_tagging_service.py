@@ -12,10 +12,10 @@ class TestRAGTaggingService:
     @patch("services.RAGTaggingService.genai")
     def test_suggest_with_ingredients_returns_structured_response(self, mock_genai, db_session):
         """Given a food with populated ingredients, returns non-empty suggested_ingredients with buckets."""
-        mock_llm = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_llm
-        mock_llm.generate_content.return_value = MagicMock(
-            text="""{"suggested_ingredients": [{"name": "wheat flour", "buckets": ["gluten", "wheat"]}], 
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(
+            text="""{"suggested_ingredients": [{"name": "wheat flour", "buckets": ["gluten", "wheat"]}],
             "suggested_buckets": [{"name": "gluten", "description": "contains wheat flour"}]}"""
         )
 
@@ -33,10 +33,10 @@ class TestRAGTaggingService:
     @patch("services.RAGTaggingService.genai")
     def test_suggest_with_no_ingredients_returns_suggestions_from_food_name(self, mock_genai, db_session):
         """Given a food with ingredients=None, returns conservative suggestions without hallucinating."""
-        mock_llm = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_llm
-        mock_llm.generate_content.return_value = MagicMock(
-            text="""{"suggested_ingredients": [{"name": "milk", "buckets": ["dairy"]}], 
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(
+            text="""{"suggested_ingredients": [{"name": "milk", "buckets": ["dairy"]}],
             "suggested_buckets": [{"name": "dairy", "description": "ice cream typically contains milk"}]}"""
         )
 
@@ -54,10 +54,10 @@ class TestRAGTaggingService:
         """Suggestions must never be saved — no new rows in tags or food_tags tables."""
         from models.tag import FoodTag, Tag
 
-        mock_llm = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_llm
-        mock_llm.generate_content.return_value = MagicMock(
-            text="""{"suggested_ingredients": 
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(
+            text="""{"suggested_ingredients":
             [{"name": "cheese", "buckets": ["dairy"]}], "suggested_buckets":
               [{"name": "dairy", "description": "contains cheese"}]}"""
         )
@@ -74,9 +74,9 @@ class TestRAGTaggingService:
     @patch("services.RAGTaggingService.genai")
     def test_suggest_handles_llm_json_parse_failure_gracefully(self, mock_genai, db_session):
         """If LLM returns malformed JSON, returns empty lists rather than crashing."""
-        mock_llm = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_llm
-        mock_llm.generate_content.return_value = MagicMock(text="this is not json")
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.return_value = MagicMock(text="this is not json")
 
         service = RAGTaggingService()
         result = service.suggest(db_session, "mystery food", ["unknown"])
@@ -88,9 +88,9 @@ class TestRAGTaggingService:
     @patch("services.RAGTaggingService.genai")
     def test_suggest_handles_llm_call_failure_gracefully(self, mock_genai, db_session):
         """If the LLM call itself throws, returns empty lists rather than crashing."""
-        mock_llm = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_llm
-        mock_llm.generate_content.side_effect = Exception("API unavailable")
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
+        mock_client.models.generate_content.side_effect = Exception("API unavailable")
 
         service = RAGTaggingService()
         result = service.suggest(db_session, "some food", ["ingredient"])
@@ -102,15 +102,15 @@ class TestRAGTaggingService:
     @patch("services.RAGTaggingService.genai")
     def test_suggest_handles_markdown_wrapped_json(self, mock_genai, db_session):
         """If LLM wraps JSON in markdown code fences, it should still parse correctly."""
-        mock_llm = MagicMock()
-        mock_genai.GenerativeModel.return_value = mock_llm
+        mock_client = MagicMock()
+        mock_genai.Client.return_value = mock_client
         json_text = (
             "```json\n"
             '{"suggested_ingredients": [{"name": "milk", "buckets": ["dairy"]}],'
             ' "suggested_buckets": [{"name": "dairy", "description": "contains milk"}]}'
             "\n```"
         )
-        mock_llm.generate_content.return_value = MagicMock(text=json_text)
+        mock_client.models.generate_content.return_value = MagicMock(text=json_text)
 
         service = RAGTaggingService()
         result = service.suggest(db_session, "latte", ["milk", "espresso"])
