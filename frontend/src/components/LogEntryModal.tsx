@@ -72,7 +72,10 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
             )}
 
             {step === "food" && (
-              <FoodLogForm onSubmit={handleSubmit} onBack={() => setStep("select_type")} />
+              <FoodLogForm 
+              onSubmit={handleSubmit} 
+              onBack={() => setStep("select_type")} 
+              onCloseModal={handleClose} /> 
             )}
 
             {step === "symptom" && (

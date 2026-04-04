@@ -13,9 +13,10 @@ import { LogDateTimePicker } from "./LogDateTimePicker";
 interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
   onBack: () => void;
+  onCloseModal: () => void; 
 }
 
-export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
+export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCloseModal }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
   const navigation = useNavigation<any>();
@@ -27,6 +28,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
 
   const [customName, setCustomName] = useState("");
   const [customIngredients, setCustomIngredients] = useState<string[]>([]);
+
 
   const [servings, setServings] = useState("1");
   const [timestamp, setTimestamp] = useState(new Date());
@@ -133,7 +135,10 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
            {/* Scan barcode button */}
           <TouchableOpacity
             style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 14, alignItems: 'center', marginTop: 8 }}
-            onPress={() => navigation.navigate('BarcodeScanner')} 
+            onPress={() => {
+              onCloseModal(); // closes the modal
+               setTimeout(() => navigation.navigate('BarcodeScanner'), 300);
+            }}
           >
             <Text className="text-lg font-ptserif text-[#eea487]">Scan Barcode</Text>
           </TouchableOpacity>
