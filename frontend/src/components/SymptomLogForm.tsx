@@ -1,5 +1,7 @@
 import { SymptomLogEntry, SymptomItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
+import { symptomLogService } from "../api/symptom_log_service";
+import { useAuthStore } from "../store/useAuthStore";
 
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -11,6 +13,7 @@ interface SymptomLogFormProps {
 }
 
 export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack }) => {
+  const username = useAuthStore((s) => s.user.name) ?? "";
   const { symptoms, addSymptom } = useBankStore();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,6 +30,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDuration, setShowDuration] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState("");
+  const [notes, setNotes] = useState("");
 
   const filtered = symptoms.filter((sy) =>
     sy.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -50,7 +54,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     const clearError = (field: string) =>
     setErrors({});
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isCustom) {
       const newErrors: Record<string, string> = {};
       if (!customLocation.trim()) newErrors.location = "Location is required.";
@@ -64,17 +68,31 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     setErrors({});
 
     const symptomId = isCustom
-      ? addSymptom(customName, customLocation, customSensation)
+      ? await addSymptom(customName, customLocation, customSensation)
       : selectedSymptom?.id ?? null;
 
     if (!symptomId) {
-      console.error("How the hell did this happen");
+      console.error("Could not resolve symptom ID for log entry");
+      return;
+    }
+
+    try {
+      await symptomLogService.createSymptomLog({
+        symptom_id: symptomId,
+        intensity,
+        timestamp: timestamp.toISOString(),
+        duration: showDuration ? parseFloat(durationMinutes) || undefined : undefined,
+        notes: notes.trim() || undefined,
+        username,
+      });
+    } catch (error) {
+      console.error("Failed to create symptom log entry:", error);
       return;
     }
 
     const entry: SymptomLogEntry = {
       type: "symptom",
-      symptomId,
+      symptomId: symptomId,
       name: isCustom ? customName : selectedSymptom?.name ?? "",
       location: isCustom ? customLocation : selectedSymptom?.location ?? "",
       sensation: isCustom ? customSensation : selectedSymptom?.sensation ?? "",
@@ -253,7 +271,16 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
               />
             </View>
           )}
-
+          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
+                Notes (optional)
+              </Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
+                placeholder="Any additional notes..."
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+              />
           <TouchableOpacity
             style={{
               borderWidth: 1, borderColor: '#ccc', borderRadius: 25,

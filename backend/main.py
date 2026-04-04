@@ -32,6 +32,39 @@ app = FastAPI(
     version="0.1.0",
 )
 
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    from fastapi.openapi.utils import get_openapi
+    schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+    )
+    # Replace the auto-generated OAuth2PasswordBearer scheme with a simple
+    # HTTPBearer scheme so the Scalar/Swagger "Authorize" button accepts a
+    # raw token instead of attempting an OAuth2 form-based password flow.
+    schema.setdefault("components", {})["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+        }
+    }
+    # Rewrite per-route security references so Scalar attaches the token.
+    for path in schema.get("paths", {}).values():
+        for operation in path.values():
+            if isinstance(operation, dict) and "security" in operation:
+                operation["security"] = [{"BearerAuth": []}]
+    schema["security"] = [{"BearerAuth": []}]
+    app.openapi_schema = schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
+
 app.add_middleware(LoggingMiddleware)
 
 

@@ -6,7 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database import get_db
+from routers.auth import get_current_user
 from schemas.food_log import FoodLogCreate, FoodLogResponse
+from schemas.user import UserResponse
 from services.food_log_service import FoodLogService
 
 router = APIRouter(prefix="/food-log")
@@ -22,13 +24,16 @@ async def create_food_log(food_log: FoodLogCreate, db: Session = Depends(get_db)
     return created_food_log
 
 
-@router.get("/user/{username}", response_model=list[FoodLogResponse])
-async def get_food_logs_by_username(username: str, db: Session = Depends(get_db)) -> list[FoodLogResponse]:
+@router.get("/user/me", response_model=list[FoodLogResponse])
+async def get_my_food_logs(
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+) -> list[FoodLogResponse]:
     """
-    Get all food logs for a given user.
+    Get all food logs for the authenticated user.
     """
     food_log_service = FoodLogService()
-    return food_log_service.get_food_logs_by_username(db, username)
+    return food_log_service.get_food_logs_by_username(db, current_user.username)
 
 
 @router.get("/{food_log_id}", response_model=FoodLogResponse)

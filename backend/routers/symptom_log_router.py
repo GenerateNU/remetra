@@ -10,7 +10,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database import get_db
+from routers.auth import get_current_user
 from schemas.symptom_log import SymptomLogCreate, SymptomLogResponse
+from schemas.user import UserResponse
 from services.symptom_log_service import SymptomLogService
 
 router = APIRouter(
@@ -31,6 +33,19 @@ async def create_symptom_log(log: SymptomLogCreate, db: Session = Depends(get_db
         return service.create_symptom_log(db, log)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.get(
+    "/user/me",
+    response_model=list[SymptomLogResponse],
+)
+async def get_my_symptom_logs(
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+) -> list[SymptomLogResponse]:
+    """Get all symptom logs for the authenticated user."""
+    service = SymptomLogService()
+    return service.get_symptom_logs_by_username(db, current_user.username)
 
 
 @router.get(
