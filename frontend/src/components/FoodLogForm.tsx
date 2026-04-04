@@ -3,6 +3,8 @@ import { useBankStore } from "../store/bankStore";
 import { Chips } from "./GenericChipComponent";
 import { foodLogService } from "../api/food_log_service";
 import { useAuthStore } from "../store/useAuthStore";
+import { useNavigation } from '@react-navigation/native';
+
 
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -16,6 +18,7 @@ interface FoodLogFormProps {
 export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
+  const navigation = useNavigation();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
@@ -128,9 +131,19 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
               </TouchableOpacity>
             )}
           </View>
+
+
+           {/* Scan barcode button */}
+          <TouchableOpacity
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 14, alignItems: 'center', marginTop: 8 }}
+           /* onPress={() => navigation.navigate('BarcodeScanner')} */
+          >
+            <Text className="text-lg font-ptserif text-[#eea487]">Scan Barcode</Text>
+          </TouchableOpacity>
         </>
       )}
 
+      
       {/* Selected food summary */}
       {selectedFood && !isCustom && (
         <View style={{ backgroundColor: '#fff5f0', borderWidth: 1, borderColor: '#eea487', borderRadius: 12, padding: 14, marginBottom: 8 }}>
