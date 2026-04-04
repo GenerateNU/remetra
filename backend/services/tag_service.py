@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class TagService:
-
     def create_tag(self, db: Session, tag: TagCreate) -> TagResponse:
         """Create a new tag."""
         tag_repo = TagRepository()

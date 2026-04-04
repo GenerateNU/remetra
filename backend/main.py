@@ -11,6 +11,7 @@ from sqlalchemy import text
 
 from database import Base, engine
 from middleware.logging_middleware import LoggingMiddleware
+from routers.algorithm_router import router as algorithm_router
 from routers.auth import router as auth_router
 from routers.food_log_router import router as food_log_router
 from routers.food_router import router as food_router
@@ -43,6 +44,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(algorithm_router)
 app.include_router(symptom_log_router)
 app.include_router(symptom_router)
 app.include_router(food_router)

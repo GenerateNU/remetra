@@ -41,9 +41,7 @@ class TestSymptomService:
     def test_update_symptom_not_there(self, db_session, authenticated_user, sample_symptom_data):
         """Test updating a symptom that does not exist."""
         service = SymptomService()
-        symptom = service.update_symptom_by_id(
-            db_session, uuid.UUID(int=0), sample_symptom_data
-        )
+        symptom = service.update_symptom_by_id(db_session, uuid.UUID(int=0), sample_symptom_data)
         assert symptom is None
 
     def test_delete_symptom_success(self, db_session, authenticated_user, sample_symptom_data):

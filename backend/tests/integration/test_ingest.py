@@ -22,6 +22,7 @@ from services.pdfconvert import chunk_text, convert
 # Shared PDF fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def pdf_with_text():
     """Return a BytesIO containing a real PDF with extractable text."""
@@ -50,6 +51,7 @@ def blank_pdf():
 # ---------------------------------------------------------------------------
 # pdfconvert.py
 # ---------------------------------------------------------------------------
+
 
 class TestPdfConvert:
     """Tests for convert() and chunk_text() in services/pdfconvert.py."""
@@ -117,6 +119,7 @@ class TestPdfConvert:
 # services/ingest.py  (ingest_pdf)
 # ---------------------------------------------------------------------------
 
+
 class TestIngestPdf:
     """Tests for the ingest_pdf() pure function in services/ingest.py."""
 
@@ -162,16 +165,14 @@ class TestIngestPdf:
 # repositories/chunk_repository.py
 # ---------------------------------------------------------------------------
 
+
 class TestChunkRepository:
     """Integration tests for ChunkRepository against the real test database."""
 
     def _make_chunks(self, texts: list[str], source: str = "test_source") -> list[dict]:
         """Helper: embed a list of strings into chunk dicts."""
         embeddings = embed(texts)
-        return [
-            {"content": t, "embedding": e, "source": source}
-            for t, e in zip(texts, embeddings)
-        ]
+        return [{"content": t, "embedding": e, "source": source} for t, e in zip(texts, embeddings)]
 
     def test_create_chunks(self, db_session):
         """create_chunks persists rows and returns KnowledgeChunk objects with IDs."""
@@ -225,9 +226,7 @@ class TestChunkRepository:
         cleared = repo.clear_chunks(db_session, source="source_a")
 
         assert cleared == 1
-        remaining = db_session.query(KnowledgeChunk).filter(
-            KnowledgeChunk.source == "source_b"
-        ).all()
+        remaining = db_session.query(KnowledgeChunk).filter(KnowledgeChunk.source == "source_b").all()
         assert len(remaining) == 1
 
     def test_clear_chunks_nonexistent_source_returns_zero(self, db_session):
@@ -243,6 +242,7 @@ class TestChunkRepository:
 # services/ingest_service.py
 # ---------------------------------------------------------------------------
 
+
 class TestIngestService:
     """Integration tests for IngestService — RAW_DATA_DIR is monkeypatched to tmp_path."""
 
@@ -254,9 +254,7 @@ class TestIngestService:
 
         assert result["source"] == "test.pdf"
         assert result["chunks_created"] > 0
-        stored = db_session.query(KnowledgeChunk).filter(
-            KnowledgeChunk.source == "test.pdf"
-        ).all()
+        stored = db_session.query(KnowledgeChunk).filter(KnowledgeChunk.source == "test.pdf").all()
         assert len(stored) == result["chunks_created"]
 
     def test_ingest_pdf_file_blank_pdf_creates_zero_chunks(self, db_session, blank_pdf):
