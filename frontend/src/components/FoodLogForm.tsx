@@ -162,13 +162,19 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
 
       {/* Custom food entry */}
       {isCustom && (
-        <View>
+        <View style={{ maxWidth: '75%' }}>
+          
           <TextInput
             style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
             placeholder="Food name"
             value={customName}
             onChangeText={setCustomName}
           />
+          {customIngredients.length === 0 && (
+          <Text style={{ color: '#aaa', fontSize: 13, marginBottom: 4 }}>
+            Ingredients
+          </Text>
+        )}
           <Chips
             items={customIngredients}
             itemName="Ingredients"
