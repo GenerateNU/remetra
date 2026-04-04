@@ -18,7 +18,7 @@ export function SummaryScreen() {
           visible={showModal}
           onClose={() => setShowModal(false)}
           onLogEntry={(entry) => {
-            // persist the entry?
+            setShowModal(false);
           }}
       />
       <BackgroundGradient />

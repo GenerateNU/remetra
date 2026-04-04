@@ -19,6 +19,11 @@ class SymptomLogRepository:
         db.refresh(log)
         return log
 
+    def get_by_username(self, db: Session, username: str):
+        query = sa.select(SymptomLog).where(SymptomLog.username == username)
+        result = db.execute(query)
+        return result.scalars().all()
+
     def delete(self, db: Session, log_id: UUID) -> bool:
         query = sa.delete(SymptomLog).where(SymptomLog.id == log_id)
         result = db.execute(query)

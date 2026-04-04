@@ -39,6 +39,16 @@ export const symptomLogService = {
     }
   },
 
+  // get_my_symptom_logs()
+  async getMySymptomLogs(): Promise<SymptomLogResponse[]> {
+    try {
+      const { data } = await apiClient.get<SymptomLogResponse[]>('/symptom-logs/user/me');
+      return data;
+    } catch (err: any) {
+      throw new SymptomLogError(err.response?.data?.detail ?? 'Failed to fetch symptom logs');
+    }
+  },
+
   // get_symptom_log()
   async getSymptomLogById(logId: string): Promise<SymptomLogResponse> {
     try {
