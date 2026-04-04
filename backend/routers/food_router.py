@@ -60,9 +60,7 @@ async def get_all_foods(db: Session = Depends(get_db)) -> list[FoodResponse]:
 
 # put route - update food
 @router.put("/{food_id}", response_model=FoodResponse)
-async def update_food(
-    food_id: UUID, food: FoodCreate, db: Session = Depends(get_db)
-) -> FoodResponse:
+async def update_food(food_id: UUID, food: FoodCreate, db: Session = Depends(get_db)) -> FoodResponse:
     """Update an existing food by ID."""
     food_service = FoodService()
     updated_food = food_service.update_food_by_id(db, food_id, food)

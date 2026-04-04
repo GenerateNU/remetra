@@ -21,6 +21,7 @@ class FoodLogBase(BaseModel):
 
 class FoodLogCreate(FoodLogBase):
     """Schema for creating a food log entry."""
+
     username: str = Field(..., description="Username of the user logging the food")
 
 

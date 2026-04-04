@@ -21,6 +21,7 @@ async def create_food_log(food_log: FoodLogCreate, db: Session = Depends(get_db)
     created_food_log = food_log_service.create_food_log(db, food_log)
     return created_food_log
 
+
 @router.get("/user/{username}", response_model=list[FoodLogResponse])
 async def get_food_logs_by_username(username: str, db: Session = Depends(get_db)) -> list[FoodLogResponse]:
     """
@@ -28,6 +29,7 @@ async def get_food_logs_by_username(username: str, db: Session = Depends(get_db)
     """
     food_log_service = FoodLogService()
     return food_log_service.get_food_logs_by_username(db, username)
+
 
 @router.get("/{food_log_id}", response_model=FoodLogResponse)
 async def get_food_log(food_log_id: UUID, db: Session = Depends(get_db)) -> FoodLogResponse:

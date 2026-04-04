@@ -106,8 +106,8 @@ class TestRAGTaggingService:
         mock_genai.GenerativeModel.return_value = mock_llm
         json_text = (
             "```json\n"
-            "{\"suggested_ingredients\": [{\"name\": \"milk\", \"buckets\": [\"dairy\"]}],"
-            " \"suggested_buckets\": [{\"name\": \"dairy\", \"description\": \"contains milk\"}]}"
+            '{"suggested_ingredients": [{"name": "milk", "buckets": ["dairy"]}],'
+            ' "suggested_buckets": [{"name": "dairy", "description": "contains milk"}]}'
             "\n```"
         )
         mock_llm.generate_content.return_value = MagicMock(text=json_text)
