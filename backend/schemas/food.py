@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from schemas.tag import SuggestedBucketResponse, SuggestedIngredientResponse
+from schemas.tag import SuggestedBucketResponse, SuggestedIngredientResponse, TagResponse
 
 
 class FoodBase(BaseModel):
@@ -49,6 +49,7 @@ class FoodResponse(FoodBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(..., description="Unique ID for this food product")
+    tags: list[TagResponse] = Field(default=[], description="Confirmed trigger bucket tags for this food")
     suggested_ingredients: list[SuggestedIngredientResponse] = Field(
         default=[], description="LLM-suggested ingredients with their trigger buckets"
     )

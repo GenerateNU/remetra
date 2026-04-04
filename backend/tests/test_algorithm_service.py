@@ -60,16 +60,12 @@ def _metrics_row(username="alice", symptom_id=None, ingredient=None, **overrides
 class TestBuildMetricsBySymptom:
     def test_returns_empty_dict_when_no_food_logs(self):
         service = AlgorithmService()
-        result = service._build_metrics_by_symptom(
-            food_logs=[], symptom_logs=[_symptom_log()], time_window_hours=4.0
-        )
+        result = service._build_metrics_by_symptom(food_logs=[], symptom_logs=[_symptom_log()], time_window_hours=4.0)
         assert result == {}
 
     def test_returns_empty_dict_when_no_symptom_logs(self):
         service = AlgorithmService()
-        result = service._build_metrics_by_symptom(
-            food_logs=[_food_log()], symptom_logs=[], time_window_hours=4.0
-        )
+        result = service._build_metrics_by_symptom(food_logs=[_food_log()], symptom_logs=[], time_window_hours=4.0)
         assert result == {}
 
     def test_returns_empty_dict_when_both_empty(self):
@@ -94,9 +90,7 @@ class TestBuildMetricsBySymptom:
         """
         service = AlgorithmService()
         # Should arguably raise, but currently returns {} silently.
-        result = service._build_metrics_by_symptom(
-            food_logs=[], symptom_logs=[], time_window_hours=-5.0
-        )
+        result = service._build_metrics_by_symptom(food_logs=[], symptom_logs=[], time_window_hours=-5.0)
         assert result == {}
 
     def test_food_id_becomes_ingredient_key(self):
@@ -257,9 +251,7 @@ class TestGetAssociations:
         row = _metrics_row(ingredient=str(food_id), symptom_id=symptom_id)
         with patch("services.algorithm_service.MetricsRepository") as MockRepo:
             MockRepo.return_value.get_by_symptom.return_value = [row]
-            result = AlgorithmService().get_associations(
-                db=MagicMock(), user_id="alice", symptom_ids=[symptom_id]
-            )
+            result = AlgorithmService().get_associations(db=MagicMock(), user_id="alice", symptom_ids=[symptom_id])
         assert len(result) == 1
         assert isinstance(result[0], AlgorithmAssociationResponse)
 
@@ -268,9 +260,7 @@ class TestGetAssociations:
         row = _metrics_row(ingredient="tomato", symptom_id=symptom_id)
         with patch("services.algorithm_service.MetricsRepository") as MockRepo:
             MockRepo.return_value.get_by_symptom.return_value = [row]
-            result = AlgorithmService().get_associations(
-                db=MagicMock(), user_id="alice", symptom_ids=[symptom_id]
-            )
+            result = AlgorithmService().get_associations(db=MagicMock(), user_id="alice", symptom_ids=[symptom_id])
         assert result == []
 
 

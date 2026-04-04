@@ -89,8 +89,7 @@ class AlgorithmService:
 
         # Feed algorithm.py with food IDs encoded as pseudo-ingredients and symptom IDs as names.
         analysis_food_logs = [
-            FoodLogEntry(timestamp=log.timestamp, ingredients=[str(log.food_id)])
-            for log in food_logs
+            FoodLogEntry(timestamp=log.timestamp, ingredients=[str(log.food_id)]) for log in food_logs
         ]
         analysis_symptom_logs = [
             SymptomLogEntry(timestamp=log.timestamp, symptom_name=str(log.symptom_id), intensity=log.intensity)

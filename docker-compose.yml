@@ -8,6 +8,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/.venv
+      - ./data_generator:/seed_data:ro
     environment:
       - ENVIRONMENT=development
       - DATABASE_URL=postgresql://test_user:test_password@test-db:5432/test_remetra

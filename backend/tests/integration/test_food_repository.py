@@ -1,10 +1,12 @@
 """Integration tests for food repository."""
 
-# import pytest
+import pytest
+
 from repositories.food_repository import FoodRepository
 from schemas.food import FoodCreate
 
 
+@pytest.mark.usefixtures("authenticated_user")
 class TestFoodRepository:
     """integration tests for FoodRepository."""
 
