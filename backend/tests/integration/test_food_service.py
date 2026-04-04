@@ -4,10 +4,13 @@
 # from fastapi import HTTPException
 import uuid
 
+import pytest
+
 from schemas.food import FoodCreate
 from services.food_service import FoodService
 
 
+@pytest.mark.usefixtures("authenticated_user")
 class TestFoodService:
     """Tests for FoodService"""
 
