@@ -64,15 +64,15 @@ def seed_users(db) -> int:
     password_hash = get_password_hash(SEED_PASSWORD)
     created = 0
     for username in SEED_USERS:
-        exists = db.execute(
-            select(User).where(User.username == username)
-        ).scalar_one_or_none()
+        exists = db.execute(select(User).where(User.username == username)).scalar_one_or_none()
         if not exists:
-            db.add(User(
-                username=username,
-                email=f"{username}@seed.remetra.test",
-                password_hash=password_hash,
-            ))
+            db.add(
+                User(
+                    username=username,
+                    email=f"{username}@seed.remetra.test",
+                    password_hash=password_hash,
+                )
+            )
             created += 1
     db.commit()
     print(f"  Users: created {created}, skipped {len(SEED_USERS) - created}")
@@ -86,9 +86,7 @@ def seed_foods(db, tag_map: dict[str, Tag]) -> tuple[dict[str, Food], int]:
     created = 0
     for entry in data["foods"]:
         name = entry["food_name"]
-        food = db.execute(
-            select(Food).where(Food.name == name, Food.username.is_(None))
-        ).scalar_one_or_none()
+        food = db.execute(select(Food).where(Food.name == name, Food.username.is_(None))).scalar_one_or_none()
         if food:
             food_map[name] = food
             continue

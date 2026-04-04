@@ -101,11 +101,7 @@ def sample_user_data():
     Any test can use this by adding 'sample_user_data' as a parameter.
     Keeps test data consistent across all tests.
     """
-    return {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "password123"
-    }
+    return {"username": "testuser", "email": "test@example.com", "password": "password123"}
 
 
 @pytest.fixture

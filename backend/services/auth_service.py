@@ -113,10 +113,7 @@ class AuthService:
         password_hash = get_password_hash(user_data.password)
 
         user = self.user_repo.create(
-            db=db,
-            username=user_data.username,
-            email=user_data.email,
-            password_hash=password_hash
+            db=db, username=user_data.username, email=user_data.email, password_hash=password_hash
         )
 
         access_token = create_access_token(
