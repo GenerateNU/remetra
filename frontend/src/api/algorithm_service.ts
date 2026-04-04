@@ -21,6 +21,8 @@ export interface AnalyzeResponse {
   job_id?: string;
   status: 'started' | 'in_progress' | 'completed' | 'failed';
   message?: string;
+}
+
 export interface KeyMetrics {
   exposures: number;
   trigger_rate: number;
