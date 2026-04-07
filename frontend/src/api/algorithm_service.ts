@@ -1,5 +1,28 @@
 import { apiClient, ApiError } from './client';
 
+export interface CorrelationsRequestParams {
+  days: number;
+  symptom_ids: number[];
+}
+
+export interface CorrelationResult {
+  symptom_id: number;
+  correlation: number;
+}
+
+export type CorrelationsResponse = CorrelationResult[];
+
+export interface AnalyzeRequestPayload {
+  days: number;
+  symptom_ids: number[];
+}
+
+export interface AnalyzeResponse {
+  job_id?: string;
+  status: 'started' | 'in_progress' | 'completed' | 'failed';
+  message?: string;
+}
+
 export interface KeyMetrics {
   exposures: number;
   trigger_rate: number;
