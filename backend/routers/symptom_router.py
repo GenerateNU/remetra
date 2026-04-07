@@ -6,20 +6,30 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database import get_db
+from routers.auth import get_current_user
 from schemas.symptom import SymptomCreate, SymptomResponse
+from schemas.user import UserResponse
 from services.symptom_service import SymptomService
 
-router = APIRouter(prefix="/symptom")
+router = APIRouter(
+    prefix="/symptom",
+    tags=["Symptom"],
+)
 
 
 # create symptom
 @router.post("/", response_model=SymptomResponse, status_code=status.HTTP_201_CREATED)
-async def create_symptom(symptom: SymptomCreate, db: Session = Depends(get_db)) -> SymptomResponse:
+async def create_symptom(
+    symptom: SymptomCreate,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+) -> SymptomResponse:
     """
     Creates new symptom item with ID, name, location, sensation.
 
     """
 
+    symptom.username = current_user.username
     symptom_service = SymptomService()
     created_symptom = symptom_service.create_symptom(db, symptom)
     return created_symptom

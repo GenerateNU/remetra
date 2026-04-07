@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -17,9 +17,11 @@ class Tag(Base):
     name = Column(String, unique=True, nullable=False)
     description = Column(String, nullable=True)
     is_system = Column(Boolean, nullable=False, default=False)
+    llm_suggested = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     food_tags = relationship("FoodTag", back_populates="tag")
+    food_log_tags = relationship("FoodLogTag", back_populates="tag")
 
 
 class FoodTag(Base):
@@ -34,3 +36,19 @@ class FoodTag(Base):
 
     food = relationship("Food", back_populates="food_tags")
     tag = relationship("Tag", back_populates="food_tags")
+
+    __table_args__ = (UniqueConstraint("food_id", "tag_id"),)
+
+
+class FoodLogTag(Base):
+    """Join table linking food logs to tags."""
+
+    __tablename__ = "food_log_tags"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    food_log_id = Column(UUID(as_uuid=True), ForeignKey("food_logs.id", ondelete="CASCADE"), nullable=False)
+    tag_id = Column(UUID(as_uuid=True), ForeignKey("tags.id", ondelete="CASCADE"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    tag = relationship("Tag", back_populates="food_log_tags")
+    food_log = relationship("FoodLog", back_populates="food_log_tags")

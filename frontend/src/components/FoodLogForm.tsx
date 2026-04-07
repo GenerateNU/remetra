@@ -1,10 +1,14 @@
 import { FoodLogEntry, FoodItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
 import { Chips } from "./GenericChipComponent";
+import { foodLogService } from "../api/food_log_service";
+import { useAuthStore } from "../store/useAuthStore";
+import { useNavigation } from '@react-navigation/native';
+
 
 import { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { LogDateTimePicker } from "./LogDateTimePicker";
 
 interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
@@ -12,7 +16,10 @@ interface FoodLogFormProps {
 }
 
 export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
+  const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
+  const navigation = useNavigation<any>();
+
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
@@ -23,7 +30,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
 
   const [servings, setServings] = useState("1");
   const [timestamp, setTimestamp] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [notes, setNotes] = useState("");
 
   const filtered = foods.filter((f) =>
     f.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -41,12 +48,28 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
     setCustomName(searchQuery);
   };
 
-  const handleSubmit = () => {
-    const foodId = isCustom ? addFood(customName, customIngredients) : selectedFood?.id;
+  const handleSubmit = async () => {
+    const foodId = isCustom
+      ? await addFood(customName, customIngredients)
+      : selectedFood?.id;
 
     if (!foodId) {
-      console.error("How the hell did this happen");
+      console.error("Could not resolve food ID for log entry");
       return;
+    }
+
+    try {
+      await foodLogService.createFoodLog({
+        food_id: foodId,
+        quantity: `${servings} serving(s)`,
+        timestamp: timestamp.toISOString(),
+        notes: notes.trim() || undefined,
+        username, 
+      });
+    } catch (error) {
+      console.error("Failed to create food log entry:", error);
+      return;
+
     }
 
     const entry: FoodLogEntry = {
@@ -61,9 +84,6 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
   };
 
   const isValid = isCustom ? customName.trim().length > 0 : selectedFood !== null;
-
-  const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999);
 
   return (
     <View className="pb-10">
@@ -108,9 +128,19 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
               </TouchableOpacity>
             )}
           </View>
+
+
+           {/* Scan barcode button */}
+          <TouchableOpacity
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 14, alignItems: 'center', marginTop: 8 }}
+            onPress={() => navigation.navigate('BarcodeScanner')} 
+          >
+            <Text className="text-lg font-ptserif text-[#eea487]">Scan Barcode</Text>
+          </TouchableOpacity>
         </>
       )}
 
+      
       {/* Selected food summary */}
       {selectedFood && !isCustom && (
         <View style={{ backgroundColor: '#fff5f0', borderWidth: 1, borderColor: '#eea487', borderRadius: 12, padding: 14, marginBottom: 8 }}>
@@ -166,29 +196,21 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
           <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
             Time
           </Text>
-          <TouchableOpacity
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, backgroundColor: '#fafafa', marginBottom: 8 }}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text>
-              {timestamp.toLocaleDateString()}{" "}
-              {timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          <LogDateTimePicker
+            value={timestamp}
+            onChange={setTimestamp}
+            accentColor="#eea487"
+          />
+          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
+              Notes (optional)
             </Text>
-          </TouchableOpacity>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={timestamp}
-              mode="datetime"
-              display="spinner"
-              maximumDate={endOfDay}
-              onChange={(_, date) => {
-                setShowDatePicker(false);
-                if (date) setTimestamp(date);
-              }}
+            <TextInput
+              style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
+              placeholder="Any additional notes..."
+              value={notes}
+              onChangeText={setNotes}
+              multiline
             />
-          )}
-
           <TouchableOpacity
             style={{
               borderWidth: 1,

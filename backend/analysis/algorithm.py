@@ -25,11 +25,6 @@ def get_analysis(
             if ingredient_total == 0:
                 continue
 
-            # a = food events with ingredient found in symptom windows
-            # b = food events with ingredient NOT in any symptom window
-            # c = food events WITHOUT ingredient found in symptom windows
-            # d = food events WITHOUT ingredient NOT in any symptom window
-
             b = ingredient_total - a
             c = total_in_window - a
             d = (total_food_events - ingredient_total) - c
@@ -67,6 +62,11 @@ def get_food_symptom_counts(
         counts: symptom_name -> ingredient -> [co_occurrence_count, [intensities]]
         foods_in_windows: symptom_name -> distinct food events found across all windows
                           (needed for computing c in the contingency table)
+
+    Each food event is counted at most once per symptom type even if it falls inside
+    multiple overlapping symptom windows (e.g. two headaches 30 min apart). Intensities
+    from every overlapping symptom are still collected so the average reflects all
+    associated symptom events.
     """
     counts: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(lambda: [0, []]))
     foods_in_windows: dict[str, int] = defaultdict(int)

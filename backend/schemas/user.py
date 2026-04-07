@@ -23,6 +23,7 @@ class UserUpdate(BaseModel):
     gender: Optional[str] = None
     medication: Optional[list[str]] = None
 
+
 class UserResponse(BaseModel):
     """Public user data (excludes password_hash). Not sure if this will be useful atm"""
 
