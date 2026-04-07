@@ -78,7 +78,7 @@ async function buildLookupMaps(): Promise<{
 }
 
 function enrichAndGroup(
-  rawAssociations: Awaited<ReturnType<typeof algorithmService.getAssociations>>,
+  rawAssociations: Awaited<ReturnType<typeof algorithmService.getCorrelations>>,
   foodMap: Record<string, string>,
   symptomMap: Record<string, string>,
 ): {
@@ -123,7 +123,7 @@ export const useAlgorithmStore = create<AlgorithmStore>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const [rawAssociations, { foodMap, symptomMap }] = await Promise.all([
-        algorithmService.getAssociations(userId),
+        algorithmService.getCorrelations(userId),
         buildLookupMaps(),
       ]);
 
@@ -138,8 +138,8 @@ export const useAlgorithmStore = create<AlgorithmStore>((set) => ({
     if (MOCK_MODE) return;
     set({ isLoading: true, error: null });
     try {
-      const [rawAssociations, { foodMap, symptomMap }] = await Promise.all([
-        algorithmService.runAlgorithm({ user_id: userId }),
+      const [{ associations: rawAssociations }, { foodMap, symptomMap }] = await Promise.all([
+        algorithmService.analyze({ user_id: userId }),
         buildLookupMaps(),
       ]);
 
