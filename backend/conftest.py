@@ -17,7 +17,7 @@ Common use cases (Most likely what we'll do):
 import os
 
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from database import Base
@@ -42,6 +42,10 @@ def db_engine():
     Creates all tables at start, drops them at end.
     Scope='session' means this runs once for all tests.
     """
+    # Enable pgvector extension before creating tables
+    with engine.connect() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        conn.commit()
     # Create all tables
     Base.metadata.create_all(bind=engine)
     yield engine

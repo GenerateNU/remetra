@@ -36,6 +36,7 @@ export interface AlgorithmAssociationResponse {
   user_id: string;
   symptom_id: string;
   associated_food_id: string;
+  ingredients: string[];
   key_metrics: KeyMetrics;
   updated_at: string;
 }
@@ -58,14 +59,16 @@ export class AlgorithmError extends Error {
 }
 
 export const algorithmService = {
-  // GET /algorithm/correlations
+  // GET /algorithm/user/{user_id}?symptom_id=...
   async getCorrelations(
-    params: CorrelationsRequestParams
-  ): Promise<CorrelationsResponse> {
+    userId: string,
+    symptomId?: string
+  ): Promise<AlgorithmAssociationResponse[]> {
     try {
-      const { data } = await apiClient.get<CorrelationsResponse>('/algorithm/correlations', {
-        params,
-      });
+      const { data } = await apiClient.get<AlgorithmAssociationResponse[]>(
+        `/algorithm/user/${userId}`,
+        { params: symptomId ? { symptom_id: symptomId } : undefined }
+      );
       return data;
     } catch (err: any) {
       throw new AlgorithmError(
@@ -74,16 +77,14 @@ export const algorithmService = {
     }
   },
 
-  // POST /algorithm/analyze
-  async analyze(
-    payload: AnalyzeRequestPayload
-  ): Promise<AnalyzeResponse> {
+  // POST /algorithm/run
+  async analyze(payload: AlgorithmRunRequest): Promise<AlgorithmRunResponse> {
     try {
-      const { data } = await apiClient.post<AnalyzeResponse>('/algorithm/analyze', payload);
+      const { data } = await apiClient.post<AlgorithmRunResponse>('/algorithm/run', payload);
       return data;
     } catch (err: any) {
       throw new AlgorithmError(
-        err?.response?.data?.detail ?? 'Failed to trigger algorithm analysis'
+        err?.response?.data?.detail ?? 'Failed to run algorithm'
       );
     }
   },

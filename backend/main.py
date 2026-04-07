@@ -4,6 +4,8 @@ Remetra API - Main application entry point.
 This module initializes the FastAPI application and registers all route handlers.
 """
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from scalar_fastapi import get_scalar_api_reference
@@ -20,16 +22,22 @@ from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
 
-with engine.connect() as conn:
-    conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-    conn.commit()
 
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if engine is not None:
+        with engine.connect() as conn:
+            conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+            conn.commit()
+        Base.metadata.create_all(bind=engine)
+    yield
+
 
 app = FastAPI(
     title="Remetra API",
     description="Backend API for Remetra 😛",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 
@@ -37,6 +45,7 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     from fastapi.openapi.utils import get_openapi
+
     schema = get_openapi(
         title=app.title,
         version=app.version,
