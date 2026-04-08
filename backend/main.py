@@ -9,9 +9,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from scalar_fastapi import get_scalar_api_reference
-from sqlalchemy import text
-
 from sqlalchemy import inspect as sa_inspect
+from sqlalchemy import text
 
 from database import Base, engine
 from middleware.logging_middleware import LoggingMiddleware
