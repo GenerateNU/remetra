@@ -4,6 +4,7 @@ Remetra API - Main application entry point.
 This module initializes the FastAPI application and registers all route handlers.
 """
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -23,24 +24,33 @@ from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
 
+logger = logging.getLogger(__name__)
+
 
 def _sync_schema() -> None:
-    """Add any columns present in SQLAlchemy models but missing from the live DB.
+    """Check for columns present in SQLAlchemy models but missing from the live DB.
 
-    create_all only creates brand-new tables; this handles new columns on
-    existing tables so deploys never break due to schema drift.
+    Logs a warning for any drift detected — does not alter the schema automatically.
+    If drift is found, run `python scripts/init_db.py --reset` (locally: `just reset-db`)
+    to drop and recreate all tables with the current schema.
     """
     inspector = sa_inspect(engine)
-    with engine.connect() as conn:
-        for table in Base.metadata.sorted_tables:
-            if not inspector.has_table(table.name):
-                continue  # create_all will handle brand-new tables
-            existing = {col["name"] for col in inspector.get_columns(table.name)}
-            for col in table.columns:
-                if col.name not in existing:
-                    col_type = col.type.compile(engine.dialect)
-                    conn.execute(text(f"ALTER TABLE {table.name} ADD COLUMN IF NOT EXISTS {col.name} {col_type}"))
-        conn.commit()
+    drift_found = False
+    for table in Base.metadata.sorted_tables:
+        if not inspector.has_table(table.name):
+            continue  # create_all will handle brand-new tables
+        existing = {col["name"] for col in inspector.get_columns(table.name)}
+        for col in table.columns:
+            if col.name not in existing:
+                logger.warning(
+                    "Schema drift: column '%s' is missing from table '%s'. "
+                    "Run `python scripts/init_db.py --reset` to reset the schema.",
+                    col.name,
+                    table.name,
+                )
+                drift_found = True
+    if not drift_found:
+        logger.info("Schema check passed: no drift detected.")
 
 
 @asynccontextmanager
