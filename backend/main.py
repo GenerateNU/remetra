@@ -13,8 +13,6 @@ from scalar_fastapi import get_scalar_api_reference
 from sqlalchemy import inspect as sa_inspect
 from sqlalchemy import text
 
-from sqlalchemy import inspect as sa_inspect
-
 from database import Base, engine
 from middleware.logging_middleware import LoggingMiddleware
 from routers.algorithm_router import router as algorithm_router
