@@ -541,6 +541,21 @@ That said, fixing IDE errors makes development way easier (autocomplete, type ch
 - Delete `.venv` folder manually
 - Run `uv sync` again
 
+### Schema Drift / DB Out of Sync
+
+If the app logs warnings like `Schema drift: column '...' is missing from table '...'`, the live database is out of sync with the ORM models.
+
+**Locally:**
+```bash
+just reset-db
+```
+
+**On Railway (production/staging):** Use the Railway dashboard or CLI to run a one-off command:
+```bash
+python scripts/init_db.py --reset
+```
+> Note: `--reset` drops all data. In early development this is intentional. When the project matures, consider migrate to Alembic for incremental schema migrations instead.
+
 ### Test Failures
 
 **"ModuleNotFoundError" in tests**

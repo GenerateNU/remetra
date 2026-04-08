@@ -31,6 +31,10 @@ seed:
 seed-clear:
     docker compose run --rm backend python scripts/seed.py --clear
 
+# Drop all tables and recreate schema from scratch (destructive — local use only)
+reset-db:
+    docker compose run --rm backend python scripts/init_db.py --reset
+
 # Ingest all PDFs from backend/data/raw/ into the RAG knowledge base
 seed-rag:
     curl -X POST http://localhost:8000/ingest/folder
