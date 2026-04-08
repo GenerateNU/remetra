@@ -13,6 +13,8 @@ from scalar_fastapi import get_scalar_api_reference
 from sqlalchemy import inspect as sa_inspect
 from sqlalchemy import text
 
+from sqlalchemy import inspect as sa_inspect
+
 from database import Base, engine
 from middleware.logging_middleware import LoggingMiddleware
 from routers.algorithm_router import router as algorithm_router
@@ -51,6 +53,25 @@ def _sync_schema() -> None:
                 drift_found = True
     if not drift_found:
         logger.info("Schema check passed: no drift detected.")
+
+
+def _sync_schema() -> None:
+    """Add any columns present in SQLAlchemy models but missing from the live DB.
+
+    create_all only creates brand-new tables; this handles new columns on
+    existing tables so deploys never break due to schema drift.
+    """
+    inspector = sa_inspect(engine)
+    with engine.connect() as conn:
+        for table in Base.metadata.sorted_tables:
+            if not inspector.has_table(table.name):
+                continue  # create_all will handle brand-new tables
+            existing = {col["name"] for col in inspector.get_columns(table.name)}
+            for col in table.columns:
+                if col.name not in existing:
+                    col_type = col.type.compile(engine.dialect)
+                    conn.execute(text(f"ALTER TABLE {table.name} ADD COLUMN IF NOT EXISTS {col.name} {col_type}"))
+        conn.commit()
 
 
 @asynccontextmanager
