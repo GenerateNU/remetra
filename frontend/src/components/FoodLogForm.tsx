@@ -5,20 +5,22 @@ import { foodLogService } from "../api/food_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNavigation } from '@react-navigation/native';
 
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 
 interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
   onBack: () => void;
+  onCloseModal: () => void; 
 }
 
-export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) => {
+export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCloseModal }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
   const navigation = useNavigation<any>();
+
+  
 
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,6 +29,17 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
 
   const [customName, setCustomName] = useState("");
   const [customIngredients, setCustomIngredients] = useState<string[]>([]);
+  const { scannedFood, setScannedFood } = useBankStore();
+
+  useEffect(() => {
+  if (scannedFood) {
+    setCustomName(scannedFood.name);
+    setCustomIngredients(scannedFood.ingredients);
+    setIsCustom(true);
+    setScannedFood(null);
+  }
+}, []);
+
 
   const [servings, setServings] = useState("1");
   const [timestamp, setTimestamp] = useState(new Date());
@@ -83,6 +96,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
     onSubmit(entry);
   };
 
+
   const isValid = isCustom ? customName.trim().length > 0 : selectedFood !== null;
 
   return (
@@ -133,7 +147,10 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack }) =>
            {/* Scan barcode button */}
           <TouchableOpacity
             style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 14, alignItems: 'center', marginTop: 8 }}
-            onPress={() => navigation.navigate('BarcodeScanner')} 
+            onPress={() => {
+              onCloseModal(); // closes the modal
+               setTimeout(() => navigation.navigate('BarcodeScanner'), 300);
+            }}
           >
             <Text className="text-lg font-ptserif text-[#eea487]">Scan Barcode</Text>
           </TouchableOpacity>

@@ -1,5 +1,5 @@
 import { Modal, ScrollView, View, TouchableOpacity, Text } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { LogEntry, ModalStep } from "../types/logs";
 import { FoodLogForm } from "./FoodLogForm";
@@ -9,19 +9,27 @@ interface LogEntryModalProps {
   visible: boolean;
   onClose: () => void;
   onLogEntry: (entry: LogEntry) => void;
+  initialStep?: ModalStep; 
 }
+const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep }) => {
+  const [step, setStep] = useState<ModalStep>(initialStep ?? "select_type");
 
-const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry }) => {
-  const [step, setStep] = useState<ModalStep>("select_type");
+  useEffect(() => {
+    if (visible) {
+      setStep(initialStep ?? "select_type");
+    }
+  }, [visible, initialStep]);
 
   const handleSubmit = (entry: LogEntry) => {
     onLogEntry(entry);
     handleClose();
   };
 
+  
+
   const handleClose = () => {
     onClose();
-    setTimeout(() => setStep("select_type"), 300);
+    setTimeout(() => setStep(initialStep ?? "select_type"), 300);
   };
 
   return (
@@ -72,7 +80,10 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
             )}
 
             {step === "food" && (
-              <FoodLogForm onSubmit={handleSubmit} onBack={() => setStep("select_type")} />
+              <FoodLogForm 
+              onSubmit={handleSubmit} 
+              onBack={() => setStep("select_type")} 
+              onCloseModal={handleClose} /> 
             )}
 
             {step === "symptom" && (

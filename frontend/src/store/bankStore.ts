@@ -7,17 +7,21 @@ import { symptomService } from "../api/symptom_service";
 interface BankStore {
   foods: FoodItem[];
   symptoms: SymptomItem[];
+  scannedFood: { name: string; ingredients: string[] } | null;
   fetchFoods: () => Promise<void>;
   fetchSymptoms: () => Promise<void>;
   addFood: (name: string, ingredients: string[]) => Promise<string | null>;
   addSymptom: (name: string, location: string, sensation: string) => Promise<string | null>;
   removeFood: (id: string) => Promise<boolean>;
   removeSymptom: (id: string) => Promise<boolean>;
+  setScannedFood: (food: { name: string; ingredients: string[] } | null) => void;
 }
 
 export const useBankStore = create<BankStore>((set, get) => ({
   foods: [],
   symptoms: [],
+  scannedFood: null,
+  setScannedFood: (food) => set({ scannedFood: food }),
 
   fetchFoods: async () => {
     try {
