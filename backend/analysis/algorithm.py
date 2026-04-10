@@ -45,7 +45,7 @@ def get_analysis(
                 exposures=a,
                 trigger_rate=round(trigger_rate, 4),
                 base_rate=round(base_rate, 4),
-                fishers_p_value=round(p_value, 6),
+                fishers_p_value=round(float(p_value), 6),
                 average_intensity=round(avg_intensity, 2),
             )
 

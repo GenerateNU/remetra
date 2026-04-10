@@ -51,4 +51,5 @@ dev = [
     "fpdf2>=2.8.0",
     "httpx>=0.28.1",
     "pytest-cov>=7.0.0",
+    "pytest-xdist>=3.8.0",
 ]

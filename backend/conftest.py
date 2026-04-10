@@ -17,21 +17,26 @@ Common use cases (Most likely what we'll do):
 import os
 
 import pytest
+from passlib.context import CryptContext
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
 
+import services.auth_service as _auth_svc
 from database import Base
-from models.food import Food
-from models.food_log import FoodLog
-from models.symptom import Symptom
-from models.symptom_log import SymptomLog
-from models.user import User
+
+# Use minimal bcrypt rounds in tests — default 12 rounds takes ~200ms per hash,
+# 4 rounds takes ~5ms. Patched here before any test imports auth_service.
+_auth_svc.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=4)
+
+from models.food import Food  # noqa: E402
+from models.food_log import FoodLog  # noqa: E402
+from models.symptom import Symptom  # noqa: E402
+from models.symptom_log import SymptomLog  # noqa: E402
+from models.user import User  # noqa: E402
 
 __all__ = ["User", "Symptom", "SymptomLog", "Food", "FoodLog"]
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "postgresql://test_user:test_password@test-db:5432/test_remetra")
 engine = create_engine(TEST_DATABASE_URL)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 @pytest.fixture(scope="session")
@@ -42,14 +47,11 @@ def db_engine():
     Creates all tables at start, drops them at end.
     Scope='session' means this runs once for all tests.
     """
-    # Enable pgvector extension before creating tables
     with engine.connect() as conn:
         conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         conn.commit()
-    # Create all tables
     Base.metadata.create_all(bind=engine)
     yield engine
-    # Drop all tables after all tests complete
     Base.metadata.drop_all(bind=engine)
 
 
@@ -63,6 +65,9 @@ def db_session(db_engine):
 
     Scope='function' means each test gets its own session.
     """
+    from sqlalchemy.orm import sessionmaker
+
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=db_engine)
     connection = db_engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)

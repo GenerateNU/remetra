@@ -17,7 +17,7 @@ class Food(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
-    ingredients = Column(JSONB, nullable=True)  # JSON array of ingredients
+    ingredients = Column(JSONB, nullable=True)
     username = Column(String, ForeignKey("users.username", ondelete="CASCADE"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 

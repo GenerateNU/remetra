@@ -38,7 +38,7 @@ def _sync_schema() -> None:
     drift_found = False
     for table in Base.metadata.sorted_tables:
         if not inspector.has_table(table.name):
-            continue  # create_all will handle brand-new tables
+            continue  # pragma: no cover  # create_all will handle brand-new tables
         existing = {col["name"] for col in inspector.get_columns(table.name)}
         for col in table.columns:
             if col.name not in existing:
