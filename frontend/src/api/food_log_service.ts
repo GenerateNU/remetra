@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, ApiError } from './client';
 
 export interface CreateFoodLogPayload {
   food_id: string; 
@@ -24,13 +24,6 @@ export interface FoodLogResponse {
   created_at: string;
 }
 
-export class FoodLogError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'FoodLogError';
-  }
-}
-
 // service functions
 
 export const foodLogService = {
@@ -41,7 +34,7 @@ export const foodLogService = {
       const { data } = await apiClient.post<FoodLogResponse>('/food-log/', payload);
       return data;
     } catch (err: any) {
-      throw new FoodLogError(err.response?.data?.detail ?? 'Failed to create food log');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to create food log');
     }
   },
 
@@ -51,7 +44,7 @@ export const foodLogService = {
       const { data } = await apiClient.get<FoodLogResponse[]>('/food-log/user/me');
       return data;
     } catch (err: any) {
-      throw new FoodLogError(err.response?.data?.detail ?? 'Failed to fetch food logs');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to fetch food logs');
     }
   },
 
@@ -61,7 +54,7 @@ export const foodLogService = {
       const { data } = await apiClient.put<FoodLogResponse>(`/food-log/${foodLogId}`, payload);
       return data;
     } catch (err: any) {
-      throw new FoodLogError(err.response?.data?.detail ?? `Failed to update food log ${foodLogId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to update food log ${foodLogId}`);
     }
   },
 
@@ -71,7 +64,7 @@ export const foodLogService = {
       const { data } = await apiClient.get<FoodLogResponse>(`/food-log/${foodLogId}`);
       return data;
     } catch (err: any) {
-      throw new FoodLogError(err.response?.data?.detail ?? `Failed to fetch food log ${foodLogId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to fetch food log ${foodLogId}`);
     }
   },
 
@@ -81,7 +74,7 @@ export const foodLogService = {
       const { data } = await apiClient.delete<FoodLogResponse>(`/food-log/${foodLogId}`);
       return data;
     } catch (err: any) {
-      throw new FoodLogError(err.response?.data?.detail ?? `Failed to delete food log ${foodLogId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to delete food log ${foodLogId}`);
     }
   },
 };

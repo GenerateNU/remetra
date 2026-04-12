@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
-import { authService, AuthError } from '../../api/auth_service';
+import { ApiError } from '../../api/client';
 import { useAuthStore } from '../../store/useAuthStore';
 
 
@@ -61,7 +61,7 @@ export function SignupScreen() {
       try {
         await register({username, email, password});
     } catch (err) {
-      if (err instanceof AuthError) {
+      if (err instanceof ApiError) {
         if (err.message.includes('already registered')) { 
           setErrors({ username: 'Username already taken' });
         } else {

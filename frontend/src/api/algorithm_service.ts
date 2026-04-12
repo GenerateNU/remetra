@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, ApiError } from './client';
 
 export interface CorrelationsRequestParams {
   days: number;
@@ -51,13 +51,6 @@ export interface AlgorithmRunResponse {
   associations: AlgorithmAssociationResponse[];
 }
 
-export class AlgorithmError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AlgorithmError';
-  }
-}
-
 export const algorithmService = {
   // GET /algorithm/user/{user_id}?symptom_id=...
   async getCorrelations(
@@ -71,7 +64,7 @@ export const algorithmService = {
       );
       return data;
     } catch (err: any) {
-      throw new AlgorithmError(
+      throw new ApiError(
         err?.response?.data?.detail ?? 'Failed to fetch correlations'
       );
     }
@@ -83,7 +76,7 @@ export const algorithmService = {
       const { data } = await apiClient.post<AlgorithmRunResponse>('/algorithm/run', payload);
       return data;
     } catch (err: any) {
-      throw new AlgorithmError(
+      throw new ApiError(
         err?.response?.data?.detail ?? 'Failed to run algorithm'
       );
     }

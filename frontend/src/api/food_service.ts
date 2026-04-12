@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, ApiError } from './client';
 
 export interface SuggestedIngredient {
   name: string;
@@ -42,14 +42,7 @@ export interface FoodSuggestionResponse {
   suggested_buckets: SuggestedBucket[];
 }
 
-export class FoodError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'FoodError';
-  }
-}
-
-// Service functions 
+// Service functions
 
 export const foodService = {
 
@@ -59,7 +52,7 @@ export const foodService = {
       const { data } = await apiClient.post<FoodResponse>('/food/', payload);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? 'Failed to create food');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to create food');
     }
   },
 
@@ -69,7 +62,7 @@ export const foodService = {
       const { data } = await apiClient.post<FoodSuggestionResponse>('/food/suggestions', payload);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? 'Failed to fetch suggestions');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to fetch suggestions');
     }
   },
 
@@ -79,7 +72,7 @@ export const foodService = {
       const { data } = await apiClient.get<FoodResponse[]>('/food/');
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? 'Failed to fetch foods');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to fetch foods');
     }
   },
 
@@ -89,7 +82,7 @@ export const foodService = {
       const { data } = await apiClient.get<FoodResponse>(`/food/${food_id}`);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? `Failed to fetch food ${food_id}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to fetch food ${food_id}`);
     }
   },
 
@@ -99,7 +92,7 @@ export const foodService = {
       const { data } = await apiClient.put<FoodResponse>(`/food/${food_id}`, payload);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? `Failed to update food ${food_id}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to update food ${food_id}`);
     }
   },
 
@@ -109,7 +102,7 @@ export const foodService = {
       const { data } = await apiClient.delete<FoodResponse>(`/food/${food_id}`);
       return data;
     } catch (err: any) {
-      throw new FoodError(err.response?.data?.detail ?? `Failed to delete food ${food_id}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to delete food ${food_id}`);
     }
   },
 };

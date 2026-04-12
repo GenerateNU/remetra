@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, ApiError } from './client';
 
 export interface CreateSymptomLogPayload {
   symptom_id: string; 
@@ -27,13 +27,6 @@ export interface SymptomLogResponse {
   created_at: string;
 }
 
-export class SymptomLogError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'SymptomLogError';
-  }
-}
-
 export const symptomLogService = {
 
   // create_symptom_log()
@@ -42,7 +35,7 @@ export const symptomLogService = {
       const { data } = await apiClient.post<SymptomLogResponse>('/symptom-logs/', payload);
       return data;
     } catch (err: any) {
-      throw new SymptomLogError(err.response?.data?.detail ?? 'Failed to create symptom log');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to create symptom log');
     }
   },
 
@@ -52,7 +45,7 @@ export const symptomLogService = {
       const { data } = await apiClient.get<SymptomLogResponse[]>('/symptom-logs/user/me');
       return data;
     } catch (err: any) {
-      throw new SymptomLogError(err.response?.data?.detail ?? 'Failed to fetch symptom logs');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to fetch symptom logs');
     }
   },
 
@@ -62,7 +55,7 @@ export const symptomLogService = {
       const { data } = await apiClient.put<SymptomLogResponse>(`/symptom-logs/${logId}`, payload);
       return data;
     } catch (err: any) {
-      throw new SymptomLogError(err.response?.data?.detail ?? `Failed to update symptom log ${logId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to update symptom log ${logId}`);
     }
   },
 
@@ -72,7 +65,7 @@ export const symptomLogService = {
       const { data } = await apiClient.get<SymptomLogResponse>(`/symptom-logs/${logId}`);
       return data;
     } catch (err: any) {
-      throw new SymptomLogError(err.response?.data?.detail ?? `Failed to fetch symptom log ${logId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to fetch symptom log ${logId}`);
     }
   },
 
@@ -81,7 +74,7 @@ export const symptomLogService = {
     try {
       await apiClient.delete(`/symptom-logs/${logId}`);
     } catch (err: any) {
-      throw new SymptomLogError(err.response?.data?.detail ?? `Failed to delete symptom log ${logId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to delete symptom log ${logId}`);
     }
   },
 };

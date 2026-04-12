@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
-import { AuthError } from '../../api/auth_service';
+import { ApiError } from '../../api/client';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export function LoginScreen() {
@@ -55,7 +55,7 @@ export function LoginScreen() {
     try {
       await login({ username, password });
     } catch (err) {
-      if (err instanceof AuthError) {
+      if (err instanceof ApiError) {
         if (err.message.includes('Incorrect')) setErrors({ password: 'Incorrect username or password' });
         else setErrors({ general: err.message });
       } else {
