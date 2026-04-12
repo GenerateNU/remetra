@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { Text, TextInput } from 'react-native';
 import { useState } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useBankStore } from '../store/bankStore';
-
+import { BaseAddModal } from './BaseAddModal';
 
 interface Props {
   visible: boolean;
@@ -57,46 +57,31 @@ export function AddSymptomModal({ visible, onClose }: Props) {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View className="flex-1 bg-black/50 justify-center items-center">
-        <View className="bg-white rounded-[20px] p-8 w-4/5">
-          <Text className="text-lg font-light font-ptserif text-remetra-accent">Sensation</Text>
-          {/* Dropdown is a third-party component that takes a style prop */}
-          <Dropdown
-            data={sensationOptions}
-            search
-            labelField="label"
-            valueField="value"
-            placeholder="Select a sensation..."
-            searchPlaceholder="Type to search..."
-            value={sensation}
-            onChange={item => setSensation(item.value)}
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
-          />
-          <Text className="text-lg font-light font-ptserif text-remetra-accent">Location</Text>
-          <TextInput
-            value={location}
-            onChangeText={setLocation}
-            placeholder="e.g. stomach, throat, skin"
-            className="border border-remetra-border rounded-lg p-2 mb-4"
-          />
-          {error ? <Text className="text-red-500 mb-2">{error}</Text> : null}
-          <View className="flex-row justify-between mt-4">
-            <TouchableOpacity
-              onPress={handleAdd}
-              className="border border-remetra-border rounded-full py-2.5 px-2.5"
-            >
-              <Text className="text-base font-light font-ptserif text-remetra-accent">Add</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleClose}
-              className="border border-remetra-border rounded-full py-2.5 px-2.5"
-            >
-              <Text className="text-base font-light font-ptserif text-remetra-accent">Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
+    <BaseAddModal visible={visible} onClose={handleClose} onAdd={handleAdd} addLabel="Add Symptom" error={error}>
+      <Text className="text-lg font-light font-ptserif text-remetra-accent">Sensation</Text>
+      {/* Dropdown is a third-party component that only accepts style, not className */}
+      <Dropdown
+        data={sensationOptions}
+        search
+        labelField="label"
+        valueField="value"
+        placeholder="Select a sensation..."
+        searchPlaceholder="Type to search..."
+        value={sensation}
+        onChange={item => setSensation(item.value)}
+        style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
+        placeholderStyle={{ color: '#aaa', fontSize: 14 }}
+        selectedTextStyle={{ fontSize: 14 }}
+      />
+      <Text className="text-lg font-light font-ptserif text-remetra-accent">Location</Text>
+      <TextInput
+        value={location}
+        onChangeText={setLocation}
+        placeholder="e.g. stomach, throat, general"
+        placeholderTextColor="#aaa"
+        className="border border-remetra-border rounded-lg p-2 mb-4 text-sm"
+        style={{ lineHeight: 16}}
+      />
+    </BaseAddModal>
   );
 }

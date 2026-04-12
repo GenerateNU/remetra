@@ -47,12 +47,13 @@ export const Chips: React.FC<ChipsProps> = ({
       </View>
       <View className="flex-row items-center gap-2">
         <TextInput
-          className="flex-1 border border-neutral-300 rounded-lg p-2.5 text-[13px] bg-remetra-surface"
+          className="flex-1 border border-neutral-300 rounded-lg p-2.5 text-sm"
           placeholder={placeholder ?? `Add ${itemName.toLowerCase()}...`}
           value={input}
           onChangeText={setInput}
           onSubmitEditing={handleSubmit}
           returnKeyType="done"
+          style={{ lineHeight: 16}}
         />
         <TouchableOpacity
           onPress={handleSubmit}

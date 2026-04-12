@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { useState } from 'react';
 import { useBankStore } from '../store/bankStore';
 import { Chips } from './GenericChipComponent';
+import { BaseAddModal } from './BaseAddModal';
 
 interface Props {
   visible: boolean;
@@ -39,42 +40,27 @@ export function AddFoodModal({ visible, onClose }: Props) {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View className="flex-1 bg-black/50 justify-center items-center">
-        <View className="bg-white rounded-[20px] p-8 w-4/5">
-          <Text className="text-lg font-light font-ptserif text-remetra-accent">Food Name</Text>
-          <TextInput
-            value={foodName}
-            onChangeText={setFoodName}
-            className="border border-remetra-border rounded-lg p-2 mb-4"
-          />
-
-          <Text className="text-lg font-light font-ptserif text-remetra-accent mt-4">Ingredients</Text>
-          <Chips
-            items={ingredients}
-            itemName="Ingredient"
-            onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
-            onRemove={(i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
-          />
-
-          {error ? <Text className="text-red-500 mb-2">{error}</Text> : null}
-
-          <View className="flex-row justify-between mt-4">
-            <TouchableOpacity
-              onPress={handleAdd}
-              className="border border-remetra-border rounded-full py-2.5 px-2.5"
-            >
-              <Text className="text-base font-light font-ptserif text-remetra-accent">Add</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleClose}
-              className="border border-remetra-border rounded-full py-2.5 px-2.5"
-            >
-              <Text className="text-base font-light font-ptserif text-remetra-accent">Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+    <BaseAddModal visible={visible} onClose={handleClose} onAdd={handleAdd} addLabel="Add Food" error={error}>
+      <Text className="text-lg font-light font-ptserif text-remetra-accent">Food Name</Text>
+      <TextInput
+        value={foodName}
+        onChangeText={setFoodName}
+        placeholder="e.g. Greek Yogurt, Sourdough Bread"
+        placeholderTextColor="#aaa"
+        className="border border-remetra-border rounded-lg p-2 mb-4 text-sm"
+        style={{ lineHeight: 16}}
+      />
+      <View className="flex-row justify-between items-baseline">
+        <Text className="text-lg font-light font-ptserif text-remetra-accent">Ingredients</Text>
+        <Text className="text-xs font-ptserif text-remetra-muted">Press Enter or tap Add</Text>
       </View>
-    </Modal>
+      <Chips
+        items={ingredients}
+        itemName="Ingredient"
+        placeholder="e.g. milk, wheat, soy..."
+        onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
+        onRemove={(i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
+      />
+    </BaseAddModal>
   );
 }

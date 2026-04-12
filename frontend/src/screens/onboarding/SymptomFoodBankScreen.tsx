@@ -43,9 +43,9 @@ export function SymptomFoodBankScreen() {
         </View>
 
         <ItemBank
-          title="Enter any symptoms you typically experience."
-          subtitle="Use the dropdown or enter in your own words."
-          description={`You can always add and modify these later.\nBe as specific as possible for improved personalization.`}
+          title="Build your symptom bank."
+          subtitle={`Describe Symptoms you experience regularily, breaking them down by location and sensation`}
+          description="Be as specific as possible. You can always add or edit these later."
           items={symptoms}
           emptyMessage="No symptoms added yet"
           onRemove={removeSymptom}
@@ -58,9 +58,9 @@ export function SymptomFoodBankScreen() {
         />
 
         <ItemBank
-          title="Enter any foods you eat regularly."
-          subtitle={`Use the dropdown, scan typical food items,\nor enter manually.`}
-          description={`You can also add as you go.\nAs you use Remetra more, repeat items will populate automatically.`}
+          title="Build your food bank."
+          subtitle={`Add foods you eat regularly with their key ingredients.\ne.g. Greek Yogurt → milk, live cultures`}
+          description="You can add more as you go — Remetra learns as you log."
           items={foods}
           emptyMessage="No foods added yet"
           onRemove={removeFood}
