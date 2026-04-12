@@ -36,7 +36,7 @@ export function GenericCorrelationChart() {
           x="food"
           y="correlation"
           style={{
-            data: { fill: '#ca5e5e' },
+            data: { fill: '#ca5e5e' /* remetra-terracotta */ },
           }}
           cornerRadius={4}
         />

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState } from "react";
 import { useBankStore } from "../store/bankStore";
@@ -12,7 +12,6 @@ export const BarcodeScannerScreen = () => {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { setScannedFood } = useBankStore();
-
 
   const handleLookup = async () => {
     if (!barcode.trim()) return;
@@ -33,11 +32,10 @@ export const BarcodeScannerScreen = () => {
 
       const name = product.product_name ?? "Unknown";
       const ingredients = product.ingredients
-        ? product.ingredients.map((i: any) => 
+        ? product.ingredients.map((i: any) =>
             i.id.replace(/^en:/, '').replace(/-/g, ' ')
-            ).filter(Boolean)
+          ).filter(Boolean)
         : [];
-
 
       setScannedFood({ name, ingredients });
       navigation.navigate('Summary');
@@ -50,38 +48,35 @@ export const BarcodeScannerScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 p-6 pt-[60px] bg-white">
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.back}>← Cancel</Text>
+        <Text className="text-base text-remetra-accent mb-6">← Cancel</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title}>Test Barcode Lookup</Text>
+      <Text className="text-[22px] font-semibold text-remetra-accent mb-5">
+        Test Barcode Lookup
+      </Text>
 
       <TextInput
-        style={styles.input}
+        className="border border-remetra-border rounded-lg p-3 mb-3 text-base"
         placeholder="Enter barcode number..."
         value={barcode}
         onChangeText={setBarcode}
         keyboardType="numeric"
       />
 
-      <TouchableOpacity style={styles.btn} onPress={handleLookup}>
-        <Text style={styles.btnText}>{loading ? "Looking up..." : "Look Up"}</Text>
+      <TouchableOpacity
+        className="bg-remetra-rose rounded-full py-3.5 items-center"
+        onPress={handleLookup}
+      >
+        <Text className="text-white text-base font-semibold">
+          {loading ? "Looking up..." : "Look Up"}
+        </Text>
       </TouchableOpacity>
 
       {result && (
-        <Text style={styles.result}>{result}</Text>
+        <Text className="mt-6 text-sm text-neutral-600 leading-[22px]">{result}</Text>
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, paddingTop: 60, backgroundColor: '#fff' },
-  back: { color: '#eea487', fontSize: 16, marginBottom: 24 },
-  title: { fontSize: 22, fontWeight: '600', color: '#eea487', marginBottom: 20 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12, fontSize: 16 },
-  btn: { backgroundColor: '#C85A4A', borderRadius: 25, paddingVertical: 14, alignItems: 'center' },
-  btnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  result: { marginTop: 24, fontSize: 14, color: '#333', lineHeight: 22 },
-});

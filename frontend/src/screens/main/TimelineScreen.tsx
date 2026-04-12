@@ -71,11 +71,25 @@ function groupByDate(entries: TimelineEntry[]): { dateKey: string; label: string
   return Array.from(map.entries()).map(([dateKey, val]) => ({ dateKey, ...val }));
 }
 
-// ─── shared edit row helpers ──────────────────────────────────────────────────
+/** Maps a 1–10 intensity level to a full Tailwind bg class. */
+function intensityBgCls(level: number) {
+  if (level >= 7) return 'bg-remetra-rose';
+  if (level >= 4) return 'bg-remetra-coral';
+  return 'bg-remetra-mauve';
+}
+
+/** Maps a 1–10 intensity level to its hex value (needed for borderLeftColor). */
+function intensityHex(level: number) {
+  if (level >= 7) return '#C85A4A'; /* remetra-rose */
+  if (level >= 4) return '#D9806E'; /* remetra-coral */
+  return '#b2939b';                 /* remetra-mauve */
+}
+
+// ─── shared edit helpers ──────────────────────────────────────────────────────
 
 function EditLabel({ children }: { children: string }) {
   return (
-    <Text style={{ fontSize: 12, fontWeight: '600', color: '#888', marginBottom: 4, marginTop: 10 }}>
+    <Text className="text-xs font-semibold text-neutral-500 mb-1 mt-2.5 tracking-wide">
       {children.toUpperCase()}
     </Text>
   );
@@ -95,11 +109,7 @@ function EditTextInput({
   integerOnly?: boolean;
 }) {
   const handleChange = (v: string) => {
-    if (integerOnly) {
-      onChange(v.replace(/[^0-9]/g, ''));
-    } else {
-      onChange(v);
-    }
+    onChange(integerOnly ? v.replace(/[^0-9]/g, '') : v);
   };
 
   return (
@@ -110,15 +120,8 @@ function EditTextInput({
       placeholderTextColor="#bbb"
       multiline={multiline}
       keyboardType={integerOnly ? 'number-pad' : 'default'}
+      className="border border-[#E0D0D8] rounded-lg px-2.5 py-2 text-sm text-neutral-700 bg-white"
       style={{
-        borderWidth: 1,
-        borderColor: '#E0D0D8',
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        fontSize: 14,
-        color: '#333',
-        backgroundColor: 'white',
         minHeight: multiline ? 60 : undefined,
         textAlignVertical: multiline ? 'top' : undefined,
       }}
@@ -136,36 +139,23 @@ function SaveCancelRow({
   onCancel: () => void;
 }) {
   return (
-    <View style={{ flexDirection: 'row', gap: 8, marginTop: 14 }}>
+    <View className="flex-row gap-2 mt-3.5">
       <TouchableOpacity
         onPress={onCancel}
-        style={{
-          flex: 1,
-          paddingVertical: 10,
-          borderRadius: 8,
-          borderWidth: 1,
-          borderColor: '#ccc',
-          alignItems: 'center',
-        }}
+        className="flex-1 py-2.5 rounded-lg border border-remetra-border items-center"
       >
-        <Text style={{ fontSize: 14, color: '#888' }}>Cancel</Text>
+        <Text className="text-sm text-remetra-muted">Cancel</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={onSave}
         disabled={saving}
-        style={{
-          flex: 2,
-          paddingVertical: 10,
-          borderRadius: 8,
-          backgroundColor: '#B8624F',
-          alignItems: 'center',
-          opacity: saving ? 0.6 : 1,
-        }}
+        className="flex-[2] py-2.5 rounded-lg bg-remetra-burgundy items-center"
+        style={{ opacity: saving ? 0.6 : 1 }}
       >
         {saving ? (
           <ActivityIndicator size="small" color="white" />
         ) : (
-          <Text style={{ fontSize: 14, color: 'white', fontWeight: '600' }}>Save Changes</Text>
+          <Text className="text-sm text-white font-semibold">Save Changes</Text>
         )}
       </TouchableOpacity>
     </View>
@@ -216,25 +206,18 @@ function FoodCard({
 
   return (
     <View
-      style={{
-        backgroundColor: '#FEF0E7',
-        borderLeftWidth: 4,
-        borderLeftColor: '#fca450',
-        borderRadius: 12,
-        marginBottom: 10,
-        overflow: 'hidden',
-      }}
+      className="rounded-xl mb-2.5 overflow-hidden"
+      style={{ backgroundColor: '#FEF0E7', borderLeftWidth: 4, borderLeftColor: '#fca450' /* remetra-orange */ }}
     >
-      {/* Collapsed header — always visible */}
       <TouchableOpacity
         onPress={() => setExpanded((prev) => !prev)}
         activeOpacity={0.7}
-        style={{ padding: 14 }}
+        className="p-3.5"
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <Text style={{ fontSize: 16 }}>🍽</Text>
+        <View className="flex-row justify-between items-start">
+          <View className="flex-1">
+            <View className="flex-row items-center gap-1.5 mb-1">
+              <Text className="text-base">🍽</Text>
               <Text style={{ fontSize: 16, fontWeight: '600', color: '#7C4A1E' }}>{entry.name}</Text>
             </View>
             {entry.quantity ? (
@@ -251,16 +234,15 @@ function FoodCard({
               </Text>
             ) : null}
           </View>
-          <View style={{ alignItems: 'flex-end', gap: 4, marginLeft: 8 }}>
+          <View className="items-end gap-1 ml-2">
             <Text style={{ fontSize: 12, color: '#B07850' }}>{formatTime(entry.timestamp)}</Text>
             <Text style={{ fontSize: 11, color: '#B07850' }}>{expanded ? '▲ collapse' : '▼ edit'}</Text>
           </View>
         </View>
       </TouchableOpacity>
 
-      {/* Expanded edit form */}
       {expanded && (
-        <View style={{ paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#FAD9C4' }}>
+        <View className="px-3.5 pb-3.5" style={{ borderTopWidth: 1, borderTopColor: '#FAD9C4' }}>
           <EditLabel>Quantity</EditLabel>
           <EditTextInput value={quantity} onChange={setQuantity} placeholder="e.g. 2" integerOnly />
 
@@ -271,7 +253,7 @@ function FoodCard({
           <EditTextInput value={notes} onChange={setNotes} placeholder="Optional notes…" multiline />
 
           {error ? (
-            <Text style={{ color: '#C85A4A', fontSize: 12, marginTop: 8 }}>{error}</Text>
+            <Text className="text-remetra-rose text-xs mt-2">{error}</Text>
           ) : null}
 
           <SaveCancelRow saving={saving} onSave={handleSave} onCancel={handleCancel} />
@@ -298,8 +280,6 @@ function SymptomCard({
   const [timestamp, setTimestamp] = useState(entry.timestamp);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const intensityColor = intensity >= 7 ? '#C85A4A' : intensity >= 4 ? '#D9806E' : '#b2939b';
 
   const handleCancel = () => {
     setIntensity(entry.intensity);
@@ -336,32 +316,28 @@ function SymptomCard({
     }
   };
 
+  const intHex = intensityHex(intensity);
+  const intBgCls = intensityBgCls(intensity);
+
   return (
     <View
-      style={{
-        backgroundColor: '#FBF0F2',
-        borderLeftWidth: 4,
-        borderLeftColor: intensityColor,
-        borderRadius: 12,
-        marginBottom: 10,
-        overflow: 'hidden',
-      }}
+      className="rounded-xl mb-2.5 overflow-hidden"
+      style={{ backgroundColor: '#FBF0F2', borderLeftWidth: 4, borderLeftColor: intHex }}
     >
-      {/* Collapsed header */}
       <TouchableOpacity
         onPress={() => setExpanded((prev) => !prev)}
         activeOpacity={0.7}
-        style={{ padding: 14 }}
+        className="p-3.5"
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <Text style={{ fontSize: 16 }}>🩺</Text>
+        <View className="flex-row justify-between items-start">
+          <View className="flex-1">
+            <View className="flex-row items-center gap-1.5 mb-1">
+              <Text className="text-base">🩺</Text>
               <Text style={{ fontSize: 16, fontWeight: '600', color: '#7B3B4E' }}>{entry.name}</Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-              <View style={{ backgroundColor: intensityColor, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 2 }}>
-                <Text style={{ color: 'white', fontSize: 12, fontWeight: '600' }}>
+            <View className="flex-row items-center gap-2 mb-0.5">
+              <View className={`${intBgCls} rounded-[10px] px-2 py-0.5`}>
+                <Text className="text-white text-xs font-semibold">
                   Intensity {entry.intensity}/10
                 </Text>
               </View>
@@ -378,34 +354,32 @@ function SymptomCard({
               </Text>
             ) : null}
           </View>
-          <View style={{ alignItems: 'flex-end', gap: 4, marginLeft: 8 }}>
+          <View className="items-end gap-1 ml-2">
             <Text style={{ fontSize: 12, color: '#9E7080' }}>{formatTime(entry.timestamp)}</Text>
             <Text style={{ fontSize: 11, color: '#9E7080' }}>{expanded ? '▲ collapse' : '▼ edit'}</Text>
           </View>
         </View>
       </TouchableOpacity>
 
-      {/* Expanded edit form */}
       {expanded && (
-        <View style={{ paddingHorizontal: 14, paddingBottom: 14, borderTopWidth: 1, borderTopColor: '#F0D0DA' }}>
+        <View className="px-3.5 pb-3.5" style={{ borderTopWidth: 1, borderTopColor: '#F0D0DA' }}>
           <EditLabel>Intensity</EditLabel>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+          <View className="flex-row flex-wrap gap-1.5">
             {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
               <TouchableOpacity
                 key={n}
                 onPress={() => setIntensity(n)}
+                className={`w-9 h-9 rounded-[18px] justify-center items-center ${
+                  intensity === n ? intensityBgCls(n) : 'bg-[#F5E8EC]'
+                }`}
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 18,
-                  backgroundColor: intensity === n ? intensityColor : '#F5E8EC',
-                  justifyContent: 'center',
-                  alignItems: 'center',
                   borderWidth: intensity === n ? 0 : 1,
                   borderColor: '#E0C8D0',
                 }}
               >
-                <Text style={{ fontSize: 13, fontWeight: '600', color: intensity === n ? 'white' : '#9E7080' }}>
+                <Text
+                  className={`text-[13px] font-semibold ${intensity === n ? 'text-white' : 'text-[#9E7080]'}`}
+                >
                   {n}
                 </Text>
               </TouchableOpacity>
@@ -415,32 +389,20 @@ function SymptomCard({
           <EditLabel>Date & Time</EditLabel>
           <LogDateTimePicker value={timestamp} onChange={setTimestamp} />
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 }}>
+          <View className="flex-row items-center gap-2 mt-2.5">
             <TouchableOpacity
               onPress={() => setHasDuration((prev) => !prev)}
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: 4,
-                borderWidth: 1,
-                borderColor: '#ccc',
-                backgroundColor: hasDuration ? '#B8624F' : 'white',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
+              className={`w-5 h-5 rounded border justify-center items-center ${
+                hasDuration ? 'bg-remetra-burgundy border-remetra-burgundy' : 'bg-white border-remetra-border'
+              }`}
             >
-              {hasDuration ? <Text style={{ color: 'white', fontSize: 12 }}>✓</Text> : null}
+              {hasDuration ? <Text className="text-white text-xs">✓</Text> : null}
             </TouchableOpacity>
             <Text style={{ fontSize: 13, color: '#7B3B4E' }}>Duration (minutes)</Text>
           </View>
           {hasDuration && (
-            <View style={{ marginTop: 6 }}>
-              <EditTextInput
-                value={duration}
-                onChange={setDuration}
-                placeholder="e.g. 30"
-                integerOnly
-              />
+            <View className="mt-1.5">
+              <EditTextInput value={duration} onChange={setDuration} placeholder="e.g. 30" integerOnly />
             </View>
           )}
 
@@ -448,7 +410,7 @@ function SymptomCard({
           <EditTextInput value={notes} onChange={setNotes} placeholder="Optional notes…" multiline />
 
           {error ? (
-            <Text style={{ color: '#C85A4A', fontSize: 12, marginTop: 8 }}>{error}</Text>
+            <Text className="text-remetra-rose text-xs mt-2">{error}</Text>
           ) : null}
 
           <SaveCancelRow saving={saving} onSave={handleSave} onCancel={handleCancel} />
@@ -545,82 +507,57 @@ export function TimelineScreen() {
   const groups = groupByDate(entries);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       <BackgroundGradient />
-      <View style={{ flex: 1, paddingTop: 60 }}>
+      <View className="flex-1 pt-[60px]">
+
         {/* Header */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 20,
-            marginBottom: 16,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: '600',
-              color: '#b2939b',
-              fontStyle: 'italic',
-              letterSpacing: 1,
-            }}
-          >
+        <View className="flex-row items-center justify-between px-5 mb-4">
+          <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[1px]">
             YOUR HISTORY
           </Text>
           <TouchableOpacity
             onPress={openLogModal}
-            style={{
-              backgroundColor: '#B8624F',
-              borderRadius: 20,
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 4,
-            }}
+            className="bg-remetra-burgundy rounded-[20px] px-3.5 py-2 flex-row items-center gap-1"
           >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>+</Text>
-            <Text style={{ color: 'white', fontSize: 13, fontWeight: '500' }}>Add Log</Text>
+            <Text className="text-white text-base font-semibold">+</Text>
+            <Text className="text-white text-[13px] font-medium">Add Log</Text>
           </TouchableOpacity>
         </View>
 
         {/* Legend */}
-        <View style={{ flexDirection: 'row', gap: 16, paddingHorizontal: 20, marginBottom: 16 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fca450' }} />
-            <Text style={{ fontSize: 12, color: '#888' }}>Food</Text>
+        <View className="flex-row gap-4 px-5 mb-4">
+          <View className="flex-row items-center gap-1.5">
+            <View className="w-3 h-3 rounded-full bg-remetra-orange" />
+            <Text className="text-xs text-remetra-muted">Food</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#b2939b' }} />
-            <Text style={{ fontSize: 12, color: '#888' }}>Symptom</Text>
+          <View className="flex-row items-center gap-1.5">
+            <View className="w-3 h-3 rounded-full bg-remetra-mauve" />
+            <Text className="text-xs text-remetra-muted">Symptom</Text>
           </View>
-          <Text style={{ fontSize: 12, color: '#bbb', marginLeft: 4 }}>Tap a card to edit</Text>
+          <Text className="text-xs text-neutral-300 ml-1">Tap a card to edit</Text>
         </View>
 
         {/* Content */}
         {loading ? (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color="#b2939b" />
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#b2939b" /* remetra-mauve */ />
           </View>
         ) : error ? (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-            <Text style={{ color: '#C85A4A', textAlign: 'center', marginBottom: 16 }}>{error}</Text>
+          <View className="flex-1 justify-center items-center p-6">
+            <Text className="text-remetra-rose text-center mb-4">{error}</Text>
             <TouchableOpacity
               onPress={() => { setLoading(true); load().finally(() => setLoading(false)); }}
-              style={{ backgroundColor: '#B8624F', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 20 }}
+              className="bg-remetra-burgundy px-6 py-2.5 rounded-[20px]"
             >
-              <Text style={{ color: 'white', fontWeight: '600' }}>Retry</Text>
+              <Text className="text-white font-semibold">Retry</Text>
             </TouchableOpacity>
           </View>
         ) : entries.length === 0 ? (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-            <Text style={{ fontSize: 48, marginBottom: 12 }}>📋</Text>
-            <Text style={{ fontSize: 18, color: '#b2939b', fontWeight: '600', textAlign: 'center' }}>
-              No logs yet
-            </Text>
-            <Text style={{ fontSize: 14, color: '#aaa', textAlign: 'center', marginTop: 8 }}>
+          <View className="flex-1 justify-center items-center p-6">
+            <Text className="text-5xl mb-3">📋</Text>
+            <Text className="text-lg text-remetra-mauve font-semibold text-center">No logs yet</Text>
+            <Text className="text-sm text-remetra-muted text-center mt-2">
               Tap + Add Log to record your first food or symptom entry.
             </Text>
           </View>
@@ -634,12 +571,10 @@ export function TimelineScreen() {
           >
             {groups.map((group) => (
               <View key={group.dateKey}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12, marginTop: 8 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#7B5B6B', marginRight: 8 }}>
-                    {group.label}
-                  </Text>
-                  <View style={{ flex: 1, height: 1, backgroundColor: '#DDD' }} />
-                  <Text style={{ fontSize: 12, color: '#aaa', marginLeft: 8 }}>
+                <View className="flex-row items-center mb-3 mt-2">
+                  <Text className="text-sm font-bold text-[#7B5B6B] mr-2">{group.label}</Text>
+                  <View className="flex-1 h-px bg-neutral-200" />
+                  <Text className="text-xs text-remetra-muted ml-2">
                     {group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}
                   </Text>
                 </View>

@@ -47,7 +47,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     setCustomName(searchQuery);
   };
 
-  const clearError = (field: string) => setErrors({});
+  const clearError = () => setErrors({});
 
   const handleSubmit = async () => {
     if (isCustom) {
@@ -174,7 +174,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
             style={{ borderWidth: 1, borderColor: errors.location ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 2, backgroundColor: '#fafafa' }}
             placeholder="Location (e.g., stomach, head)"
             value={customLocation}
-            onChangeText={(text) => { setCustomLocation(text); if (errors.location) clearError("location"); }}
+            onChangeText={(text) => { setCustomLocation(text); if (errors.location) clearError(); }}
           />
           {errors.location && (
             <Text className="text-red-500 text-xs mb-2">{errors.location}</Text>
@@ -183,7 +183,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
             style={{ borderWidth: 1, borderColor: errors.sensation ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 2, backgroundColor: '#fafafa' }}
             placeholder="Sensation (e.g., burning, throbbing)"
             value={customSensation}
-            onChangeText={(text) => { setCustomSensation(text); if (errors.sensation) clearError("sensation"); }}
+            onChangeText={(text) => { setCustomSensation(text); if (errors.sensation) clearError(); }}
           />
           {errors.sensation && (
             <Text className="text-red-500 text-xs mb-2">{errors.sensation}</Text>
@@ -206,14 +206,12 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
             {Array.from({ length: 10 }, (_, i) => i + 1).map((val) => (
               <TouchableOpacity
                 key={val}
-                style={{
-                  width: 28, height: 28, borderRadius: 16,
-                  alignItems: 'center', justifyContent: 'center',
-                  backgroundColor: val <= intensity ? '#eea487' : '#e5e5e5',
-                }}
+                className={`w-7 h-7 rounded-2xl items-center justify-center ${
+                  val <= intensity ? 'bg-remetra-accent' : 'bg-neutral-200'
+                }`}
                 onPress={() => setIntensity(val)}
               >
-                <Text style={{ fontSize: 12, fontWeight: '600', color: val <= intensity ? 'white' : '#a3a3a3' }}>
+                <Text className={`text-xs font-semibold ${val <= intensity ? 'text-white' : 'text-neutral-400'}`}>
                   {val}
                 </Text>
               </TouchableOpacity>
@@ -226,7 +224,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
           <LogDateTimePicker
             value={timestamp}
             onChange={setTimestamp}
-            accentColor="#eea487"
+            accentColor="#eea487" /* remetra-accent */
           />
 
           {!showDuration ? (

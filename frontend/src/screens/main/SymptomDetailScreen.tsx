@@ -65,7 +65,6 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
 
         setCorrelations(mapped);
 
-        // Flatten to ingredient level, keeping the highest trigger rate per ingredient
         const ingMap = new Map<string, number>();
         for (const food of mapped) {
           for (const ing of food.ingredients) {
@@ -92,63 +91,37 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
   }));
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       <BackgroundGradient />
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 64 }}>
 
         {/* Back button */}
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24, gap: 6 }}
+          className="flex-row items-center mb-6 gap-1.5"
         >
-          <Text style={{ fontSize: 18, color: '#b2939b' }}>‹</Text>
-          <Text style={{ fontSize: 14, color: '#b2939b' }}>Analysis</Text>
+          <Text className="text-lg text-remetra-mauve">‹</Text>
+          <Text className="text-sm text-remetra-mauve">Analysis</Text>
         </TouchableOpacity>
 
         {/* Title */}
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: '600',
-            color: '#b2939b',
-            fontStyle: 'italic',
-            letterSpacing: 1,
-            textAlign: 'center',
-            marginBottom: 32,
-          }}
-        >
+        <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[1px] text-center mb-8">
           {symptomName.toUpperCase()}
         </Text>
 
         {loading ? (
           <ActivityIndicator color="#b2939b" style={{ marginTop: 32 }} />
         ) : error ? (
-          <Text style={{ color: '#B8624F', textAlign: 'center', marginTop: 24 }}>{error}</Text>
+          <Text className="text-remetra-burgundy text-center mt-6">{error}</Text>
         ) : ingredientCorrelations.length === 0 ? (
-          <Text style={{ color: '#aaa', textAlign: 'center', marginTop: 24, fontSize: 14 }}>
+          <Text className="text-remetra-muted text-center mt-6 text-sm">
             No correlation data yet. Log more food and symptoms to see results.
           </Text>
         ) : (
           <>
             {/* Chart */}
-            <View
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.35)',
-                borderRadius: 16,
-                padding: 8,
-                marginBottom: 32,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 13,
-                  fontWeight: '700',
-                  color: '#aaa',
-                  letterSpacing: 1,
-                  textAlign: 'center',
-                  marginBottom: 4,
-                }}
-              >
+            <View className="bg-white/35 rounded-2xl p-2 mb-8">
+              <Text className="text-[13px] font-bold text-remetra-muted tracking-[1px] text-center mb-1">
                 TOP INGREDIENT CORRELATIONS
               </Text>
               <VictoryChart
@@ -168,7 +141,7 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
                 />
                 <VictoryBar
                   data={chartData}
-                  style={{ data: { fill: '#F8B4A8' } }}
+                  style={{ data: { fill: '#F8B4A8' } /* remetra-peach */ }}
                   cornerRadius={4}
                 />
               </VictoryChart>
@@ -176,7 +149,7 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
 
             {/* List */}
             <SectionDivider label="Related Ingredients" />
-            <View style={{ gap: 10 }}>
+            <View className="gap-2.5">
               {ingredientCorrelations.map((item, index) => (
                 <IngredientRow key={item.name} rank={index + 1} item={item} />
               ))}
@@ -190,45 +163,33 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
 
 function SectionDivider({ label }: { label: string }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-      <Text style={{ fontSize: 12, fontWeight: '700', color: '#aaa', marginRight: 8, letterSpacing: 1 }}>
+    <View className="flex-row items-center mb-3">
+      <Text className="text-xs font-bold text-remetra-muted mr-2 tracking-[1px]">
         {label.toUpperCase()}
       </Text>
-      <View style={{ flex: 1, height: 1, backgroundColor: '#E5E5E5' }} />
+      <View className="flex-1 h-px bg-neutral-200" />
     </View>
   );
 }
 
 function IngredientRow({ rank, item }: { rank: number; item: IngredientCorrelation }) {
   const pct = Math.round(item.triggerRate * 100);
-  const barColor = pct >= 60 ? '#B8624F' : pct >= 30 ? '#F8B4A8' : '#D4E8D4';
+  // Bar colour driven by trigger rate — full class names required for Tailwind purge
+  const barCls = pct >= 60 ? 'bg-remetra-burgundy' : pct >= 30 ? 'bg-remetra-peach' : 'bg-green-200';
 
   return (
-    <View
-      style={{
-        backgroundColor: 'rgba(255,255,255,0.35)',
-        borderRadius: 12,
-        padding: 16,
-        gap: 8,
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#b2939b', width: 24, textAlign: 'center' }}>
-          {rank}
-        </Text>
-        <Text style={{ fontSize: 15, color: '#444', fontWeight: '600', flex: 1 }}>{item.name}</Text>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#7B3B4E' }}>{pct}%</Text>
+    <View className="bg-white/35 rounded-xl p-4 gap-2">
+      <View className="flex-row items-center gap-3">
+        <Text className="text-sm font-bold text-remetra-mauve w-6 text-center">{rank}</Text>
+        <Text className="text-[15px] text-neutral-700 font-semibold flex-1">{item.name}</Text>
+        <Text className="text-sm font-bold text-remetra-rose">{pct}%</Text>
       </View>
 
       {/* Trigger rate bar */}
-      <View style={{ height: 6, backgroundColor: '#eee', borderRadius: 3, marginLeft: 36 }}>
+      <View className="h-1.5 bg-neutral-200 rounded-full ml-9">
         <View
-          style={{
-            height: 6,
-            width: `${Math.min(pct, 100)}%`,
-            backgroundColor: barColor,
-            borderRadius: 3,
-          }}
+          className={`h-1.5 rounded-full ${barCls}`}
+          style={{ width: `${Math.min(pct, 100)}%` }}
         />
       </View>
     </View>
