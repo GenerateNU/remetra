@@ -1,32 +1,28 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { useState } from "react";
 import { useBankStore } from "../store/bankStore";
 
 export const BarcodeScannerScreen = () => {
   const navigation = useNavigation<any>();
-  const route = useRoute<any>();
-  const onScanned = route.params?.onScanned;
-
-  const [barcode, setBarcode] = useState("");
-  const [result, setResult] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const { setScannedFood } = useBankStore();
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false);
 
-  const handleLookup = async () => {
-    if (!barcode.trim()) return;
-    setLoading(true);
-    setResult(null);
+  const handleBarCodeScanned = async ({ data }: { data: string }) => {
+    if (scanned) return;
+    setScanned(true);
 
     try {
       const res = await fetch(
-        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
+        `https://world.openfoodfacts.org/api/v0/product/${data}.json`
       );
       const json = await res.json();
       const product = json.product;
 
       if (!product) {
-        setResult("Product not found");
+        setScanned(false);
         return;
       }
 
@@ -40,43 +36,53 @@ export const BarcodeScannerScreen = () => {
       setScannedFood({ name, ingredients });
       navigation.navigate('Summary');
     } catch (err) {
-      setResult("Lookup failed");
-      console.error(err);
-    } finally {
-      setLoading(false);
+      console.error("Barcode lookup failed:", err);
+      setScanned(false);
     }
   };
 
+  if (!permission?.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Camera permission is required.</Text>
+        <TouchableOpacity style={styles.btn} onPress={requestPermission}>
+          <Text style={styles.btnText}>Grant Permission</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+
   return (
-    <View className="flex-1 p-6 pt-[60px] bg-white">
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text className="text-base text-remetra-accent mb-6">← Cancel</Text>
-      </TouchableOpacity>
-
-      <Text className="text-[22px] font-semibold text-remetra-accent mb-5">
-        Test Barcode Lookup
-      </Text>
-
-      <TextInput
-        className="border border-remetra-border rounded-lg p-3 mb-3 text-base"
-        placeholder="Enter barcode number..."
-        value={barcode}
-        onChangeText={setBarcode}
-        keyboardType="numeric"
+    <View style={styles.container}>
+      <CameraView
+        style={StyleSheet.absoluteFillObject}
+        facing="front"
+        onBarcodeScanned={handleBarCodeScanned}
+        barcodeScannerSettings={{ barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"] }}
       />
-
-      <TouchableOpacity
-        className="bg-remetra-rose rounded-full py-3.5 items-center"
-        onPress={handleLookup}
-      >
-        <Text className="text-white text-base font-semibold">
-          {loading ? "Looking up..." : "Look Up"}
-        </Text>
-      </TouchableOpacity>
-
-      {result && (
-        <Text className="mt-6 text-sm text-neutral-600 leading-[22px]">{result}</Text>
-      )}
+      <View style={styles.overlay}>
+        <Text style={styles.instructions}>Point at a barcode</Text>
+        <TouchableOpacity style={styles.cancelBtn} onPress={() => navigation.goBack()}>
+          <Text style={styles.cancelText}>← Cancel</Text>
+        </TouchableOpacity>
+        {scanned && (
+          <TouchableOpacity style={styles.btn} onPress={() => setScanned(false)}>
+            <Text style={styles.btnText}>Scan Again</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#000" },
+  overlay: { position: "absolute", bottom: 60, width: "100%", alignItems: "center", gap: 12 },
+  instructions: { color: "#fff", fontSize: 16, marginBottom: 8 },
+  cancelBtn: { paddingVertical: 10, paddingHorizontal: 20 },
+  cancelText: { color: "#eea487", fontSize: 16 },
+  btn: { backgroundColor: "#C85A4A", borderRadius: 25, paddingVertical: 14, paddingHorizontal: 32 },
+  btnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  text: { color: "#fff", fontSize: 16, marginBottom: 20 },
+});
