@@ -4,10 +4,10 @@ import { Chips } from "./GenericChipComponent";
 import { foodLogService } from "../api/food_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNavigation } from '@react-navigation/native';
-
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
+import { CustomItemButton } from "./CustomItemButton";
 
 interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
@@ -126,14 +126,10 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
               </TouchableOpacity>
             ))}
             {searchQuery.trim().length > 0 && (
-              <TouchableOpacity
-                style={{ borderWidth: 1, borderColor: '#eea487', borderStyle: 'dashed', borderRadius: 8, padding: 14, backgroundColor: '#fafafa' }}
+              <CustomItemButton
+                label={`+ Add '${searchQuery}' as custom food`}
                 onPress={handleSwitchToCustom}
-              >
-                <Text className="font-medium text-base font-ptserif text-remetra-accent">
-                  + Add &apos;{searchQuery}&apos; as custom food
-                </Text>
-              </TouchableOpacity>
+              />
             )}
           </View>
 
@@ -167,7 +163,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
 
       {/* Custom food entry */}
       {isCustom && (
-        <View style={{ width: '75%' }}>
+        <View>
           <TextInput
             className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
             placeholder="Food name"
@@ -177,15 +173,13 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
           {customIngredients.length === 0 && (
             <Text className="text-remetra-muted text-[13px] mb-1">Ingredients</Text>
           )}
-          <View>
-            <Chips
-              items={customIngredients}
-              itemName="Ingredients"
-              placeholder="Add Ingredients..."
-              onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
-              onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
-            />
-          </View>
+          <Chips
+            items={customIngredients}
+            itemName="Ingredients"
+            placeholder="Add Ingredients..."
+            onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
+            onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
+          />
           <TouchableOpacity onPress={() => { setIsCustom(false); setSearchQuery(""); }}>
             <Text className="text-sm font-medium font-ptserif text-remetra-accent mt-2">
               Search bank instead

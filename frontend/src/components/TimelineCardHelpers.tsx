@@ -58,7 +58,7 @@ export function EditTextInput({
       placeholderTextColor="#bbb"
       multiline={multiline}
       keyboardType={integerOnly ? 'number-pad' : 'default'}
-      className="border border-[#E0D0D8] rounded-lg px-2.5 py-2 text-sm text-neutral-700 bg-white"
+      className="border border-remetra-border rounded-lg px-2.5 py-2 text-sm text-neutral-700 bg-white"
       style={{
         minHeight: multiline ? 60 : undefined,
         textAlignVertical: multiline ? 'top' : undefined,
