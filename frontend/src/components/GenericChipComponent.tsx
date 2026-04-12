@@ -45,9 +45,9 @@ export const Chips: React.FC<ChipsProps> = ({
           </View>
         ))}
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <View className="flex-row items-center gap-2">
         <TextInput
-          style={{ flex: 1, borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 8, padding: 10, fontSize: 13, backgroundColor: '#fafafa' }}
+          className="flex-1 border border-neutral-300 rounded-lg p-2.5 text-[13px] bg-remetra-surface"
           placeholder={placeholder ?? `Add ${itemName.toLowerCase()}...`}
           value={input}
           onChangeText={setInput}
@@ -56,9 +56,9 @@ export const Chips: React.FC<ChipsProps> = ({
         />
         <TouchableOpacity
           onPress={handleSubmit}
-          style={{ backgroundColor: '#eea487', borderRadius: 8, padding: 10 }}
+          className="bg-remetra-accent rounded-lg p-2.5"
         >
-          <Text style={{ color: 'white', fontWeight: '600', fontSize: 13 }}>Add</Text>
+          <Text className="text-white font-semibold text-[13px]">Add</Text>
         </TouchableOpacity>
       </View>
     </View>

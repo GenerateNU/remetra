@@ -40,16 +40,16 @@ export function AddFoodModal({ visible, onClose }: Props) {
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-        <View style={{ backgroundColor: 'white', borderRadius: 20, padding: 30, width: '80%' }}>
-          <Text className="text-[18px] font-light font-ptserif text-[#eea487]">Food Name</Text>
+      <View className="flex-1 bg-black/50 justify-center items-center">
+        <View className="bg-white rounded-[20px] p-8 w-4/5">
+          <Text className="text-lg font-light font-ptserif text-remetra-accent">Food Name</Text>
           <TextInput
             value={foodName}
             onChangeText={setFoodName}
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
+            className="border border-remetra-border rounded-lg p-2 mb-4"
           />
 
-          <Text className="text-[18px] font-light font-ptserif text-[#eea487] mt-4">Ingredients</Text>
+          <Text className="text-lg font-light font-ptserif text-remetra-accent mt-4">Ingredients</Text>
           <Chips
             items={ingredients}
             itemName="Ingredient"
@@ -57,20 +57,20 @@ export function AddFoodModal({ visible, onClose }: Props) {
             onRemove={(i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
           />
 
-          {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
+          {error ? <Text className="text-red-500 mb-2">{error}</Text> : null}
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
+          <View className="flex-row justify-between mt-4">
             <TouchableOpacity
               onPress={handleAdd}
-              style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 10, paddingHorizontal: 10 }}
+              className="border border-remetra-border rounded-full py-2.5 px-2.5"
             >
-              <Text className="text-[16px] font-light font-ptserif text-[#eea487]">Add</Text>
+              <Text className="text-base font-light font-ptserif text-remetra-accent">Add</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handleClose}
-              style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 10, paddingHorizontal: 10 }}
+              className="border border-remetra-border rounded-full py-2.5 px-2.5"
             >
-              <Text className="text-[16px] font-light font-ptserif text-[#eea487]">Cancel</Text>
+              <Text className="text-base font-light font-ptserif text-remetra-accent">Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>

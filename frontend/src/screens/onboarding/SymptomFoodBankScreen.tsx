@@ -37,7 +37,7 @@ export function SymptomFoodBankScreen() {
       >
         {/* Header */}
         <View className="items-center mb-8">
-          <Text className="text-[32px] font-light font-ptserif tracking-[3px] text-[#eea487]">
+          <Text className="text-brand font-light font-ptserif tracking-[3px] text-remetra-accent">
             R E M E T R A
           </Text>
         </View>

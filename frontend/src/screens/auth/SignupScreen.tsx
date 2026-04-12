@@ -82,16 +82,13 @@ export function SignupScreen() {
         <View className="flex-1 justify-start items-center px-6 pt-[15%]">
         
           <View className="pt-36 items-center mb-16">
-            <Text className="text-4xl text-[#F8B4A8] tracking-[7px] mb-3 font-ptserif">
+            <Text className="text-4xl text-remetra-peach tracking-[7px] mb-3 font-ptserif">
               R E M E T R A
             </Text>
   
             <View className="flex-row items-center">
-              <Text className="text-lg text-[#F8B4A8] italic">
-                create your account{' '}
-              </Text>
-              <Text className="text-lg text-[#F8B4A8] font-ptserif">
-                today
+              <Text className="text-lg text-remetra-peach italic">
+                create your account today
               </Text>
             </View>
           </View>
@@ -102,14 +99,14 @@ export function SignupScreen() {
 
           <TextInput
             placeholder="Username"
-            placeholderTextColor='#B8624F'
+            placeholderTextColor='#B8624F' /* remetra-burgundy */
             value={username}
             onChangeText={(text) => {
               setUsername(text);
               if (errors.username) setErrors(prev => ({ ...prev, username: undefined }));
             }}
             autoCapitalize="none"
-            className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
+            className="border border-remetra-burgundy text-remetra-burgundy py-3 pl-2 mb-2"
           />
           {/* if username field is error, then box turns red*/}
 
@@ -121,7 +118,7 @@ export function SignupScreen() {
 
           <TextInput
             placeholder="Email"
-            placeholderTextColor='#B8624F'
+            placeholderTextColor='#B8624F' /* remetra-burgundy */
             value={email}
             onChangeText={(text) => {
               setEmail(text);
@@ -129,7 +126,7 @@ export function SignupScreen() {
             }}
             keyboardType="email-address"
             autoCapitalize="none"
-            className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
+            className="border border-remetra-burgundy text-remetra-burgundy py-3 pl-2 mb-2"
           />
           {/* if username field is error, then box turns red*/}
           {errors.email && (
@@ -140,7 +137,7 @@ export function SignupScreen() {
 
           <TextInput
             placeholder="Password"
-            placeholderTextColor='#B8624F'
+            placeholderTextColor='#B8624F' /* remetra-burgundy */
             secureTextEntry
             value={password}
             onChangeText={(text) => {
@@ -148,7 +145,7 @@ export function SignupScreen() {
               if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
             }}
             autoCapitalize="none"
-            className="border border-[#B8624F] text-[#B8624F] py-3 pl-2 mb-2"
+            className="border border-remetra-burgundy text-remetra-burgundy py-3 pl-2 mb-2"
           />
           {errors.password && (
             <Text className="text-red-400 mb-2">{errors.password}</Text>

@@ -50,31 +50,31 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
         >
           <View className="flex-row justify-end px-4">
             <TouchableOpacity onPress={handleClose}>
-              <Text className="text-xl p-1 font-ptserif text-[#eea487]">✕</Text>
+              <Text className="text-xl p-1 font-ptserif text-remetra-accent">✕</Text>
             </TouchableOpacity>
           </View>
 
           <ScrollView className="px-5 pb-8" keyboardShouldPersistTaps="handled">
             {step === "select_type" && (
               <View className="items-center pt-4 gap-5 pb-6">
-                <Text className="text-2xl font-bold font-ptserif mb-3 text-[#eea487]">
+                <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-accent">
                   What are you logging?
                 </Text>
 
                 <TouchableOpacity
-                  style={{ width: '100%', flexDirection: 'row', alignItems: 'center', gap: 16, borderWidth: 1, borderColor: '#ccc', borderRadius: 16, padding: 20 }}
+                  className="w-full flex-row items-center gap-4 border border-remetra-border rounded-2xl p-5"
                   onPress={() => setStep("food")}
                 >
                   <Text className="text-3xl">🍽</Text>
-                  <Text className="text-lg font-semibold font-ptserif text-[#eea487]">Food</Text>
+                  <Text className="text-lg font-semibold font-ptserif text-remetra-accent">Food</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={{ width: '100%', flexDirection: 'row', alignItems: 'center', gap: 16, borderWidth: 1, borderColor: '#ccc', borderRadius: 16, padding: 20 }}
+                  className="w-full flex-row items-center gap-4 border border-remetra-border rounded-2xl p-5"
                   onPress={() => setStep("symptom")}
                 >
                   <Text className="text-3xl">🩺</Text>
-                  <Text className="text-lg font-semibold font-ptserif text-[#eea487]">Symptom</Text>
+                  <Text className="text-lg font-semibold font-ptserif text-remetra-accent">Symptom</Text>
                 </TouchableOpacity>
               </View>
             )}

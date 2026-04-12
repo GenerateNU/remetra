@@ -8,18 +8,29 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'remetra-peach': '#F8B4A8',
-        'remetra-orange': '#fca450',
-        'remetra-coral': '#D9806E',
-        'remetra-rose': '#C85A4A',
-        'remetra-burgundy': '#B8624F',
-        'remetra-terracotta': '#ca5e5e',
-        'remetra-mauve': '#b2939b',
+        // Brand palette — warm terracotta/peach tones
+        'remetra-accent':         '#eea487',  // primary: labels, titles, links
+        'remetra-peach':          '#F8B4A8',  // auth screens brand title, chart fills
+        'remetra-orange':         '#fca450',  // food accent / legend dot
+        'remetra-coral':          '#D9806E',  // onboarding inputs, medium intensity
+        'remetra-rose':           '#C85A4A',  // onboarding text, high intensity, errors
+        'remetra-burgundy':       '#B8624F',  // CTAs, save buttons, auth borders
+        'remetra-terracotta':     '#ca5e5e',  // chart bar fill
+        'remetra-mauve':          '#b2939b',  // screen headers, low intensity, spinners
+        // Structural / semantic
+        'remetra-surface':        '#fafafa',  // input & list-item backgrounds
+        'remetra-border':         '#ccc',     // generic input / card borders
+        'remetra-muted':          '#aaa',     // secondary / meta text
+        'remetra-surface-accent': '#fff5f0',  // selected-item card background
+      },
+      fontSize: {
+        // Brand wordmark used across onboarding screens
+        brand: '32px',
       },
       fontFamily: {
-      lora: ['Lora_400Regular'],
-      ptserif: ['PTSerif_400Regular'],
-    },
+        lora:    ['Lora_400Regular'],
+        ptserif: ['PTSerif_400Regular'],
+      },
     },
   },
   plugins: [],
