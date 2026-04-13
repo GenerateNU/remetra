@@ -28,6 +28,13 @@ export const setOnUnauthenticated = (callback: () => void) => {
   onUnauthenticated = callback;
 };
 
+export class ApiError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 // Attach a simple response interceptor for centralized error logging
 apiClient.interceptors.response.use(
   (response) => response,

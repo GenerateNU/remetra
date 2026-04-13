@@ -2,10 +2,11 @@ import { SymptomLogEntry, SymptomItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
 import { symptomLogService } from "../api/symptom_log_service";
 import { useAuthStore } from "../store/useAuthStore";
-
 import { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import { LogDateTimePicker } from "./LogDateTimePicker";
+import { sensationOptions, locationOptions } from "../types/symptomOptions";
 
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
@@ -20,7 +21,6 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const [selectedSymptom, setSelectedSymptom] = useState<SymptomItem | null>(null);
   const [isCustom, setIsCustom] = useState(false);
 
-  const [customName, setCustomName] = useState("");
   const [customLocation, setCustomLocation] = useState("");
   const [customSensation, setCustomSensation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -37,18 +37,10 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
 
   const handleSelectSymptom = (symptom: SymptomItem) => {
     setSelectedSymptom(symptom);
-    setIsCustom(false);
     setSearchQuery(symptom.name);
   };
 
-  const handleSwitchToCustom = () => {
-    setSelectedSymptom(null);
-    setIsCustom(true);
-    setCustomName(searchQuery);
-  };
-
-    const clearError = (field: string) =>
-    setErrors({});
+  const clearError = () => setErrors({});
 
   const handleSubmit = async () => {
     if (isCustom) {
@@ -63,8 +55,9 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
 
     setErrors({});
 
+    const derivedName = `${customSensation} — ${customLocation}`;
     const symptomId = isCustom
-      ? await addSymptom(customName, customLocation, customSensation)
+      ? await addSymptom(derivedName, customLocation, customSensation)
       : selectedSymptom?.id ?? null;
 
     if (!symptomId) {
@@ -89,7 +82,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     const entry: SymptomLogEntry = {
       type: "symptom",
       symptomId: symptomId,
-      name: isCustom ? customName : selectedSymptom?.name ?? "",
+      name: isCustom ? derivedName : selectedSymptom?.name ?? "",
       location: isCustom ? customLocation : selectedSymptom?.location ?? "",
       sensation: isCustom ? customSensation : selectedSymptom?.sensation ?? "",
       intensity,
@@ -99,15 +92,26 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     onSubmit(entry);
   };
 
-  const isValid = isCustom ? customName.trim().length > 0 : selectedSymptom !== null;
+  const isValid = isCustom
+    ? customLocation.trim().length > 0 && customSensation.trim().length > 0
+    : selectedSymptom !== null;
 
   return (
     <View className="pb-10">
-      <TouchableOpacity onPress={onBack}>
-        <Text className="text-base font-ptserif text-[#eea487] mb-4">← Back</Text>
+      <TouchableOpacity onPress={() => {
+        if (!selectedSymptom && !isCustom) {
+          onBack()
+        } else {
+          setIsCustom(false); setSearchQuery(""); setSelectedSymptom(null);
+          setCustomSensation(""); setCustomLocation("");
+        }
+          onBack
+        }
+      }>
+        <Text className="text-base font-ptserif text-remetra-accent mb-4">← Back</Text>
       </TouchableOpacity>
 
-      <Text className="text-2xl font-bold font-ptserif mb-3 text-[#eea487]">
+      <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-accent">
         Log Symptom
       </Text>
 
@@ -115,134 +119,131 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
       {!selectedSymptom && !isCustom && (
         <>
           <TextInput
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
+            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
             placeholder="Search symptoms..."
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          <TouchableOpacity
+            className="rounded-lg p-3.5 bg-remetra-burgundy mb-2 opacity-80"
+            onPress={() => setIsCustom(true)}
+            activeOpacity={0.6}
+          >
+            <Text className="font-medium text-base font-ptserif text-white">+ New Symptom</Text>
+          </TouchableOpacity>
           <View className="gap-1 mb-3">
             {filtered.map((sy) => (
               <TouchableOpacity
                 key={sy.id}
-                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 14, backgroundColor: '#fafafa' }}
+                className="border border-remetra-mauve/40 rounded-lg p-3.5 bg-remetra-surface"
                 onPress={() => handleSelectSymptom(sy)}
               >
-                <Text className="text-base font-medium text-neutral-900">{sy.name}</Text>
-                <Text className="text-xs text-neutral-400 mt-0.5">
-                  {sy.location} · {sy.sensation}
-                </Text>
+                <Text className="text-base font-medium text-remetra-burgundy">{sy.sensation}</Text>
+                <Text className="text-xs text-remetra-muted mt-0.5">Location: {sy.location}</Text>
               </TouchableOpacity>
             ))}
-            {searchQuery.trim().length > 0 && (
-              <TouchableOpacity
-                style={{ borderWidth: 1, borderColor: '#eea487', borderStyle: 'dashed', borderRadius: 8, padding: 14, backgroundColor: '#fafafa' }}
-                onPress={handleSwitchToCustom}
-              >
-                <Text className="font-medium text-base font-ptserif text-[#eea487]">
-                  + Add &apos;{searchQuery}&apos; as custom symptom
-                </Text>
-              </TouchableOpacity>
-            )}
           </View>
         </>
       )}
 
       {/* Selected symptom summary */}
       {selectedSymptom && !isCustom && (
-        <View style={{ backgroundColor: '#fff5f0', borderWidth: 1, borderColor: '#eea487', borderRadius: 12, padding: 14, marginBottom: 8 }}>
-          <View className="flex-row justify-between items-center">
-            <Text className="text-lg font-semibold text-neutral-900">{selectedSymptom.name}</Text>
+        <View className="bg-remetra-surface-accent border border-remetra-accent rounded-xl p-3.5 mb-2">
+          <View className="flex-row justify-between items-start">
+            <View>
+              <Text className="text-lg font-semibold text-remetra-burgundy">{selectedSymptom.sensation}</Text>
+              <Text className="text-xs text-remetra-muted mt-0.5">Location: {selectedSymptom.location}</Text>
+            </View>
             <TouchableOpacity onPress={() => { setSelectedSymptom(null); setSearchQuery(""); }}>
-              <Text className="text-sm font-medium font-ptserif text-[#eea487]">Change</Text>
+              <Text className="text-sm font-medium font-ptserif text-remetra-accent">Change</Text>
             </TouchableOpacity>
           </View>
-          <Text className="text-xs text-neutral-400 mt-0.5">
-            {selectedSymptom.location} · {selectedSymptom.sensation}
-          </Text>
         </View>
       )}
 
-      {/* Custom symptom entry */}
+      {/* New symptom inline form */}
       {isCustom && (
         <View>
-          <TextInput
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
-            placeholder="Symptom name"
-            value={customName}
-            onChangeText={setCustomName}
-          />
-          <TextInput
-            style={{ borderWidth: 1, borderColor: errors.location ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 2, backgroundColor: '#fafafa' }}
-            placeholder="Location (e.g., stomach, head)"
-            value={customLocation}
-            onChangeText={(text) => { setCustomLocation(text); if (errors.location) clearError("location"); }}
-          />
-          {errors.location && (
-            <Text className="text-red-500 text-xs mb-2">{errors.location}</Text>
-          )}
-          <TextInput
-            style={{ borderWidth: 1, borderColor: errors.sensation ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 2, backgroundColor: '#fafafa' }}
-            placeholder="Sensation (e.g., burning, throbbing)"
+          {/* Dropdown is a third-party component that only accepts style, not className */}
+          <Dropdown
+            data={sensationOptions}
+            search
+            labelField="label"
+            valueField="value"
+            placeholder="Select a sensation..."
+            searchPlaceholder="Type to search..."
             value={customSensation}
-            onChangeText={(text) => { setCustomSensation(text); if (errors.sensation) clearError("sensation"); }}
+            onChange={item => { setCustomSensation(item.value); if (errors.sensation) clearError(); }}
+            style={{ borderWidth: 1, borderColor: errors.sensation ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 4, backgroundColor: '#fafafa' }}
+            placeholderStyle={{ color: '#aaa', fontSize: 14 }}
+            selectedTextStyle={{ fontSize: 14 }}
           />
           {errors.sensation && (
-            <Text className="text-red-500 text-xs mb-2">{errors.sensation}</Text>
+            <Text className="text-red-400 text-xs mb-2">{errors.sensation}</Text>
           )}
-          <TouchableOpacity onPress={() => { setIsCustom(false); setSearchQuery(""); setErrors({}); }}>
-            <Text className="text-sm font-medium font-ptserif text-[#eea487] mt-2">
-              Search bank instead
-            </Text>
-          </TouchableOpacity>
+          <Dropdown
+            data={locationOptions}
+            search
+            labelField="label"
+            valueField="value"
+            placeholder="Select a location..."
+            searchPlaceholder="Type to search..."
+            value={customLocation}
+            onChange={item => { setCustomLocation(item.value); if (errors.location) clearError(); }}
+            style={{ borderWidth: 1, borderColor: errors.location ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 4, backgroundColor: '#fafafa' }}
+            placeholderStyle={{ color: '#aaa', fontSize: 14 }}
+            selectedTextStyle={{ fontSize: 14 }}
+          />
+          {errors.location && (
+            <Text className="text-red-400 text-xs mb-2">{errors.location}</Text>
+          )}
         </View>
       )}
 
       {/* Intensity + Timestamp + Duration */}
       {(selectedSymptom || isCustom) && (
         <>
-          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
             Intensity: {intensity}/10
           </Text>
           <View className="flex-row justify-between gap-1 mb-2">
             {Array.from({ length: 10 }, (_, i) => i + 1).map((val) => (
               <TouchableOpacity
                 key={val}
-                style={{
-                  width: 28, height: 28, borderRadius: 16,
-                  alignItems: 'center', justifyContent: 'center',
-                  backgroundColor: val <= intensity ? '#eea487' : '#e5e5e5',
-                }}
+                className={`w-7 h-7 rounded-2xl items-center justify-center ${
+                  val <= intensity ? 'bg-remetra-accent' : 'bg-neutral-200'
+                }`}
                 onPress={() => setIntensity(val)}
               >
-                <Text style={{ fontSize: 12, fontWeight: '600', color: val <= intensity ? 'white' : '#a3a3a3' }}>
+                <Text className={`text-xs font-semibold ${val <= intensity ? 'text-white' : 'text-neutral-400'}`}>
                   {val}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
             Time
           </Text>
           <LogDateTimePicker
             value={timestamp}
             onChange={setTimestamp}
-            accentColor="#eea487"
+            accentColor="#eea487" /* remetra-accent */
           />
 
           {!showDuration ? (
             <TouchableOpacity onPress={() => setShowDuration(true)}>
-              <Text className="text-sm font-medium font-ptserif text-[#eea487] mt-2">
+              <Text className="text-sm font-medium font-ptserif text-remetra-accent mt-2">
                 + Add duration
               </Text>
             </TouchableOpacity>
           ) : (
             <View>
-              <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
+              <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
                 Duration (minutes)
               </Text>
               <TextInput
-                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
+                className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
                 keyboardType="numeric"
                 value={durationMinutes}
                 onChangeText={setDurationMinutes}
@@ -250,26 +251,25 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
               />
             </View>
           )}
-          <Text className="text-sm font-semibold font-ptserif text-[#eea487] mt-4 mb-1.5">
-                Notes (optional)
-              </Text>
-              <TextInput
-                style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 8, backgroundColor: '#fafafa' }}
-                placeholder="Any additional notes..."
-                value={notes}
-                onChangeText={setNotes}
-                multiline
-              />
+
+          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+            Notes (optional)
+          </Text>
+          <TextInput
+            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
+            placeholder="Any additional notes..."
+            value={notes}
+            onChangeText={setNotes}
+            multiline
+          />
+
           <TouchableOpacity
-            style={{
-              borderWidth: 1, borderColor: '#ccc', borderRadius: 25,
-              paddingVertical: 14, alignItems: 'center', marginTop: 24,
-              opacity: isValid ? 1 : 0.4,
-            }}
+            className="border border-remetra-border rounded-full py-3.5 items-center mt-6"
+            style={{ opacity: isValid ? 1 : 0.4 }}
             onPress={handleSubmit}
             disabled={!isValid}
           >
-            <Text className="text-lg font-ptserif text-[#eea487]">Log Symptom</Text>
+            <Text className="text-lg font-ptserif text-remetra-accent">Log Symptom</Text>
           </TouchableOpacity>
         </>
       )}

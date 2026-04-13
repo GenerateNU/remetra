@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, ApiError } from './client';
 
 export interface RegisterPayload {
   username: string;
@@ -33,14 +33,6 @@ export interface UserUpdatePayload {
   medication?: string[];
 }
 
-export class AuthError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AuthError';
-  }
-}
-
-
 export const authService = {
 
   // POST /auth/signup -> register_user()
@@ -49,7 +41,7 @@ export const authService = {
       const { data } = await apiClient.post('/auth/signup', payload);
       return data;
     } catch (err: any) {
-      throw new AuthError(err.response?.data?.detail ?? 'Registration failed');
+      throw new ApiError(err.response?.data?.detail ?? 'Registration failed');
     }
   },
 
@@ -59,7 +51,7 @@ export const authService = {
       const { data } = await apiClient.post('/auth/login', payload);
       return data;
     } catch (err: any) {
-      throw new AuthError(err.response?.data?.detail ?? 'Incorrect username or password');
+      throw new ApiError(err.response?.data?.detail ?? 'Incorrect username or password');
     }
   },
 
@@ -69,7 +61,7 @@ export const authService = {
       const { data } = await apiClient.get('/auth/me');
       return data;
     } catch (err: any) {
-      throw new AuthError(err.response?.data?.detail ?? 'Failed to fetch user profile');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to fetch user profile');
     }
   },
 
@@ -78,7 +70,7 @@ export const authService = {
     try {
       await apiClient.put('/auth/me', payload);
     } catch (err: any) {
-      throw new AuthError(err.response?.data?.detail ?? 'Failed to update profile');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to update profile');
     }
   },
 };

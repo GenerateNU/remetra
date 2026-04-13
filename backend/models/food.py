@@ -23,6 +23,6 @@ class Food(Base):
 
     food_tags = relationship("FoodTag", back_populates="food")
     food_logs = relationship("FoodLog", back_populates="food")
-    tags = relationship("Tag", secondary="food_tags", viewonly=True, lazy="selectin")
+    tags = relationship("Tag", secondary="food_tags", lazy="select")
 
     __table_args__ = (UniqueConstraint("name", "username"),)

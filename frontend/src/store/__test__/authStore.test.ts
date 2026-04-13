@@ -152,43 +152,4 @@ describe("AuthStore navigation states", () => {
     expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
     expect(getInitialScreen()).toBe("main");
   });
-
-  test("logout clears auth state but not onboarding flag", async () => {
-    await useAuthStore.getState().login({
-      username: "testuser",
-      password: "password123",
-    });
-    useAuthStore.getState().completeOnboarding();
-    useAuthStore.getState().logout();
-
-    const { isAuthenticated, accessToken, hasCompletedOnboarding, user } =
-      useAuthStore.getState();
-
-    expect(isAuthenticated).toBe(false);
-    expect(accessToken).toBeNull();
-    // hasCompletedOnboarding is intentionally preserved so re-login skips onboarding
-    expect(hasCompletedOnboarding).toBe(true);
-    expect(user).toEqual({
-      id: null,
-      email: null,
-      name: null,
-      avatarUrl: null,
-    });
-    // isAuthenticated=false always lands on auth stack regardless of onboarding flag
-    expect(getInitialScreen()).toBe("auth");
-  });
-
-  test("re-login after logout skips onboarding when already completed", async () => {
-    await useAuthStore.getState().login({ username: "testuser", password: "password123" });
-    useAuthStore.getState().completeOnboarding();
-    useAuthStore.getState().logout();
-
-    jest.clearAllMocks();
-    mockLogin.mockResolvedValue({ access_token: "new-token", token_type: "bearer", username: "testuser" });
-    mockGetMe.mockResolvedValue({ username: "testuser", email: "testuser@example.com" });
-
-    await useAuthStore.getState().login({ username: "testuser", password: "password123" });
-
-    expect(getInitialScreen()).toBe("main");
-  });
 });

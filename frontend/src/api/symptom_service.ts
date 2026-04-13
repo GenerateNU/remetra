@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, ApiError } from './client';
 
 export interface CreateSymptomPayload {
   name: string;
@@ -23,13 +23,6 @@ export interface SymptomResponse {
   created_at: string;
 }
 
-export class SymptomError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'SymptomError';
-  }
-}
-
 export const symptomService = {
 
   // create_symptom()
@@ -38,7 +31,7 @@ export const symptomService = {
       const { data } = await apiClient.post<SymptomResponse>('/symptom/', payload);
       return data;
     } catch (err: any) {
-      throw new SymptomError(err.response?.data?.detail ?? 'Failed to create symptom');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to create symptom');
     }
   },
 
@@ -48,7 +41,7 @@ export const symptomService = {
       const { data } = await apiClient.get<SymptomResponse[]>('/symptom/');
       return data;
     } catch (err: any) {
-      throw new SymptomError(err.response?.data?.detail ?? 'Failed to fetch symptoms');
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to fetch symptoms');
     }
   },
 
@@ -58,7 +51,7 @@ export const symptomService = {
       const { data } = await apiClient.get<SymptomResponse>(`/symptom/${symptomId}`);
       return data;
     } catch (err: any) {
-      throw new SymptomError(err.response?.data?.detail ?? `Failed to fetch symptom ${symptomId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to fetch symptom ${symptomId}`);
     }
   },
 
@@ -68,7 +61,7 @@ export const symptomService = {
       const { data } = await apiClient.put<SymptomResponse>(`/symptom/${symptomId}`, payload);
       return data;
     } catch (err: any) {
-      throw new SymptomError(err.response?.data?.detail ?? `Failed to update symptom ${symptomId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to update symptom ${symptomId}`);
     }
   },
 
@@ -78,7 +71,7 @@ export const symptomService = {
       const { data } = await apiClient.delete<SymptomResponse>(`/symptom/${symptomId}`);
       return data;
     } catch (err: any) {
-      throw new SymptomError(err.response?.data?.detail ?? `Failed to delete symptom ${symptomId}`);
+      throw new ApiError(err.response?.data?.detail ?? `Failed to delete symptom ${symptomId}`);
     }
   },
 };

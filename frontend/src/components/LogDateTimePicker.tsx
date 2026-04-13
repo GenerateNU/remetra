@@ -50,38 +50,24 @@ function IOSPicker({
   onCancel: () => void;
   accentColor: string;
 }) {
-  // Keep a local draft so the spinner doesn't commit on every scroll tick
   const [draft, setDraft] = useState(value);
 
   return (
     <Modal transparent animationType="slide">
-      <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.35)' }}>
+      <View className="flex-1 justify-end bg-black/35">
         {/* Header bar */}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: 'white',
-            paddingHorizontal: 20,
-            paddingVertical: 12,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: '#F0E8E8',
-          }}
-        >
+        <View className="flex-row justify-between items-center bg-white px-5 py-3 rounded-tl-2xl rounded-tr-2xl border-b border-[#F0E8E8]">
           <TouchableOpacity onPress={onCancel} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-            <Text style={{ fontSize: 16, color: '#999' }}>Cancel</Text>
+            <Text className="text-base text-remetra-muted">Cancel</Text>
           </TouchableOpacity>
-          <Text style={{ fontSize: 15, fontWeight: '600', color: '#555' }}>Select Date & Time</Text>
+          <Text className="text-[15px] font-semibold text-neutral-600">Select Date & Time</Text>
           <TouchableOpacity onPress={() => onDone(draft)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Text style={{ fontSize: 16, fontWeight: '700', color: accentColor }}>Done</Text>
           </TouchableOpacity>
         </View>
 
         {/* Spinner */}
-        <View style={{ backgroundColor: 'white', paddingBottom: 32 }}>
+        <View className="bg-white pb-8">
           <DateTimePicker
             value={draft}
             mode="datetime"
@@ -122,7 +108,6 @@ function AndroidPicker({
 
   const handleTimeChange = (_: DateTimePickerEvent, selected?: Date) => {
     if (!selected) { onCancel(); return; }
-    // Combine the picked date with the picked time
     const combined = new Date(dateDraft);
     combined.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
     onDone(combined);
@@ -156,7 +141,7 @@ export function LogDateTimePicker({
   value,
   onChange,
   maximumDate,
-  accentColor = '#B8624F',
+  accentColor = '#B8624F', /* remetra-burgundy */
 }: LogDateTimePickerProps) {
   const [open, setOpen] = useState(false);
   const maxDate = maximumDate ?? (() => { const d = new Date(); d.setHours(23, 59, 59, 999); return d; })();
@@ -173,19 +158,9 @@ export function LogDateTimePicker({
       <TouchableOpacity
         onPress={() => setOpen(true)}
         activeOpacity={0.7}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          borderWidth: 1,
-          borderColor: '#ddd',
-          borderRadius: 10,
-          paddingHorizontal: 14,
-          paddingVertical: 12,
-          backgroundColor: '#fafafa',
-          gap: 10,
-        }}
+        className="flex-row items-center border border-remetra-border rounded-[10px] px-3.5 py-3 bg-remetra-surface gap-2.5"
       >
-        <Text style={{ fontSize: 15, color: '#333', flex: 1 }}>{formatDisplay(value)}</Text>
+        <Text className="text-[15px] text-neutral-700 flex-1">{formatDisplay(value)}</Text>
         <Text style={{ fontSize: 12, color: accentColor, fontWeight: '600' }}>Change</Text>
       </TouchableOpacity>
 

@@ -70,16 +70,19 @@ async def get_symptom(symptom_id: UUID, db: Session = Depends(get_db)) -> Sympto
     "/",
     response_model=list[SymptomResponse],
 )
-async def get_all_symptoms(db: Session = Depends(get_db)) -> list[SymptomResponse]:
+async def get_all_symptoms(
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+) -> list[SymptomResponse]:
     """
-    Get all symptom items.
+    Get all symptom items for the authenticated user.
 
     Returns:
-        List of all symptom items
+        List of symptom items belonging to the current user
     """
 
     symptom_service = SymptomService()
-    symptoms = symptom_service.get_all_symptoms(db)
+    symptoms = symptom_service.get_all_symptoms(db, username=current_user.username)
     return symptoms
 
 

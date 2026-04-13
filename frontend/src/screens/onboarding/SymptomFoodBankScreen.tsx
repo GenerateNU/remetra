@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView} from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
@@ -12,9 +12,14 @@ import { useAuthStore } from '../../store/useAuthStore';
 export function SymptomFoodBankScreen() {
   const { completeOnboarding } = useAuthStore()
 
-  const { foods, symptoms, removeFood, removeSymptom } = useBankStore();
+  const { foods, symptoms, removeFood, removeSymptom, fetchFoods, fetchSymptoms } = useBankStore();
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
+
+  useEffect(() => {
+    fetchFoods();
+    fetchSymptoms();
+  }, []);
 
   const [fontsLoaded] = useFonts({
     PTSerif_400Regular,
@@ -37,15 +42,15 @@ export function SymptomFoodBankScreen() {
       >
         {/* Header */}
         <View className="items-center mb-8">
-          <Text className="text-[32px] font-light font-ptserif tracking-[3px] text-[#eea487]">
+          <Text className="text-brand font-light font-ptserif tracking-[3px] text-remetra-accent">
             R E M E T R A
           </Text>
         </View>
 
         <ItemBank
-          title="Enter any symptoms you typically experience."
-          subtitle="Use the dropdown or enter in your own words."
-          description={`You can always add and modify these later.\nBe as specific as possible for improved personalization.`}
+          title="Build your symptom bank."
+          subtitle={`Describe Symptoms you experience regularily, breaking them down by location and sensation`}
+          description="Be as specific as possible. You can always add or edit these later."
           items={symptoms}
           emptyMessage="No symptoms added yet"
           onRemove={removeSymptom}
@@ -58,9 +63,9 @@ export function SymptomFoodBankScreen() {
         />
 
         <ItemBank
-          title="Enter any foods you eat regularly."
-          subtitle={`Use the dropdown, scan typical food items,\nor enter manually.`}
-          description={`You can also add as you go.\nAs you use Remetra more, repeat items will populate automatically.`}
+          title="Build your food bank."
+          subtitle={`Add foods you eat regularly with their key ingredients.\ne.g. Greek Yogurt → milk, live cultures`}
+          description="You can add more as you go — Remetra learns as you log."
           items={foods}
           emptyMessage="No foods added yet"
           onRemove={removeFood}

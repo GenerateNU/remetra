@@ -89,15 +89,15 @@ class FoodService:
 
         return FoodResponse.model_validate(deleted_food)
 
-    def get_all_foods(self, db: Session) -> list[FoodResponse]:
+    def get_all_foods(self, db: Session, username: Optional[str] = None) -> list[FoodResponse]:
         """
-        Retrieve all food items.
+        Retrieve all food items, optionally filtered by username.
 
         Returns:
-            List of all food items
+            List of all food items (filtered by username if provided)
         """
 
-        all_foods = self.food_repo.get_all_foods(db)
+        all_foods = self.food_repo.get_all_foods(db, username=username)
         new_list = list()
         for food in all_foods:
             new_list.append(FoodResponse.model_validate(food))

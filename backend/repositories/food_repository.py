@@ -91,15 +91,18 @@ class FoodRepository:
         # get the food based on the id given
         return db.query(Food).filter(Food.id == food_id).first()
 
-    def get_all_foods(self, db: Session) -> list[Food]:
+    def get_all_foods(self, db: Session, username: Optional[str] = None) -> list[Food]:
         """
-        Retrieve a list of all Food products in the database
+        Retrieve a list of all Food products in the database, optionally filtered by username.
 
         Returns:
-            All of the foods in the database
+            All of the foods in the database (filtered by username if provided)
         """
-        logging.info("Retrieving all food from the database")
-        return db.query(Food).all()
+        logging.info(f"Retrieving all food from the database (username={username})")
+        query = db.query(Food)
+        if username:
+            query = query.filter(Food.username == username)
+        return query.all()
 
     def update_food_by_id(self, db: Session, food_id: UUID, food_data: dict) -> Optional[Food]:
         """

@@ -22,15 +22,15 @@ export function LandingScreen() {
         
         {/* Title Section */}
         <View className="pt-36 items-center"> 
-          <Text className="text-4xl text-[#F8B4A8] tracking-[7px] mb-3 font-ptserif">
+          <Text className="text-4xl text-remetra-peach tracking-[7px] mb-3 font-ptserif">
             R E M E T R A
           </Text>
           
           <View className="flex-row items-center">
-            <Text className="text-lg text-[#F8B4A8] italic">
+            <Text className="text-lg text-remetra-peach italic">
               peace of mind{' '}
             </Text>
-            <Text className="text-lg text-[#F8B4A8] font-ptserif">
+            <Text className="text-lg text-remetra-peach font-ptserif">
               begins here
             </Text>
           </View>

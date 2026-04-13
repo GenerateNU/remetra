@@ -6,8 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from database import get_db
+from routers.auth import get_current_user
 from schemas.food import FoodCreate, FoodResponse, FoodSuggestionRequest
 from schemas.tag import SuggestedTagsAndIngredientsResponse
+from schemas.user import UserResponse
 from services.food_service import FoodService
 from services.RAGTaggingService import RAGTaggingService
 
@@ -16,8 +18,13 @@ router = APIRouter(prefix="/food", tags=["Food"])
 
 # create food
 @router.post("/", response_model=FoodResponse, status_code=status.HTTP_201_CREATED)
-async def create_food(food: FoodCreate, db: Session = Depends(get_db)) -> FoodResponse:
+async def create_food(
+    food: FoodCreate,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+) -> FoodResponse:
     """Creates new food item with ID, name, ingredients."""
+    food.username = current_user.username
     food_service = FoodService()
     created_food = food_service.create_food(db, food)
     return created_food
@@ -52,10 +59,13 @@ async def get_food(food_id: UUID, db: Session = Depends(get_db)) -> FoodResponse
 
 # get all food items
 @router.get("/", response_model=list[FoodResponse])
-async def get_all_foods(db: Session = Depends(get_db)) -> list[FoodResponse]:
-    """Get all food items."""
+async def get_all_foods(
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user),
+) -> list[FoodResponse]:
+    """Get all food items for the authenticated user."""
     food_service = FoodService()
-    return food_service.get_all_foods(db)
+    return food_service.get_all_foods(db, username=current_user.username)
 
 
 # put route - update food

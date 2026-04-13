@@ -11,50 +11,28 @@ export function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       <BackgroundGradient />
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 64 }}>
-        {/* Header */}
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: '600',
-            color: '#b2939b',
-            fontStyle: 'italic',
-            letterSpacing: 1,
-            textAlign: 'center',
-            marginBottom: 32,
-          }}
-        >
+        <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[1px] text-center mb-8">
           YOUR PROFILE
         </Text>
 
-        {/* Avatar placeholder */}
-        <View style={{ alignItems: 'center', marginBottom: 24 }}>
-          <View
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: 40,
-              backgroundColor: '#F8B4A8',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ fontSize: 36 }}>👤</Text>
+        {/* Avatar */}
+        <View className="items-center mb-6">
+          <View className="w-20 h-20 rounded-full bg-remetra-peach justify-center items-center">
+            <Text className="text-4xl">👤</Text>
           </View>
           {user?.name ? (
-            <Text style={{ fontSize: 18, fontWeight: '600', color: '#7B3B4E', marginTop: 12 }}>
-              {user.name}
-            </Text>
+            <Text className="text-lg font-semibold text-remetra-rose mt-3">{user.name}</Text>
           ) : null}
           {user?.email ? (
-            <Text style={{ fontSize: 14, color: '#aaa', marginTop: 4 }}>{user.email}</Text>
+            <Text className="text-sm text-remetra-muted mt-1">{user.email}</Text>
           ) : null}
         </View>
 
         {/* Actions */}
-        <View style={{ gap: 12 }}>
+        <View className="gap-3">
           <SectionDivider label="Account" />
 
           <ActionRow
@@ -75,30 +53,17 @@ export function ProfileScreen() {
 
           <TouchableOpacity
             onPress={() => useAuthStore.setState({ hasCompletedOnboarding: false })}
-            style={{
-              backgroundColor: '#FEF0E7',
-              borderRadius: 12,
-              padding: 16,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 12,
-            }}
+            className="bg-remetra-surface-accent rounded-xl p-4 flex-row items-center gap-3"
           >
-            <Text style={{ fontSize: 20 }}>↩️</Text>
-            <Text style={{ fontSize: 15, color: '#A0673A', flex: 1 }}>Reset Onboarding</Text>
+            <Text className="text-xl">↩️</Text>
+            <Text className="text-[15px] text-remetra-burgundy flex-1">Reset Onboarding</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             onPress={logout}
-            style={{
-              backgroundColor: '#B8624F',
-              borderRadius: 12,
-              padding: 16,
-              alignItems: 'center',
-              marginTop: 8,
-            }}
+            className="bg-remetra-burgundy rounded-xl p-4 items-center mt-2"
           >
-            <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>Log Out</Text>
+            <Text className="text-white text-base font-semibold">Log Out</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -108,11 +73,11 @@ export function ProfileScreen() {
 
 function SectionDivider({ label }: { label: string }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 4 }}>
-      <Text style={{ fontSize: 12, fontWeight: '700', color: '#aaa', marginRight: 8, letterSpacing: 1 }}>
+    <View className="flex-row items-center mt-2 mb-1">
+      <Text className="text-xs font-bold text-remetra-muted mr-2 tracking-[1px]">
         {label.toUpperCase()}
       </Text>
-      <View style={{ flex: 1, height: 1, backgroundColor: '#E5E5E5' }} />
+      <View className="flex-1 h-px bg-neutral-200" />
     </View>
   );
 }
@@ -129,18 +94,11 @@ function ActionRow({
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={{
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        borderRadius: 12,
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-      }}
+      className="bg-white/70 rounded-xl p-4 flex-row items-center gap-3"
     >
-      <Text style={{ fontSize: 20 }}>{emoji}</Text>
-      <Text style={{ fontSize: 15, color: '#444', flex: 1 }}>{label}</Text>
-      <Text style={{ fontSize: 18, color: '#ccc' }}>›</Text>
+      <Text className="text-xl">{emoji}</Text>
+      <Text className="text-[15px] text-neutral-700 flex-1">{label}</Text>
+      <Text className="text-lg text-remetra-border">›</Text>
     </TouchableOpacity>
   );
 }

@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { useState } from 'react';
 import { useBankStore } from '../store/bankStore';
 import { Chips } from './GenericChipComponent';
+import { BaseAddModal } from './BaseAddModal';
 
 interface Props {
   visible: boolean;
@@ -39,42 +40,27 @@ export function AddFoodModal({ visible, onClose }: Props) {
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
-        <View style={{ backgroundColor: 'white', borderRadius: 20, padding: 30, width: '80%' }}>
-          <Text className="text-[18px] font-light font-ptserif text-[#eea487]">Food Name</Text>
-          <TextInput
-            value={foodName}
-            onChangeText={setFoodName}
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
-          />
-
-          <Text className="text-[18px] font-light font-ptserif text-[#eea487] mt-4">Ingredients</Text>
-          <Chips
-            items={ingredients}
-            itemName="Ingredient"
-            onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
-            onRemove={(i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
-          />
-
-          {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
-
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
-            <TouchableOpacity
-              onPress={handleAdd}
-              style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 10, paddingHorizontal: 10 }}
-            >
-              <Text className="text-[16px] font-light font-ptserif text-[#eea487]">Add</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleClose}
-              style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 25, paddingVertical: 10, paddingHorizontal: 10 }}
-            >
-              <Text className="text-[16px] font-light font-ptserif text-[#eea487]">Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+    <BaseAddModal visible={visible} onClose={handleClose} onAdd={handleAdd} addLabel="Add Food" error={error}>
+      <Text className="text-lg font-light font-ptserif text-remetra-accent">Food Name</Text>
+      <TextInput
+        value={foodName}
+        onChangeText={setFoodName}
+        placeholder="e.g. Greek Yogurt, Sourdough Bread"
+        placeholderTextColor="#aaa"
+        className="border border-remetra-border rounded-lg p-2 mb-4 text-sm"
+        style={{ lineHeight: 16}}
+      />
+      <View className="flex-row justify-between items-baseline">
+        <Text className="text-lg font-light font-ptserif text-remetra-accent">Ingredients</Text>
+        <Text className="text-xs font-ptserif text-remetra-muted">Press Enter or tap Add</Text>
       </View>
-    </Modal>
+      <Chips
+        items={ingredients}
+        itemName="Ingredient"
+        placeholder="e.g. milk, wheat, soy..."
+        onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
+        onRemove={(i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
+      />
+    </BaseAddModal>
   );
 }

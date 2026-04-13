@@ -47,12 +47,11 @@ export function AnalysisScreen() {
 
         setSymptomCounts(counts);
 
-        // Pre-run the algorithm for all logged symptoms so the detail screen has data ready
         const loggedSymptomIds = counts.map((s) => s.symptomId);
         if (loggedSymptomIds.length > 0 && username) {
           algorithmService
             .analyze({ user_id: username, symptom_ids: loggedSymptomIds })
-            .catch(() => {}); // fire-and-forget; failures are non-blocking
+            .catch(() => {});
         }
       } catch (err: any) {
         setError(err.message ?? 'Failed to load analysis');
@@ -65,20 +64,10 @@ export function AnalysisScreen() {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View className="flex-1">
       <BackgroundGradient />
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 64 }}>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: '600',
-            color: '#b2939b',
-            fontStyle: 'italic',
-            letterSpacing: 1,
-            textAlign: 'center',
-            marginBottom: 32,
-          }}
-        >
+        <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[1px] text-center mb-8">
           YOUR ANALYSIS
         </Text>
 
@@ -87,18 +76,17 @@ export function AnalysisScreen() {
         {loading ? (
           <ActivityIndicator color="#b2939b" style={{ marginTop: 32 }} />
         ) : error ? (
-          <Text style={{ color: '#B8624F', textAlign: 'center', marginTop: 24 }}>{error}</Text>
+          <Text className="text-remetra-burgundy text-center mt-6">{error}</Text>
         ) : symptomCounts.length === 0 ? (
-          <Text style={{ color: '#aaa', textAlign: 'center', marginTop: 24, fontSize: 14 }}>
+          <Text className="text-remetra-muted text-center mt-6 text-sm">
             No symptoms logged yet.
           </Text>
         ) : (
-          <View style={{ gap: 10 }}>
+          <View className="gap-2.5">
             {symptomCounts.map((item, index) => (
               <SymptomRow key={item.symptomId} rank={index + 1} item={item} />
             ))}
           </View>
-
         )}
       </ScrollView>
     </View>
@@ -107,11 +95,11 @@ export function AnalysisScreen() {
 
 function SectionDivider({ label }: { label: string }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-      <Text style={{ fontSize: 12, fontWeight: '700', color: '#aaa', marginRight: 8, letterSpacing: 1 }}>
+    <View className="flex-row items-center mb-3">
+      <Text className="text-xs font-bold text-remetra-muted mr-2 tracking-[1px]">
         {label.toUpperCase()}
       </Text>
-      <View style={{ flex: 1, height: 1, backgroundColor: '#E5E5E5' }} />
+      <View className="flex-1 h-px bg-neutral-200" />
     </View>
   );
 }
@@ -123,37 +111,19 @@ function SymptomRow({ rank, item }: { rank: number; item: SymptomCount }) {
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('SymptomDetail', { symptomId: item.symptomId, symptomName: item.name })}
-      style={{
-        backgroundColor: 'rgba(255,255,255,0.35)',
-        borderRadius: 12,
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-      }}
+      className="bg-white/35 rounded-xl p-4 flex-row items-center gap-3"
     >
-      <Text style={{ fontSize: 14, fontWeight: '700', color: '#b2939b', width: 24, textAlign: 'center' }}>
-        {rank}
-      </Text>
-      <View style={{ flex: 1 }}>
-        <Text style={{ fontSize: 15, color: '#444', fontWeight: '600' }}>{item.name}</Text>
+      <Text className="text-sm font-bold text-remetra-mauve w-6 text-center">{rank}</Text>
+      <View className="flex-1">
+        <Text className="text-[15px] text-neutral-700 font-semibold">{item.name}</Text>
         {subtitle ? (
-          <Text style={{ fontSize: 12, color: '#aaa', marginTop: 2 }}>{subtitle}</Text>
+          <Text className="text-xs text-remetra-muted mt-0.5">{subtitle}</Text>
         ) : null}
       </View>
-      <View
-        style={{
-          backgroundColor: '#F8B4A8',
-          borderRadius: 20,
-          paddingHorizontal: 10,
-          paddingVertical: 4,
-          minWidth: 36,
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#7B3B4E' }}>{item.count}</Text>
+      <View className="bg-remetra-peach rounded-full px-2.5 py-1 min-w-9 items-center">
+        <Text className="text-sm font-bold text-remetra-rose">{item.count}</Text>
       </View>
-      <Text style={{ fontSize: 18, color: '#ccc' }}>›</Text>
+      <Text className="text-lg text-remetra-border">›</Text>
     </TouchableOpacity>
   );
 }

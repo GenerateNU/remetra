@@ -47,17 +47,11 @@ export function UserGoalsScreen() {
         contentContainerClassName="flex-grow px-6 pt-[60px] pb-10"
         showsVerticalScrollIndicator={false}
       >
-        <View className="items-center mb-10">
-          <Text className="text-[32px] font-light font-ptserif tracking-[3px] text-[#eea487]">
-            R E M E T R A
-          </Text>
-        </View>
-
         <View className="flex-1">
-          <Text className="text-xl text-[#C85A4A] font-ptserif text-center mb-2 font-normal">
+          <Text className="text-xl text-remetra-rose font-ptserif text-center mt-36 mb-2 font-normal">
             What are you hoping to accomplish with Remetra?
           </Text>
-          <Text className="text-base text-[#C85A4A] font-ptserif text-center mb-8 opacity-80">
+          <Text className="text-base text-remetra-rose font-ptserif text-center mb-8 opacity-80">
             Select all that apply
           </Text>
 
@@ -65,12 +59,12 @@ export function UserGoalsScreen() {
             {GOAL_OPTIONS.map((goal) => (
               <TouchableOpacity
                 key={goal}
-                className={`rounded-xl overflow-hidden shadow-md ${selectedGoals.includes(goal) ? 'bg-[#B8624F]' : 'bg-[#D9806E]'}`}
+                className={`rounded-xl overflow-hidden shadow-md ${selectedGoals.includes(goal) ? 'bg-remetra-burgundy' : 'bg-remetra-coral'}`}
                 onPress={() => toggleGoal(goal)}
                 activeOpacity={0.7}
               >
                 <View className="py-6 px-6 items-center">
-                  <Text className="text-white text-[16px] font-ptserif font-medium text-center leading-5">
+                  <Text className="text-white text-base font-ptserif font-medium text-center leading-5">
                     {goal}
                   </Text>
                 </View>
@@ -82,7 +76,7 @@ export function UserGoalsScreen() {
             className="bg-white py-4 rounded-[25px] items-center shadow-md mt-auto"
             onPress={handleDone}
           >
-            <Text className="text-[#C85A4A] font-ptserif text-lg font-semibold">
+            <Text className="text-remetra-rose font-ptserif text-lg font-semibold">
               Done
             </Text>
           </TouchableOpacity>
