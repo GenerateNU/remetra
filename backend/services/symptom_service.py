@@ -88,15 +88,15 @@ class SymptomService:
 
         return SymptomResponse.model_validate(deleted_symptom)
 
-    def get_all_symptoms(self, db: Session) -> list[SymptomResponse]:
+    def get_all_symptoms(self, db: Session, username: Optional[str] = None) -> list[SymptomResponse]:
         """
-        Retrieve all symptom items.
+        Retrieve all symptom items, optionally filtered by username.
 
         Returns:
-            List of all symptom items
+            List of all symptom items (filtered by username if provided)
         """
 
-        all_symptoms = self.symptom_repo.get_all_symptoms(db)
+        all_symptoms = self.symptom_repo.get_all_symptoms(db, username=username)
         new_list = list()
         for symptom in all_symptoms:
             new_list.append(SymptomResponse.model_validate(symptom))

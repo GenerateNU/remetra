@@ -57,14 +57,17 @@ class SymptomRepository:
 
         return db.query(Symptom).filter(Symptom.id == symptom_id).first()
 
-    def get_all_symptoms(self, db: Session) -> list[Symptom]:
+    def get_all_symptoms(self, db: Session, username: Optional[str] = None) -> list[Symptom]:
         """
-        Retrieve all symptoms from the database.
+        Retrieve all symptoms from the database, optionally filtered by username.
         """
 
-        logging.info("Retrieving all symptoms from database")
+        logging.info(f"Retrieving all symptoms from database (username={username})")
 
-        return db.query(Symptom).all()
+        query = db.query(Symptom)
+        if username:
+            query = query.filter(Symptom.username == username)
+        return query.all()
 
     def update_symptom_by_id(
         self,

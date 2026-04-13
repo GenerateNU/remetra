@@ -15,6 +15,7 @@ interface BankStore {
   removeFood: (id: string) => Promise<boolean>;
   removeSymptom: (id: string) => Promise<boolean>;
   setScannedFood: (food: { name: string; ingredients: string[] } | null) => void;
+  clearBank: () => void;
 }
 
 export const useBankStore = create<BankStore>((set, get) => ({
@@ -22,6 +23,7 @@ export const useBankStore = create<BankStore>((set, get) => ({
   symptoms: [],
   scannedFood: null,
   setScannedFood: (food) => set({ scannedFood: food }),
+  clearBank: () => set({ foods: [], symptoms: [], scannedFood: null }),
 
   fetchFoods: async () => {
     try {

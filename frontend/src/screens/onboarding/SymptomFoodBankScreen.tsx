@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView} from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
@@ -12,9 +12,14 @@ import { useAuthStore } from '../../store/useAuthStore';
 export function SymptomFoodBankScreen() {
   const { completeOnboarding } = useAuthStore()
 
-  const { foods, symptoms, removeFood, removeSymptom } = useBankStore();
+  const { foods, symptoms, removeFood, removeSymptom, fetchFoods, fetchSymptoms } = useBankStore();
   const [showSymptomModal, setShowSymptomModal] = useState(false);
   const [showFoodModal, setShowFoodModal] = useState(false);
+
+  useEffect(() => {
+    fetchFoods();
+    fetchSymptoms();
+  }, []);
 
   const [fontsLoaded] = useFonts({
     PTSerif_400Regular,
