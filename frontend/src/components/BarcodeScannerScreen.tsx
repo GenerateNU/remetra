@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useBankStore } from "../store/bankStore";
 
 export const BarcodeScannerScreen = () => {
@@ -9,34 +9,48 @@ export const BarcodeScannerScreen = () => {
   const { setScannedFood } = useBankStore();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
+  const scannedRef = useRef(false);
 
   const handleBarCodeScanned = async ({ data }: { data: string }) => {
-    if (scanned) return;
-    setScanned(true);
+    if (scannedRef.current) return;
+    scannedRef.current = true;
+    setScanned(true); 
 
     try {
       const res = await fetch(
         `https://world.openfoodfacts.org/api/v0/product/${data}.json`
       );
+
+      if (!res.ok) {
+        console.error('API error:', res.status);
+        scannedRef.current = false;
+        setScanned(false);
+        return;
+      }
+
       const json = await res.json();
       const product = json.product;
 
       if (!product) {
+        scannedRef.current = false;
         setScanned(false);
         return;
       }
 
       const name = product.product_name ?? "Unknown";
-      const ingredients = product.ingredients
-        ? product.ingredients.map((i: any) =>
-            i.id.replace(/^en:/, '').replace(/-/g, ' ')
-          ).filter(Boolean)
+      const ingredients = product.ingredients_text
+        ? product.ingredients_text
+            .split(',')
+            .map((i: string) => i.trim().replace(/\.$/, ''))
+            .filter(Boolean)
         : [];
 
       setScannedFood({ name, ingredients });
-      navigation.navigate('Summary');
+      //navigation.navigate('Timeline');
+      navigation.goBack();
     } catch (err) {
       console.error("Barcode lookup failed:", err);
+      scannedRef.current = false;
       setScanned(false);
     }
   };
@@ -57,7 +71,7 @@ export const BarcodeScannerScreen = () => {
     <View style={styles.container}>
       <CameraView
         style={StyleSheet.absoluteFillObject}
-        facing="front"
+        facing="back"
         onBarcodeScanned={handleBarCodeScanned}
         barcodeScannerSettings={{ barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"] }}
       />
