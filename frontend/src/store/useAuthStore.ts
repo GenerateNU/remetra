@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService, LoginPayload, RegisterPayload, AuthError } from '../api/auth_service';
+import { authService, LoginPayload, RegisterPayload } from '../api/auth_service';
 
 interface UserProfile {
   id: string | null;
@@ -71,10 +71,10 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: () =>
-
         set({
           isAuthenticated: false,
           accessToken: null,
+          hasCompletedOnboarding: false,
           user: initialUserProfile,
         }),
 
