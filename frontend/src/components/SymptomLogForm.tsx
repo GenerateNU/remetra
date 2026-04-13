@@ -5,7 +5,6 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
-import { CustomItemButton } from "./CustomItemButton";
 
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
@@ -20,7 +19,6 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const [selectedSymptom, setSelectedSymptom] = useState<SymptomItem | null>(null);
   const [isCustom, setIsCustom] = useState(false);
 
-  const [customName, setCustomName] = useState("");
   const [customLocation, setCustomLocation] = useState("");
   const [customSensation, setCustomSensation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -37,14 +35,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
 
   const handleSelectSymptom = (symptom: SymptomItem) => {
     setSelectedSymptom(symptom);
-    setIsCustom(false);
     setSearchQuery(symptom.name);
-  };
-
-  const handleSwitchToCustom = () => {
-    setSelectedSymptom(null);
-    setIsCustom(true);
-    setCustomName(searchQuery);
   };
 
   const clearError = () => setErrors({});
@@ -62,8 +53,9 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
 
     setErrors({});
 
+    const derivedName = `${customSensation} — ${customLocation}`;
     const symptomId = isCustom
-      ? await addSymptom(customName, customLocation, customSensation)
+      ? await addSymptom(derivedName, customLocation, customSensation)
       : selectedSymptom?.id ?? null;
 
     if (!symptomId) {
@@ -88,7 +80,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     const entry: SymptomLogEntry = {
       type: "symptom",
       symptomId: symptomId,
-      name: isCustom ? customName : selectedSymptom?.name ?? "",
+      name: isCustom ? derivedName : selectedSymptom?.name ?? "",
       location: isCustom ? customLocation : selectedSymptom?.location ?? "",
       sensation: isCustom ? customSensation : selectedSymptom?.sensation ?? "",
       intensity,
@@ -98,11 +90,21 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
     onSubmit(entry);
   };
 
-  const isValid = isCustom ? customName.trim().length > 0 : selectedSymptom !== null;
+  const isValid = isCustom
+    ? customLocation.trim().length > 0 && customSensation.trim().length > 0
+    : selectedSymptom !== null;
 
   return (
     <View className="pb-10">
-      <TouchableOpacity onPress={onBack}>
+      <TouchableOpacity onPress={() => {
+        if (!selectedSymptom && !isCustom) {
+          onBack()
+        } else {
+          setIsCustom(false); setSearchQuery(""); setSelectedSymptom(null)
+        }
+          onBack
+        }
+      }>
         <Text className="text-base font-ptserif text-remetra-accent mb-4">← Back</Text>
       </TouchableOpacity>
 
@@ -119,25 +121,24 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          <TouchableOpacity
+            className="rounded-lg p-3.5 bg-remetra-burgundy mb-2 opacity-80"
+            onPress={() => setIsCustom(true)}
+            activeOpacity={0.6}
+          >
+            <Text className="font-medium text-base font-ptserif text-white">+ New Symptom</Text>
+          </TouchableOpacity>
           <View className="gap-1 mb-3">
             {filtered.map((sy) => (
               <TouchableOpacity
                 key={sy.id}
-                className="border border-remetra-border rounded-lg p-3.5 bg-remetra-surface"
+                className="border border-remetra-mauve/40 rounded-lg p-3.5 bg-remetra-surface"
                 onPress={() => handleSelectSymptom(sy)}
               >
-                <Text className="text-base font-medium text-remetra-accent">{sy.name}</Text>
-                <Text className="text-xs text-neutral-400 mt-0.5">
-                  {sy.location} · {sy.sensation}
-                </Text>
+                <Text className="text-base font-medium text-remetra-burgundy">{sy.sensation}</Text>
+                <Text className="text-xs text-remetra-muted mt-0.5">Location: {sy.location}</Text>
               </TouchableOpacity>
             ))}
-            {searchQuery.trim().length > 0 && (
-              <CustomItemButton
-                label={`+ Add '${searchQuery}' as custom symptom`}
-                onPress={handleSwitchToCustom}
-              />
-            )}
           </View>
         </>
       )}
@@ -145,36 +146,21 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
       {/* Selected symptom summary */}
       {selectedSymptom && !isCustom && (
         <View className="bg-remetra-surface-accent border border-remetra-accent rounded-xl p-3.5 mb-2">
-          <View className="flex-row justify-between items-center">
-            <Text className="text-lg font-semibold text-neutral-900">{selectedSymptom.name}</Text>
+          <View className="flex-row justify-between items-start">
+            <View>
+              <Text className="text-lg font-semibold text-remetra-burgundy">{selectedSymptom.sensation}</Text>
+              <Text className="text-xs text-remetra-muted mt-0.5">Location: {selectedSymptom.location}</Text>
+            </View>
             <TouchableOpacity onPress={() => { setSelectedSymptom(null); setSearchQuery(""); }}>
               <Text className="text-sm font-medium font-ptserif text-remetra-accent">Change</Text>
             </TouchableOpacity>
           </View>
-          <Text className="text-xs text-neutral-400 mt-0.5">
-            {selectedSymptom.location} · {selectedSymptom.sensation}
-          </Text>
         </View>
       )}
 
-      {/* Custom symptom entry */}
+      {/* New symptom inline form */}
       {isCustom && (
         <View>
-          <TextInput
-            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
-            placeholder="Symptom name"
-            value={customName}
-            onChangeText={setCustomName}
-          />
-          <TextInput
-            className={`border ${errors.location ? 'border-red-400' : 'border-remetra-border'} rounded-lg p-3 mb-0.5 bg-remetra-surface`}
-            placeholder="Location (e.g., stomach, head)"
-            value={customLocation}
-            onChangeText={(text) => { setCustomLocation(text); if (errors.location) clearError(); }}
-          />
-          {errors.location && (
-            <Text className="text-red-400 text-xs mb-2">{errors.location}</Text>
-          )}
           <TextInput
             className={`border ${errors.sensation ? 'border-red-400' : 'border-remetra-border'} rounded-lg p-3 mb-0.5 bg-remetra-surface`}
             placeholder="Sensation (e.g., burning, throbbing)"
@@ -184,11 +170,15 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
           {errors.sensation && (
             <Text className="text-red-400 text-xs mb-2">{errors.sensation}</Text>
           )}
-          <TouchableOpacity onPress={() => { setIsCustom(false); setSearchQuery(""); setErrors({}); }}>
-            <Text className="text-sm font-medium font-ptserif text-remetra-accent mt-2">
-              Search bank instead
-            </Text>
-          </TouchableOpacity>
+          <TextInput
+            className={`border ${errors.location ? 'border-red-400' : 'border-remetra-border'} rounded-lg p-3 mb-0.5 bg-remetra-surface`}
+            placeholder="Location (e.g., stomach, head)"
+            value={customLocation}
+            onChangeText={(text) => { setCustomLocation(text); if (errors.location) clearError(); }}
+          />
+          {errors.location && (
+            <Text className="text-red-400 text-xs mb-2">{errors.location}</Text>
+          )}
         </View>
       )}
 

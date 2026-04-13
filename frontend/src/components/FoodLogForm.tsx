@@ -7,7 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
-import { CustomItemButton } from "./CustomItemButton";
 
 interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
@@ -95,7 +94,13 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
 
   return (
     <View className="pb-10">
-      <TouchableOpacity onPress={onBack}>
+      <TouchableOpacity onPress={() => {
+        if (!selectedFood && !isCustom) {
+          onBack()
+        } else {
+          setIsCustom(false); setSearchQuery(""); setSelectedFood(null)
+        }
+        }}>
         <Text className="text-base font-ptserif text-remetra-accent mb-4">← Back</Text>
       </TouchableOpacity>
 
@@ -112,25 +117,27 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          <TouchableOpacity
+            className="rounded-lg p-3.5 bg-remetra-burgundy mb-2 opacity-80"
+            onPress={handleSwitchToCustom}
+            activeOpacity={0.6}
+          >
+            <Text className="font-medium text-base font-ptserif text-white">+ New Food</Text>
+          </TouchableOpacity>
+
           <View className="gap-1 mb-3">
             {filtered.map((food) => (
               <TouchableOpacity
                 key={food.id}
-                className="border border-remetra-border rounded-lg p-3.5 bg-remetra-surface"
+                className="border border-remetra-mauve/40 rounded-lg p-3.5 bg-remetra-surface"
                 onPress={() => handleSelectFood(food)}
               >
-                <Text className="text-base font-medium text-neutral-900">{food.name}</Text>
-                <Text className="text-xs text-neutral-400 mt-0.5">
+                <Text className="text-base font-medium text-remetra-burgundy">{food.name}</Text>
+                <Text className="text-xs text-remetra-muted mt-0.5">
                   {food.ingredients.join(", ")}
                 </Text>
               </TouchableOpacity>
             ))}
-            {searchQuery.trim().length > 0 && (
-              <CustomItemButton
-                label={`+ Add '${searchQuery}' as custom food`}
-                onPress={handleSwitchToCustom}
-              />
-            )}
           </View>
 
           {/* Scan barcode button */}
@@ -171,7 +178,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
             onChangeText={setCustomName}
           />
           {customIngredients.length === 0 && (
-            <Text className="text-remetra-muted text-[13px] mb-1">Ingredients</Text>
+            <Text className="text-remetra-accent text-[13px] mb-1">Ingredients</Text>
           )}
           <Chips
             items={customIngredients}
@@ -180,11 +187,6 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
             onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
             onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
           />
-          <TouchableOpacity onPress={() => { setIsCustom(false); setSearchQuery(""); }}>
-            <Text className="text-sm font-medium font-ptserif text-remetra-accent mt-2">
-              Search bank instead
-            </Text>
-          </TouchableOpacity>
         </View>
       )}
 
