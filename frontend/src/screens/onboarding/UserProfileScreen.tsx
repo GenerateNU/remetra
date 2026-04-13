@@ -175,7 +175,7 @@ export function UserProfileScreen() {
           {/* Divider between required and optional */}
           <View className="flex-row items-center gap-2">
             <View className="flex-1 h-px bg-remetra-accent" />
-            <Text className="text-xs text-remetra-rose font-ptserif">optional</Text>
+            <Text className="text-sm text-remetra-rose font-ptserif">optional</Text>
             <View className="flex-1 h-px bg-remetra-accent" />
           </View>
 

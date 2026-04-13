@@ -1,40 +1,23 @@
-import { Text, TextInput } from 'react-native';
+import { Text } from 'react-native';
 import { useState } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useBankStore } from '../store/bankStore';
 import { BaseAddModal } from './BaseAddModal';
+import { sensationOptions, locationOptions } from '../types/symptomOptions';
 
 interface Props {
   visible: boolean;
   onClose: () => void;
 }
 
-const sensationOptions = [
-  { label: 'Bloating', value: 'Bloating' },
-  { label: 'Cramping', value: 'Cramping' },
-  { label: 'Nausea', value: 'Nausea' },
-  { label: 'Rash', value: 'Rash' },
-  { label: 'Itchiness', value: 'Itchiness' },
-  { label: 'Hives', value: 'Hives' },
-  { label: 'Headache', value: 'Headache' },
-  { label: 'Fatigue', value: 'Fatigue' },
-  { label: 'Brain Fog', value: 'Brain Fog' },
-  { label: 'Heartburn', value: 'Heartburn' },
-  { label: 'Swelling', value: 'Swelling' },
-  { label: 'Diarrhea', value: 'Diarrhea' },
-  { label: 'Constipation', value: 'Constipation' },
-  { label: 'Gas', value: 'Gas' },
-  { label: 'Other', value: 'Other' },
-];
-
 export function AddSymptomModal({ visible, onClose }: Props) {
   const { addSymptom } = useBankStore();
-  const [location, setLocation] = useState('');
   const [sensation, setSensation] = useState('');
+  const [location, setLocation] = useState('');
   const [error, setError] = useState('');
 
   const handleAdd = async () => {
-    if (!location.trim() || !sensation.trim()) {
+    if (!sensation || !location) {
       setError('Please fill out all fields.');
       return;
     }
@@ -45,13 +28,13 @@ export function AddSymptomModal({ visible, onClose }: Props) {
       setError('Failed to add symptom. Please try again.');
       return;
     }
-    setLocation('');
     setSensation('');
+    setLocation('');
   };
 
   const handleClose = () => {
-    setLocation('');
     setSensation('');
+    setLocation('');
     setError('');
     onClose();
   };
@@ -74,13 +57,19 @@ export function AddSymptomModal({ visible, onClose }: Props) {
         selectedTextStyle={{ fontSize: 14 }}
       />
       <Text className="text-lg font-light font-ptserif text-remetra-accent">Location</Text>
-      <TextInput
+      {/* Dropdown is a third-party component that only accepts style, not className */}
+      <Dropdown
+        data={locationOptions}
+        search
+        labelField="label"
+        valueField="value"
+        placeholder="Select a location..."
+        searchPlaceholder="Type to search..."
         value={location}
-        onChangeText={setLocation}
-        placeholder="e.g. stomach, throat, general"
-        placeholderTextColor="#aaa"
-        className="border border-remetra-border rounded-lg p-2 mb-4 text-sm"
-        style={{ lineHeight: 16}}
+        onChange={item => setLocation(item.value)}
+        style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
+        placeholderStyle={{ color: '#aaa', fontSize: 14 }}
+        selectedTextStyle={{ fontSize: 14 }}
       />
     </BaseAddModal>
   );

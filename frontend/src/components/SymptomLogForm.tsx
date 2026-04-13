@@ -4,7 +4,9 @@ import { symptomLogService } from "../api/symptom_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import { LogDateTimePicker } from "./LogDateTimePicker";
+import { sensationOptions, locationOptions } from "../types/symptomOptions";
 
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
@@ -100,7 +102,8 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
         if (!selectedSymptom && !isCustom) {
           onBack()
         } else {
-          setIsCustom(false); setSearchQuery(""); setSelectedSymptom(null)
+          setIsCustom(false); setSearchQuery(""); setSelectedSymptom(null);
+          setCustomSensation(""); setCustomLocation("");
         }
           onBack
         }
@@ -161,20 +164,35 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
       {/* New symptom inline form */}
       {isCustom && (
         <View>
-          <TextInput
-            className={`border ${errors.sensation ? 'border-red-400' : 'border-remetra-border'} rounded-lg p-3 mb-0.5 bg-remetra-surface`}
-            placeholder="Sensation (e.g., burning, throbbing)"
+          {/* Dropdown is a third-party component that only accepts style, not className */}
+          <Dropdown
+            data={sensationOptions}
+            search
+            labelField="label"
+            valueField="value"
+            placeholder="Select a sensation..."
+            searchPlaceholder="Type to search..."
             value={customSensation}
-            onChangeText={(text) => { setCustomSensation(text); if (errors.sensation) clearError(); }}
+            onChange={item => { setCustomSensation(item.value); if (errors.sensation) clearError(); }}
+            style={{ borderWidth: 1, borderColor: errors.sensation ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 4, backgroundColor: '#fafafa' }}
+            placeholderStyle={{ color: '#aaa', fontSize: 14 }}
+            selectedTextStyle={{ fontSize: 14 }}
           />
           {errors.sensation && (
             <Text className="text-red-400 text-xs mb-2">{errors.sensation}</Text>
           )}
-          <TextInput
-            className={`border ${errors.location ? 'border-red-400' : 'border-remetra-border'} rounded-lg p-3 mb-0.5 bg-remetra-surface`}
-            placeholder="Location (e.g., stomach, head)"
+          <Dropdown
+            data={locationOptions}
+            search
+            labelField="label"
+            valueField="value"
+            placeholder="Select a location..."
+            searchPlaceholder="Type to search..."
             value={customLocation}
-            onChangeText={(text) => { setCustomLocation(text); if (errors.location) clearError(); }}
+            onChange={item => { setCustomLocation(item.value); if (errors.location) clearError(); }}
+            style={{ borderWidth: 1, borderColor: errors.location ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 4, backgroundColor: '#fafafa' }}
+            placeholderStyle={{ color: '#aaa', fontSize: 14 }}
+            selectedTextStyle={{ fontSize: 14 }}
           />
           {errors.location && (
             <Text className="text-red-400 text-xs mb-2">{errors.location}</Text>
