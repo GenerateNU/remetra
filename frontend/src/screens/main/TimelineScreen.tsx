@@ -47,6 +47,7 @@ function groupByDate(entries: TimelineEntry[]): { dateKey: string; label: string
 export function TimelineScreen() {
   const { foods, symptoms, fetchFoods, fetchSymptoms } = useBankStore();
   const openLogModal = useUIStore((s) => s.openLogModal);
+  const logVersion = useUIStore((s) => s.logVersion);
 
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,6 +112,12 @@ export function TimelineScreen() {
     setLoading(true);
     load().finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (logVersion === 0) return;
+    load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logVersion]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

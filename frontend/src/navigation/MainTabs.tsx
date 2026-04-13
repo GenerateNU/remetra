@@ -24,14 +24,14 @@ function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 }
 
 export function MainTabs() {
-  const { showLogModal, closeLogModal } = useUIStore();
+  const { showLogModal, closeLogModal, notifyLogCreated } = useUIStore();
 
   return (
     <>
       <LogEntryModal
         visible={showLogModal}
         onClose={closeLogModal}
-        onLogEntry={closeLogModal}
+        onLogEntry={() => { notifyLogCreated(); closeLogModal(); }}
       />
 
       <Tab.Navigator
