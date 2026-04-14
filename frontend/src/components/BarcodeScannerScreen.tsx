@@ -38,23 +38,34 @@ export const BarcodeScannerScreen = () => {
       }
 
       const name = product.product_name ?? "Unknown";
-      const ingredients = product.ingredients_text
-        ? product.ingredients_text
-            .split(',')
-            .map((i: string) => i.trim().replace(/\.$/, ''))
-            .filter(Boolean)
-        : [];
 
-      setScannedFood({ name, ingredients });
-      //navigation.navigate('Timeline');
-      navigation.goBack();
-    } catch (err) {
-      console.error("Barcode lookup failed:", err);
-      scannedRef.current = false;
-      setScanned(false);
-    }
-  };
+      const skipPatterns = [
+        /^made of/i,
+        /^less than/i,
+        /^contains/i,
+        /^to maintain/i,
+      ];
 
+
+      const ingredients = product.ingredients
+      ? product.ingredients
+          .filter((i: any) => 
+            i.rank !== undefined && 
+            i.percent_estimate > 2 &&
+            !skipPatterns.some(p => p.test(i.text))
+          )
+          .map((i: any) => i.text?.toLowerCase().trim())
+          .filter(Boolean)
+      : [];
+
+        setScannedFood({ name, ingredients });
+        navigation.goBack();
+      } catch (err) {
+        console.error("Barcode lookup failed:", err);
+        scannedRef.current = false;
+        setScanned(false);
+      }
+    };
   if (!permission?.granted) {
     return (
       <View style={styles.container}>
