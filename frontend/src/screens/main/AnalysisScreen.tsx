@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+import { FrequencyIntensityChart } from '../../components/FrequencyIntensityChart';
 import { useBankStore } from '../../store/bankStore';
 import { symptomLogService } from '../../api/symptom_log_service';
-import { algorithmService } from '../../api/algorithm_service';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useAlgorithmStore } from '../../store/useAlgorithmStore';
 import { useAppNavigation } from '../../navigation/hooks';
 
 interface SymptomCount {
@@ -18,6 +19,8 @@ interface SymptomCount {
 export function AnalysisScreen() {
   const { symptoms, fetchSymptoms } = useBankStore();
   const username = useAuthStore((s) => s.user.name);
+  const navigation = useAppNavigation();
+  const { associationsBySymptom, fetchAssociations } = useAlgorithmStore();
   const [symptomCounts, setSymptomCounts] = useState<SymptomCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,11 +50,8 @@ export function AnalysisScreen() {
 
         setSymptomCounts(counts);
 
-        const loggedSymptomIds = counts.map((s) => s.symptomId);
-        if (loggedSymptomIds.length > 0 && username) {
-          algorithmService
-            .analyze({ user_id: username, symptom_ids: loggedSymptomIds })
-            .catch(() => {});
+        if (username) {
+          fetchAssociations(username).catch(() => {});
         }
       } catch (err: any) {
         setError(err.message ?? 'Failed to load analysis');
@@ -82,11 +82,39 @@ export function AnalysisScreen() {
             No symptoms logged yet.
           </Text>
         ) : (
-          <View className="gap-2.5">
-            {symptomCounts.map((item, index) => (
-              <SymptomRow key={item.symptomId} rank={index + 1} item={item} />
-            ))}
-          </View>
+          <>
+            {/* Symptom overview: instances vs avg intensity */}
+            {(() => {
+              const scatterData = symptomCounts
+                .map(s => {
+                  const assocs = associationsBySymptom[s.symptomId] ?? [];
+                  if (assocs.length === 0) return null;
+                  const avgIntensity = assocs.reduce((sum, a) => sum + a.average_intensity, 0) / assocs.length;
+                  return { food_name: s.name, exposures: s.count, average_intensity: avgIntensity };
+                })
+                .filter((d): d is NonNullable<typeof d> => d !== null);
+
+              return scatterData.length >= 2 ? (
+                <FrequencyIntensityChart data={scatterData} />
+              ) : null;
+            })()}
+
+            <SectionDivider label="Tap a symptom for details" />
+            <View className="gap-2.5">
+              {symptomCounts.map((item, index) => (
+                <SymptomRow key={item.symptomId} rank={index + 1} item={item} />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Correlations')}
+              className="mt-6 bg-remetra-rose/10 border border-remetra-rose/30 rounded-xl py-3 items-center"
+            >
+              <Text className="text-remetra-rose font-semibold text-sm tracking-wide">
+                VIEW ALL CORRELATIONS →
+              </Text>
+            </TouchableOpacity>
+          </>
         )}
       </ScrollView>
     </View>

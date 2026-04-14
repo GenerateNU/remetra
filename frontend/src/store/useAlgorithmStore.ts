@@ -26,7 +26,7 @@ interface AlgorithmActions {
 
 type AlgorithmStore = AlgorithmState & AlgorithmActions;
 
-const MOCK_MODE = true;
+const MOCK_MODE = false;
 
 const initialState: AlgorithmState = MOCK_MODE
   ? {

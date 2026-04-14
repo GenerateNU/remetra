@@ -5,11 +5,11 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  useWindowDimensions,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from 'victory-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+import { TriggerRateChart } from '../../components/TriggerRateChart';
+import { AssociationCard, Association } from '../../components/AssociationCard';
 import { algorithmService, AlgorithmAssociationResponse } from '../../api/algorithm_service';
 import { useBankStore } from '../../store/bankStore';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -17,27 +17,11 @@ import { MainStackParamList } from '../../navigation/stacks/MainStack';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'SymptomDetail'>;
 
-interface FoodCorrelation {
-  foodId: string;
-  name: string;
-  ingredients: string[];
-  triggerRate: number;
-}
-
-interface IngredientCorrelation {
-  name: string;
-  triggerRate: number;
-}
-
-const CHART_LIMIT = 5;
-
 export function SymptomDetailScreen({ route, navigation }: Props) {
   const { symptomId, symptomName } = route.params;
-  const { width: screenWidth } = useWindowDimensions();
   const { fetchFoods } = useBankStore();
   const username = useAuthStore((s) => s.user.name);
-  const [correlations, setCorrelations] = useState<FoodCorrelation[]>([]);
-  const [ingredientCorrelations, setIngredientCorrelations] = useState<IngredientCorrelation[]>([]);
+  const [associations, setAssociations] = useState<Association[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,27 +38,18 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
           useBankStore.getState().foods.map((f) => [f.id, f.name])
         );
 
-        const mapped: FoodCorrelation[] = results
+        const mapped: Association[] = results
           .map((r) => ({
-            foodId: r.associated_food_id,
-            name: foodMap.get(r.associated_food_id) ?? `Food ${r.associated_food_id}`,
-            ingredients: r.ingredients,
-            triggerRate: r.key_metrics.trigger_rate,
+            food_name: foodMap.get(r.associated_food_id) ?? r.associated_food_id,
+            trigger_rate: r.key_metrics.trigger_rate,
+            base_rate: r.key_metrics.base_rate,
+            exposures: r.key_metrics.exposures,
+            average_intensity: r.key_metrics.average_intensity,
+            fishers_p_value: r.key_metrics.fishers_p_value,
           }))
-          .sort((a, b) => b.triggerRate - a.triggerRate);
+          .sort((a, b) => b.trigger_rate - a.trigger_rate);
 
-        setCorrelations(mapped);
-
-        const ingMap = new Map<string, number>();
-        for (const food of mapped) {
-          for (const ing of food.ingredients) {
-            ingMap.set(ing, Math.max(ingMap.get(ing) ?? 0, food.triggerRate));
-          }
-        }
-        const ingList: IngredientCorrelation[] = Array.from(ingMap.entries())
-          .map(([name, triggerRate]) => ({ name, triggerRate }))
-          .sort((a, b) => b.triggerRate - a.triggerRate);
-        setIngredientCorrelations(ingList);
+        setAssociations(mapped);
       } catch (err: any) {
         setError(err.message ?? 'Failed to load data');
       } finally {
@@ -84,11 +59,6 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
 
     load();
   }, []);
-
-  const chartData = ingredientCorrelations.slice(0, CHART_LIMIT).map((c) => ({
-    x: c.name.length > 10 ? c.name.slice(0, 9) + '…' : c.name,
-    y: c.triggerRate,
-  }));
 
   return (
     <View className="flex-1">
@@ -113,45 +83,21 @@ export function SymptomDetailScreen({ route, navigation }: Props) {
           <ActivityIndicator color="#b2939b" style={{ marginTop: 32 }} />
         ) : error ? (
           <Text className="text-remetra-burgundy text-center mt-6">{error}</Text>
-        ) : ingredientCorrelations.length === 0 ? (
+        ) : associations.length === 0 ? (
           <Text className="text-remetra-muted text-center mt-6 text-sm">
             No correlation data yet. Log more food and symptoms to see results.
           </Text>
         ) : (
           <>
-            {/* Chart */}
-            <View className="bg-white/35 rounded-2xl p-2 mb-8">
-              <Text className="text-[13px] font-bold text-remetra-muted tracking-[1px] text-center mb-1">
-                TOP INGREDIENT CORRELATIONS
-              </Text>
-              <VictoryChart
-                theme={VictoryTheme.material}
-                domainPadding={20}
-                width={screenWidth - 64}
-                height={220}
-                padding={{ top: 16, bottom: 48, left: 40, right: 16 }}
-              >
-                <VictoryAxis
-                  style={{ tickLabels: { fontSize: 9, fill: '#666' }, grid: { stroke: 'none' } }}
-                />
-                <VictoryAxis
-                  dependentAxis
-                  tickFormat={(t: number) => `${Math.round(t * 100)}%`}
-                  style={{ tickLabels: { fontSize: 9, fill: '#666' }, grid: { stroke: '#eee' } }}
-                />
-                <VictoryBar
-                  data={chartData}
-                  style={{ data: { fill: '#F8B4A8' } /* remetra-peach */ }}
-                  cornerRadius={4}
-                />
-              </VictoryChart>
-            </View>
+            <TriggerRateChart
+              data={associations.map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }))}
+              title="Top Food Triggers"
+            />
 
-            {/* List */}
-            <SectionDivider label="Related Ingredients" />
-            <View className="gap-2.5">
-              {ingredientCorrelations.map((item, index) => (
-                <IngredientRow key={item.name} rank={index + 1} item={item} />
+            <SectionDivider label="Symptom–Food Breakdown" />
+            <View className="gap-1">
+              {associations.map(assoc => (
+                <AssociationCard key={assoc.food_name} {...assoc} />
               ))}
             </View>
           </>
@@ -168,30 +114,6 @@ function SectionDivider({ label }: { label: string }) {
         {label.toUpperCase()}
       </Text>
       <View className="flex-1 h-px bg-neutral-200" />
-    </View>
-  );
-}
-
-function IngredientRow({ rank, item }: { rank: number; item: IngredientCorrelation }) {
-  const pct = Math.round(item.triggerRate * 100);
-  // Bar colour driven by trigger rate — full class names required for Tailwind purge
-  const barCls = pct >= 60 ? 'bg-remetra-burgundy' : pct >= 30 ? 'bg-remetra-peach' : 'bg-green-200';
-
-  return (
-    <View className="bg-white/35 rounded-xl p-4 gap-2">
-      <View className="flex-row items-center gap-3">
-        <Text className="text-sm font-bold text-remetra-mauve w-6 text-center">{rank}</Text>
-        <Text className="text-[15px] text-neutral-700 font-semibold flex-1">{item.name}</Text>
-        <Text className="text-sm font-bold text-remetra-rose">{pct}%</Text>
-      </View>
-
-      {/* Trigger rate bar */}
-      <View className="h-1.5 bg-neutral-200 rounded-full ml-9">
-        <View
-          className={`h-1.5 rounded-full ${barCls}`}
-          style={{ width: `${Math.min(pct, 100)}%` }}
-        />
-      </View>
     </View>
   );
 }
