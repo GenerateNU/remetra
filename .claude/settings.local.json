@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C \"f:/ADriveStuff/Generate/remetra\" diff HEAD -- backend/services/pdfconvert.py)"
+      "Bash(git -C \"f:/ADriveStuff/Generate/remetra\" diff HEAD -- backend/services/pdfconvert.py)",
+      "Bash(grep -c \"def test_\" /Users/jeromerodrigo/Documents/Generate/remetra/backend/tests/integration/*.py /Users/jeromerodrigo/Documents/Generate/remetra/backend/tests/*.py)",
+      "Bash(sort -t: -k2 -rn)",
+      "Bash(uv --version)",
+      "Bash(gh pr:*)"
     ]
   }
 }

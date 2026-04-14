@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 
 from repositories.food_log_repository import FoodLogRepository
-from schemas.food_log import FoodLogCreate, FoodLogResponse
+from schemas.food_log import FoodLogCreate, FoodLogResponse, FoodLogUpdate
 from services.food_log_service import FoodLogService
 
 
@@ -180,5 +180,24 @@ class TestFoodLogService:
         service = FoodLogService()
 
         result = service.delete_food_log_by_id(db_session, uuid4())
+
+        assert result is None
+
+    def test_update_food_log(self, db_session, sample_food_log_data):
+        """update_food_log returns an updated FoodLogResponse."""
+        service = FoodLogService()
+        created = service.create_food_log(db_session, sample_food_log_data)
+
+        result = service.update_food_log(db_session, created.id, FoodLogUpdate(notes="updated notes"))
+
+        assert isinstance(result, FoodLogResponse)
+        assert result.id == created.id
+        assert result.notes == "updated notes"
+
+    def test_update_food_log_not_found(self, db_session):
+        """update_food_log returns None for a non-existent log."""
+        service = FoodLogService()
+
+        result = service.update_food_log(db_session, uuid4(), FoodLogUpdate(notes="x"))
 
         assert result is None
