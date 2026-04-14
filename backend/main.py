@@ -38,32 +38,6 @@ def _sync_schema() -> None:
     drift_found = False
     for table in Base.metadata.sorted_tables:
         if not inspector.has_table(table.name):
-            continue  # pragma: no cover  # create_all will handle brand-new tables
-        existing = {col["name"] for col in inspector.get_columns(table.name)}
-        for col in table.columns:
-            if col.name not in existing:
-                logger.warning(
-                    "Schema drift: column '%s' is missing from table '%s'. "
-                    "Run `python scripts/init_db.py --reset` to reset the schema.",
-                    col.name,
-                    table.name,
-                )
-                drift_found = True
-    if not drift_found:
-        logger.info("Schema check passed: no drift detected.")
-
-
-def _sync_schema() -> None:
-    """Check for columns present in SQLAlchemy models but missing from the live DB.
-
-    Logs a warning for any drift detected — does not alter the schema automatically.
-    If drift is found, run `python scripts/init_db.py --reset` (locally: `just reset-db`)
-    to drop and recreate all tables with the current schema.
-    """
-    inspector = sa_inspect(engine)
-    drift_found = False
-    for table in Base.metadata.sorted_tables:
-        if not inspector.has_table(table.name):
             continue  # create_all will handle brand-new tables
         existing = {col["name"] for col in inspector.get_columns(table.name)}
         for col in table.columns:
