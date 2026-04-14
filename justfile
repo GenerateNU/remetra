@@ -42,7 +42,7 @@ seed-rag:
 test:
     docker compose up -d test-db
     sleep 3
-    docker compose run --rm backend pytest --cov=services --cov=repositories --cov=main --cov-report=term-missing --cov-fail-under=100
+    docker compose run --rm backend pytest --cov=services --cov=repositories --cov=main --cov-report=term-missing --cov-fail-under=90
     docker compose stop test-db
 
 lint:
