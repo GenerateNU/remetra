@@ -1,8 +1,8 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useEffect } from 'react';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { TriggerRateChart } from '../../components/TriggerRateChart';
-import { FrequencyIntensityChart } from '../../components/FrequencyIntensityChart';
+import { FishersExposuresChart } from '../../components/FishersExposuresChart';
 import { AssociationCard } from '../../components/AssociationCard';
 import { useAppNavigation } from '../../navigation/hooks';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
@@ -11,7 +11,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 export function CorrelationsScreen() {
   const navigation = useAppNavigation();
   const userId = useAuthStore.getState().user.name ?? 'user_001';
-  const { associationsBySymptom, symptoms, fetchAssociations } = useAlgorithmStore();
+  const { associationsBySymptom, symptoms, isLoading, error, fetchAssociations } = useAlgorithmStore();
 
   useEffect(() => {
     if (userId) fetchAssociations(userId);
@@ -32,9 +32,13 @@ export function CorrelationsScreen() {
         </View>
 
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}>
-          {symptoms.length === 0 ? (
+          {isLoading ? (
+            <ActivityIndicator color="#b2939b" style={{ marginTop: 48 }} />
+          ) : error ? (
+            <Text style={{ textAlign: 'center', color: '#ca5e5e', marginTop: 40 }}>{error}</Text>
+          ) : symptoms.length === 0 ? (
             <Text style={{ textAlign: 'center', color: '#888', marginTop: 40 }}>
-              No symptoms found. Log some symptoms to get started.
+              No correlation data yet. Log more food and symptoms to see results.
             </Text>
           ) : (
             symptoms.map(symptom => {
@@ -56,13 +60,7 @@ export function CorrelationsScreen() {
                         data={associations.map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }))}
                         title={`${symptom.name} — Trigger Rates`}
                       />
-                      <FrequencyIntensityChart
-                        data={associations.map(a => ({
-                          food_name: a.food_name,
-                          exposures: a.exposures,
-                          average_intensity: a.average_intensity,
-                        }))}
-                      />
+                      <FishersExposuresChart data={associations} />
                       <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 8, marginBottom: 4, color: '#333' }}>
                         Breakdown
                       </Text>
