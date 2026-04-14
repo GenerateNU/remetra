@@ -7,7 +7,7 @@ import pytest
 from repositories.symptom_log_repository import SymptomLogRepository
 from repositories.symptom_repository import SymptomRepository
 from schemas.symptom import SymptomCreate
-from schemas.symptom_log import SymptomLogCreate
+from schemas.symptom_log import SymptomLogCreate, SymptomLogUpdate
 from services.symptom_log_service import SymptomLogService
 
 
@@ -143,3 +143,38 @@ class TestSymptomLogService:
         service = SymptomLogService()
         result = service.delete_symptom_log(db_session, uuid4())
         assert result is False
+
+    def test_get_symptom_logs_by_username(self, db_session, sample_log_data):
+        """get_symptom_logs_by_username returns all logs for the user."""
+        from schemas.symptom_log import SymptomLogResponse
+
+        service = SymptomLogService()
+        service.create_symptom_log(db_session, sample_log_data)
+        service.create_symptom_log(db_session, sample_log_data)
+
+        results = service.get_symptom_logs_by_username(db_session, sample_log_data.username)
+
+        assert len(results) == 2
+        assert all(isinstance(r, SymptomLogResponse) for r in results)
+        assert all(r.username == sample_log_data.username for r in results)
+
+    def test_update_symptom_log(self, db_session, sample_log_data):
+        """update_symptom_log returns an updated SymptomLogResponse."""
+        from schemas.symptom_log import SymptomLogResponse
+
+        service = SymptomLogService()
+        created = service.create_symptom_log(db_session, sample_log_data)
+
+        result = service.update_symptom_log(db_session, created.id, SymptomLogUpdate(intensity=9))
+
+        assert isinstance(result, SymptomLogResponse)
+        assert result.id == created.id
+        assert result.intensity == 9
+
+    def test_update_symptom_log_not_found(self, db_session):
+        """update_symptom_log returns None for a non-existent log."""
+        from uuid import uuid4
+
+        service = SymptomLogService()
+        result = service.update_symptom_log(db_session, uuid4(), SymptomLogUpdate(intensity=5))
+        assert result is None

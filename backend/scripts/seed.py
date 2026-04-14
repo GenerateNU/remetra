@@ -14,9 +14,17 @@ from pathlib import Path
 # Ensure /app (backend root) is importable when run as scripts/seed.py
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, text
 
-from database import SessionLocal
+import models.food  # noqa: F401
+import models.food_log  # noqa: F401
+import models.knowledge_chunk  # noqa: F401
+import models.metrics  # noqa: F401
+import models.symptom  # noqa: F401
+import models.symptom_log  # noqa: F401
+import models.tag  # noqa: F401
+import models.user  # noqa: F401
+from database import Base, SessionLocal, engine
 from models.food import Food
 from models.food_log import FoodLog
 from models.metrics import Metrics
@@ -223,6 +231,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Seed Remetra with mock data.")
     parser.add_argument("--clear", action="store_true", help="Clear seed data before reseeding.")
     args = parser.parse_args()
+
+    with engine.connect() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        conn.commit()
+    Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
     try:
