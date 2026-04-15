@@ -69,10 +69,12 @@ export const BarcodeScannerScreen = () => {
   if (!permission?.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.text}>Camera permission is required.</Text>
-        <TouchableOpacity style={styles.btn} onPress={requestPermission}>
-          <Text style={styles.btnText}>Grant Permission</Text>
-        </TouchableOpacity>
+        <View style={styles.permissionContent}>
+          <Text style={styles.text}>Camera permission is required.</Text>
+          <TouchableOpacity style={styles.btn} onPress={requestPermission}>
+            <Text style={styles.btnText}>Grant Permission</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -103,6 +105,7 @@ export const BarcodeScannerScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000" },
+  permissionContent: { flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 32 },
   overlay: { position: "absolute", bottom: 60, width: "100%", alignItems: "center", gap: 12 },
   instructions: { color: "#fff", fontSize: 16, marginBottom: 8 },
   cancelBtn: { paddingVertical: 10, paddingHorizontal: 20 },
