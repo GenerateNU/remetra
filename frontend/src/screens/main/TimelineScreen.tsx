@@ -45,9 +45,15 @@ function groupByDate(entries: TimelineEntry[]): { dateKey: string; label: string
 // ─── screen ───────────────────────────────────────────────────────────────────
 
 export function TimelineScreen() {
-  const { foods, symptoms, fetchFoods, fetchSymptoms } = useBankStore();
+  const { foods, symptoms, fetchFoods, fetchSymptoms, scannedFood } = useBankStore();
   const openLogModal = useUIStore((s) => s.openLogModal);
   const logVersion = useUIStore((s) => s.logVersion);
+
+  useEffect(() => {
+    if (scannedFood) {
+      openLogModal('food')
+    }
+  }, [scannedFood]);
 
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -146,8 +152,16 @@ export function TimelineScreen() {
             YOUR HISTORY
           </Text>
           <TouchableOpacity
-            onPress={openLogModal}
-            className="bg-remetra-burgundy rounded-[20px] px-3.5 py-2 flex-row items-center gap-1"
+            onPress={() => openLogModal()}
+            style={{
+              backgroundColor: '#B8624F',
+              borderRadius: 20,
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+            }}
           >
             <Text className="text-white text-base font-semibold">+</Text>
             <Text className="text-white text-[13px] font-medium">Add Log</Text>
