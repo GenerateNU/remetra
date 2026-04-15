@@ -12,8 +12,7 @@ export interface AlgorithmAssociationResponse {
   id: string;
   user_id: string;
   symptom_id: string;
-  associated_food_id: string;
-  ingredients: string[];
+  ingredient_name: string;
   key_metrics: KeyMetrics;
   updated_at: string;
 }
@@ -32,12 +31,14 @@ export const algorithmService = {
   // GET /algorithm/user/{user_id}?symptom_id=...
   async getAssociations(
     userId: string,
-    symptomId?: string
+    symptomId?: string,
   ): Promise<AlgorithmAssociationResponse[]> {
     try {
+      const params: Record<string, string | number> = {};
+      if (symptomId) params.symptom_id = symptomId;
       const { data } = await apiClient.get<AlgorithmAssociationResponse[]>(
         `/algorithm/user/${userId}`,
-        { params: symptomId ? { symptom_id: symptomId } : undefined }
+        { params: Object.keys(params).length > 0 ? params : undefined }
       );
       return data;
     } catch (err: any) {

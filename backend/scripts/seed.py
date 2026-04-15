@@ -87,29 +87,32 @@ def seed_users(db) -> int:
     return created
 
 
-def seed_foods(db, tag_map: dict[str, Tag]) -> tuple[dict[str, Food], int]:
-    """Create foods from foods.json + FoodTag rows; return name → Food map."""
+def seed_foods(db, tag_map: dict[str, Tag]) -> tuple[dict[tuple[str, str], Food], int]:
+    """Create per-user foods from foods.json + FoodTag rows; return (username, name) → Food map."""
     data = _load_json("foods.json")
-    food_map: dict[str, Food] = {}
+    food_map: dict[tuple[str, str], Food] = {}
     created = 0
     for entry in data["foods"]:
         name = entry["food_name"]
-        food = db.execute(select(Food).where(Food.name == name, Food.username.is_(None))).scalar_one_or_none()
-        if food:
-            food_map[name] = food
-            continue
-        food = Food(name=name, ingredients=entry["ingredients"], username=None)
-        db.add(food)
-        db.flush()
-        for tag_name in entry.get("tags", []):
-            tag = tag_map.get(tag_name)
-            if tag:
-                db.add(FoodTag(food_id=food.id, tag_id=tag.id))
-        food_map[name] = food
-        created += 1
+        for username in SEED_USERS:
+            food = db.execute(
+                select(Food).where(Food.name == name, Food.username == username)
+            ).scalar_one_or_none()
+            if food:
+                food_map[(username, name)] = food
+                continue
+            food = Food(name=name, ingredients=entry["ingredients"], username=username)
+            db.add(food)
+            db.flush()
+            for tag_name in entry.get("tags", []):
+                tag = tag_map.get(tag_name)
+                if tag:
+                    db.add(FoodTag(food_id=food.id, tag_id=tag.id))
+            food_map[(username, name)] = food
+            created += 1
     db.commit()
-    skipped = len(data["foods"]) - created
-    print(f"  Foods: created {created}, skipped {skipped}")
+    total = len(data["foods"]) * len(SEED_USERS)
+    print(f"  Foods: created {created}, skipped {total - created}")
     return food_map, created
 
 
@@ -138,7 +141,7 @@ def seed_symptoms(db) -> tuple[dict[tuple[str, str], Symptom], int]:
     return symptom_map, created
 
 
-def seed_food_logs(db, food_map: dict[str, Food]) -> int:
+def seed_food_logs(db, food_map: dict[tuple[str, str], Food]) -> int:
     """Create FoodLog rows from food_logs.json; skip users who already have logs."""
     data = _load_json("food_logs.json")
     by_user: dict[str, list] = {}
@@ -157,11 +160,11 @@ def seed_food_logs(db, food_map: dict[str, Food]) -> int:
         logs = [
             FoodLog(
                 username=username,
-                food_id=food_map[entry["food_name"]].id,
+                food_id=food_map[(username, entry["food_name"])].id,
                 timestamp=datetime.fromisoformat(entry["timestamp"]),
             )
             for entry in entries
-            if entry["food_name"] in food_map
+            if (username, entry["food_name"]) in food_map
         ]
         db.add_all(logs)
         created_total += len(logs)
@@ -215,7 +218,8 @@ def clear_seed_data(db) -> None:
     db.execute(delete(Metrics).where(Metrics.username.in_(SEED_USERS)))
     # Users cascade → food_logs, symptom_logs, symptoms
     db.execute(delete(User).where(User.username.in_(SEED_USERS)))
-    # Seed foods (shared, username IS NULL) cascade → food_tags + food_logs
+    # Seed foods are per-user and cascade-deleted with users, but clean up any
+    # leftover shared (username IS NULL) foods from older seed runs
     seed_food_names = [e["food_name"] for e in _load_json("foods.json")["foods"]]
     db.execute(delete(Food).where(Food.name.in_(seed_food_names), Food.username.is_(None)))
     db.commit()

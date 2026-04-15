@@ -2,7 +2,7 @@ import { VictoryChart, VictoryScatter, VictoryAxis, VictoryTheme, VictoryLabel }
 import { View, Text, useWindowDimensions } from 'react-native';
 
 export interface ScatterPoint {
-  food_name: string;
+  ingredient_name: string;
   exposures: number;
   average_intensity: number;
 }
@@ -48,7 +48,7 @@ export function FrequencyIntensityChart({ data }: Props) {
           data={data}
           x="exposures"
           y="average_intensity"
-          labels={({ datum }: { datum: ScatterPoint }) => datum.food_name}
+          labels={({ datum }: { datum: ScatterPoint }) => datum.ingredient_name}
           labelComponent={<VictoryLabel style={{ fontSize: 8 }} dy={-10} />}
           style={{ data: { fill: '#ca5e5e', opacity: 0.85 } }}
           size={7}

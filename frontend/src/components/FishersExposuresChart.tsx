@@ -42,7 +42,7 @@ export function FishersExposuresChart({ data }: Props) {
           data={data}
           x="exposures"
           y="fishers_p_value"
-          labels={({ datum }: { datum: Association }) => datum.food_name}
+          labels={({ datum }: { datum: Association }) => datum.ingredient_name}
           labelComponent={<VictoryLabel style={{ fontSize: 8 }} dy={-10} />}
           style={{ data: { fill: '#b2939b', opacity: 0.85 } }}
           size={7}

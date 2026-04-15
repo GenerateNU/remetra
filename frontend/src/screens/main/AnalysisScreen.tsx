@@ -89,7 +89,7 @@ export function AnalysisScreen() {
                   const assocs = associationsBySymptom[s.symptomId] ?? [];
                   if (assocs.length === 0) return null;
                   const avgIntensity = assocs.reduce((sum, a) => sum + a.average_intensity, 0) / assocs.length;
-                  return { food_name: s.name, exposures: s.count, average_intensity: avgIntensity };
+                  return { ingredient_name: s.name, exposures: s.count, average_intensity: avgIntensity };
                 })
                 .filter((d): d is NonNullable<typeof d> => d !== null);
 

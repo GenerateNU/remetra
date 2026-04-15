@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 
 export interface Association {
-  food_name: string;
+  ingredient_name: string;
   trigger_rate: number;
   base_rate: number;
   exposures: number;
@@ -17,7 +17,7 @@ function confidenceBadge(p: number): { label: string; color: string } {
 }
 
 export function AssociationCard({
-  food_name,
+  ingredient_name,
   trigger_rate,
   base_rate,
   exposures,
@@ -45,7 +45,7 @@ export function AssociationCard({
     >
       {/* Header row */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: symptom_name ? 2 : 10 }}>
-        <Text style={{ fontSize: 16, fontWeight: '600', flex: 1 }}>{food_name}</Text>
+        <Text style={{ fontSize: 16, fontWeight: '600', flex: 1 }}>{ingredient_name}</Text>
         <View style={{ backgroundColor: badge.color, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 }}>
           <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>{badge.label}</Text>
         </View>
