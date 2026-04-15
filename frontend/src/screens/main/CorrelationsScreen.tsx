@@ -18,8 +18,6 @@ export function CorrelationsScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     if (userId) fetchAssociations(userId);
-    console.log(symptoms)
-    console.log(associationsBySymptom)
   }, [userId]);
   const [selectedSymptomId, setSelectedSymptomId] = useState<string | null>(
     route.params?.initialSymptomId ?? null
