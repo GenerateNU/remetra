@@ -19,8 +19,7 @@ interface SymptomCount {
 export function AnalysisScreen() {
   const { symptoms, fetchSymptoms } = useBankStore();
   const username = useAuthStore((s) => s.user.name);
-  const navigation = useAppNavigation();
-  const { associationsBySymptom, fetchAssociations } = useAlgorithmStore();
+  const { associationsBySymptom, runAlgorithm } = useAlgorithmStore();
   const [symptomCounts, setSymptomCounts] = useState<SymptomCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +50,7 @@ export function AnalysisScreen() {
         setSymptomCounts(counts);
 
         if (username) {
-          fetchAssociations(username).catch(() => {});
+          runAlgorithm(username).catch(() => {});
         }
       } catch (err: any) {
         setError(err.message ?? 'Failed to load analysis');
@@ -71,10 +70,10 @@ export function AnalysisScreen() {
           YOUR ANALYSIS
         </Text>
 
-        <SectionDivider label="Symptoms by Occurrences" />
+        <SectionDivider label="Symptoms by Occurrences"/>
 
         {loading ? (
-          <ActivityIndicator color="#b2939b" style={{ marginTop: 32 }} />
+          <ActivityIndicator color="#b2939b" style={{ marginTop: 24 }} />
         ) : error ? (
           <Text className="text-remetra-burgundy text-center mt-6">{error}</Text>
         ) : symptomCounts.length === 0 ? (
@@ -99,21 +98,11 @@ export function AnalysisScreen() {
               ) : null;
             })()}
 
-            <SectionDivider label="Tap a symptom for details" />
             <View className="gap-2.5">
               {symptomCounts.map((item, index) => (
                 <SymptomRow key={item.symptomId} rank={index + 1} item={item} />
               ))}
             </View>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Correlations')}
-              className="mt-6 bg-remetra-rose/10 border border-remetra-rose/30 rounded-xl py-3 items-center"
-            >
-              <Text className="text-remetra-rose font-semibold text-sm tracking-wide">
-                VIEW ALL CORRELATIONS →
-              </Text>
-            </TouchableOpacity>
           </>
         )}
       </ScrollView>
@@ -134,11 +123,12 @@ function SectionDivider({ label }: { label: string }) {
 
 function SymptomRow({ rank, item }: { rank: number; item: SymptomCount }) {
   const navigation = useAppNavigation();
-  const subtitle = [item.location, item.sensation].filter(Boolean).join(' · ');
+  // Add backend route to return avg intensity for symptoms
+  const subtitle = "Average Intensity: "
 
   return (
     <TouchableOpacity
-      onPress={() => navigation.navigate('SymptomDetail', { symptomId: item.symptomId, symptomName: item.name })}
+      onPress={() => navigation.navigate('Correlations', { initialSymptomId: item.symptomId })}
       className="bg-white/35 rounded-xl p-4 flex-row items-center gap-3"
     >
       <Text className="text-sm font-bold text-remetra-mauve w-6 text-center">{rank}</Text>

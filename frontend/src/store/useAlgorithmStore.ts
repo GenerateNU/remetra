@@ -26,35 +26,6 @@ interface AlgorithmActions {
 
 type AlgorithmStore = AlgorithmState & AlgorithmActions;
 
-const MOCK_MODE = false;
-
-const initialState: AlgorithmState = MOCK_MODE
-  ? {
-      symptoms: [
-        { id: 'sym-1', name: 'bloating' },
-        { id: 'sym-2', name: 'fatigue' },
-      ],
-      associationsBySymptom: {
-        'sym-1': [
-          { symptom_id: 'sym-1', food_name: 'Dairy', trigger_rate: 0.72, base_rate: 0.2, exposures: 14, average_intensity: 6.5, fishers_p_value: 0.003 },
-          { symptom_id: 'sym-1', food_name: 'Gluten', trigger_rate: 0.55, base_rate: 0.18, exposures: 11, average_intensity: 5.0, fishers_p_value: 0.01 },
-          { symptom_id: 'sym-1', food_name: 'Onions', trigger_rate: 0.4, base_rate: 0.15, exposures: 8, average_intensity: 4.2, fishers_p_value: 0.04 },
-        ],
-        'sym-2': [
-          { symptom_id: 'sym-2', food_name: 'Coffee', trigger_rate: 0.6, base_rate: 0.25, exposures: 20, average_intensity: 4.0, fishers_p_value: 0.02 },
-          { symptom_id: 'sym-2', food_name: 'Sugar', trigger_rate: 0.45, base_rate: 0.2, exposures: 15, average_intensity: 3.5, fishers_p_value: 0.03 },
-        ],
-      },
-      isLoading: false,
-      error: null,
-    }
-  : {
-      associationsBySymptom: {},
-      symptoms: [],
-      isLoading: false,
-      error: null,
-    };
-
 async function buildLookupMaps(): Promise<{
   foodMap: Record<string, string>;
   symptomMap: Record<string, string>;
@@ -78,7 +49,7 @@ async function buildLookupMaps(): Promise<{
 }
 
 function enrichAndGroup(
-  rawAssociations: Awaited<ReturnType<typeof algorithmService.getCorrelations>>,
+  rawAssociations: Awaited<ReturnType<typeof algorithmService.getAssociations>>,
   foodMap: Record<string, string>,
   symptomMap: Record<string, string>,
 ): {
@@ -115,15 +86,21 @@ function enrichAndGroup(
   return { associationsBySymptom, symptoms };
 }
 
+const initialState: AlgorithmState = {
+  associationsBySymptom: {},
+  symptoms: [],
+  isLoading: false,
+  error: null,
+};
+
 export const useAlgorithmStore = create<AlgorithmStore>((set) => ({
   ...initialState,
 
   fetchAssociations: async (userId: string) => {
-    if (MOCK_MODE) return;
     set({ isLoading: true, error: null });
     try {
       const [rawAssociations, { foodMap, symptomMap }] = await Promise.all([
-        algorithmService.getCorrelations(userId),
+        algorithmService.getAssociations(userId),
         buildLookupMaps(),
       ]);
 
@@ -135,7 +112,6 @@ export const useAlgorithmStore = create<AlgorithmStore>((set) => ({
   },
 
   runAlgorithm: async (userId: string) => {
-    if (MOCK_MODE) return;
     set({ isLoading: true, error: null });
     try {
       const [rawAssociations, { foodMap, symptomMap }] = await Promise.all([

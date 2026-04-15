@@ -1,26 +1,50 @@
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { TriggerRateChart } from '../../components/TriggerRateChart';
 import { FishersExposuresChart } from '../../components/FishersExposuresChart';
-import { useAppNavigation } from '../../navigation/hooks';
+import { FrequencyIntensityChart } from '../../components/FrequencyIntensityChart';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
-import { AssociationCard, Association } from '../../components/AssociationCard';
+import { AssociationCard } from '../../components/AssociationCard';
 import { useAuthStore } from '../../store/useAuthStore';
+import { MainStackParamList } from '../../navigation/stacks/MainStack';
 
-export function CorrelationsScreen() {
-  const navigation = useAppNavigation();
+type Props = NativeStackScreenProps<MainStackParamList, 'Correlations'>;
+
+export function CorrelationsScreen({ navigation, route }: Props) {
   const userId = useAuthStore.getState().user.name ?? 'user_001';
   const { associationsBySymptom, symptoms, isLoading, error, fetchAssociations } = useAlgorithmStore();
 
   useEffect(() => {
     if (userId) fetchAssociations(userId);
+    console.log(symptoms)
+    console.log(associationsBySymptom)
   }, [userId]);
-  const [selectedSymptomId, setSelectedSymptomId] = useState<string | null>(null);
+  const [selectedSymptomId, setSelectedSymptomId] = useState<string | null>(
+    route.params?.initialSymptomId ?? null
+  );
 
   const activeSymptomId = selectedSymptomId ?? symptoms[0]?.id ?? null;
-  const associations = activeSymptomId ? (associationsBySymptom[activeSymptomId] ?? []) : [];
-  const selectedName = symptoms.find(s => s.id === activeSymptomId)?.name ?? '';
+  const activeAssociations = activeSymptomId
+    ? (associationsBySymptom[activeSymptomId] ?? []).slice().sort((a, b) => b.trigger_rate - a.trigger_rate)
+    : [];
+  const activeName = symptoms.find(s => s.id === activeSymptomId)?.name ?? '';
+
+  const topTriggers = useMemo(() => {
+    const best: Record<string, (typeof activeAssociations)[number] & { symptom_name: string }> = {};
+    for (const symptom of symptoms) {
+      const assocs = associationsBySymptom[symptom.id] ?? [];
+      for (const assoc of assocs) {
+        if (!best[assoc.food_name] || assoc.trigger_rate > best[assoc.food_name].trigger_rate) {
+          best[assoc.food_name] = { ...assoc, symptom_name: symptom.name };
+        }
+      }
+    }
+    return Object.values(best)
+      .sort((a, b) => b.trigger_rate - a.trigger_rate)
+      .slice(0, 5);
+  }, [associationsBySymptom, symptoms]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -32,10 +56,11 @@ export function CorrelationsScreen() {
             <Text style={{ color: '#ca5e5e', fontSize: 14 }}>← Back</Text>
           </TouchableOpacity>
           <Text style={{ fontSize: 24, fontWeight: '600', color: '#b2939b', fontStyle: 'italic', textAlign: 'center' }}>
-            ALL CORRELATIONS
+            {activeName}
           </Text>
         </View>
 
+        {/* Main content */}
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}>
           {isLoading ? (
             <ActivityIndicator color="#b2939b" style={{ marginTop: 48 }} />
@@ -46,120 +71,53 @@ export function CorrelationsScreen() {
               No correlation data yet. Log more food and symptoms to see results.
             </Text>
           ) : (
-            symptoms.map(symptom => {
-              const associations = (associationsBySymptom[symptom.id] ?? [])
-                .slice()
-                .sort((a, b) => b.trigger_rate - a.trigger_rate);
-
-              return (
-                <View key={symptom.id} style={{ marginBottom: 40 }}>
-                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#b2939b', marginBottom: 12 }}>
-                    {symptom.name}
+            <>
+              {/* Top triggers across all symptoms */}
+              {topTriggers.length > 0 && (
+                <View style={{ marginBottom: 32 }}>
+                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#b2939b', marginBottom: 4 }}>
+                    Top Triggers
                   </Text>
-
-                  {associations.length === 0 ? (
-                    <Text style={{ color: '#888' }}>No correlations found for {symptom.name}.</Text>
-                  ) : (
-                    <>
-                      <TriggerRateChart
-                        data={associations.map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }))}
-                        title={`${symptom.name} — Trigger Rates`}
-                      />
-                      <FishersExposuresChart data={associations} />
-                      <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 8, marginBottom: 4, color: '#333' }}>
-                        Breakdown
-                      </Text>
-                      {associations.map(assoc => (
-                        <AssociationCard key={assoc.food_name} {...assoc} />
-                      ))}
-                    </>
-                  )}
-                </View>
-              );
-            })
-          )
-        }
-        </ScrollView>
-        {/* Symptom selector */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, gap: 8 }}
-        >
-          {symptoms.map(symptom => (
-            <TouchableOpacity
-              key={symptom.id}
-              onPress={() => setSelectedSymptomId(symptom.id)}
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-                borderRadius: 20,
-                backgroundColor: activeSymptomId === symptom.id ? '#ca5e5e' : 'white',
-                shadowColor: '#000',
-                shadowOpacity: 0.08,
-                shadowRadius: 3,
-                elevation: 2,
-              }}
-            >
-              <Text
-                numberOfLines={1}
-                style={{
-                  fontSize: 13,
-                  fontWeight: '600',
-                  fontFamily: undefined,
-                  color: activeSymptomId === symptom.id ? 'white' : '#444',
-                }}
-              >
-                {symptom.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {/* Main content */}
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}>
-          {symptoms.length === 0 ? (
-            <Text style={{ textAlign: 'center', color: '#888', marginTop: 40 }}>
-              No symptoms found. Log some symptoms to get started.
-            </Text>
-          ) : (
-            symptoms.map(symptom => {
-              const associations = (associationsBySymptom[symptom.id] ?? [])
-                .slice()
-                .sort((a, b) => b.trigger_rate - a.trigger_rate);
-
-              return (
-                <View key={symptom.id} style={{ marginBottom: 40 }}>
-                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#b2939b', marginBottom: 12 }}>
-                    {symptom.name}
+                  <Text style={{ fontSize: 12, color: '#999', marginBottom: 12 }}>
+                    Highest correlated ingredients across all symptoms
                   </Text>
-
-                  {associations.length === 0 ? (
-                    <Text style={{ color: '#888' }}>No correlations found for {symptom.name}.</Text>
-                  ) : (
-                    <>
-                      <TriggerRateChart
-                        data={associations.map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }))}
-                        title={`${symptom.name} — Trigger Rates`}
-                      />
-                      <FrequencyIntensityChart
-                        data={associations.map(a => ({
-                          food_name: a.food_name,
-                          exposures: a.exposures,
-                          average_intensity: a.average_intensity,
-                        }))}
-                      />
-                      <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 8, marginBottom: 4, color: '#333' }}>
-                        Breakdown
-                      </Text>
-                      {associations.map(assoc => (
-                        <AssociationCard key={assoc.food_name} {...assoc} />
-                      ))}
-                    </>
-                  )}
+                  {topTriggers.map(assoc => (
+                    <AssociationCard key={assoc.food_name} {...assoc} />
+                  ))}
                 </View>
-              );
-            })
+              )}
+
+              {/* Per-symptom detail */}
+              {activeAssociations.length === 0 ? (
+                <Text style={{ color: '#888', textAlign: 'center' }}>
+                  No correlations found for {activeName}.
+                </Text>
+              ) : (
+                <View style={{ marginBottom: 40 }}>
+                  <Text style={{ fontSize: 18, fontWeight: '700', color: '#b2939b', marginBottom: 12 }}>
+                    Overview
+                  </Text>
+                  {/* <TriggerRateChart
+                    data={activeAssociations.map(a => ({ food_name: a.food_name, trigger_rate: a.trigger_rate }))}
+                    title={`${activeName} — Trigger Rates`}
+                  /> */}
+                  <FishersExposuresChart data={activeAssociations} />
+                  {/* <FrequencyIntensityChart
+                    data={activeAssociations.map(a => ({
+                      food_name: a.food_name,
+                      exposures: a.exposures,
+                      average_intensity: a.average_intensity,
+                    }))}
+                  /> */}
+                  {/* <Text style={{ fontSize: 15, fontWeight: '600', marginTop: 8, marginBottom: 4, color: '#333' }}>
+                    Breakdown
+                  </Text>
+                  {activeAssociations.map(assoc => (
+                    <AssociationCard key={assoc.food_name} {...assoc} />
+                  ))} */}
+                </View>
+              )}
+            </>
           )}
         </ScrollView>
       </View>

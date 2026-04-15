@@ -7,6 +7,7 @@ export interface Association {
   exposures: number;
   average_intensity: number;
   fishers_p_value: number;
+  symptom_name?: string;
 }
 
 function confidenceBadge(p: number): { label: string; color: string } {
@@ -22,6 +23,7 @@ export function AssociationCard({
   exposures,
   average_intensity,
   fishers_p_value,
+  symptom_name,
 }: Association) {
   const badge = confidenceBadge(fishers_p_value);
   const triggerPct = Math.min(Math.round(trigger_rate * 100), 100);
@@ -42,12 +44,17 @@ export function AssociationCard({
       }}
     >
       {/* Header row */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: symptom_name ? 2 : 10 }}>
         <Text style={{ fontSize: 16, fontWeight: '600', flex: 1 }}>{food_name}</Text>
         <View style={{ backgroundColor: badge.color, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 }}>
           <Text style={{ color: 'white', fontSize: 11, fontWeight: '600' }}>{badge.label}</Text>
         </View>
       </View>
+      {symptom_name && (
+        <Text style={{ fontSize: 11, color: '#b2939b', fontWeight: '500', marginBottom: 10 }}>
+          {symptom_name}
+        </Text>
+      )}
 
       {/* Trigger rate bar */}
       <Text style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>
