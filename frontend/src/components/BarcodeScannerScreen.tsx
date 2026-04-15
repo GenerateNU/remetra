@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useState, useRef } from "react";
