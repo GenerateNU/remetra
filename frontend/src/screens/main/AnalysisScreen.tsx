@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
-import { FrequencyIntensityChart } from '../../components/FrequencyIntensityChart';
 import { useBankStore } from '../../store/bankStore';
 import { symptomLogService } from '../../api/symptom_log_service';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -14,12 +13,13 @@ interface SymptomCount {
   location: string;
   sensation: string;
   count: number;
+  avgIntensity: number;
 }
 
 export function AnalysisScreen() {
   const { symptoms, fetchSymptoms } = useBankStore();
   const username = useAuthStore((s) => s.user.name);
-  const { associationsBySymptom, runAlgorithm } = useAlgorithmStore();
+  const { runAlgorithm } = useAlgorithmStore();
   const [symptomCounts, setSymptomCounts] = useState<SymptomCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,19 +31,29 @@ export function AnalysisScreen() {
         const logs = await symptomLogService.getMySymptomLogs();
 
         const countMap: Record<string, number> = {};
+        const intensityMap: Record<string, number[]> = {};
         for (const log of logs) {
           countMap[log.symptom_id] = (countMap[log.symptom_id] ?? 0) + 1;
+          if (!intensityMap[log.symptom_id]) intensityMap[log.symptom_id] = [];
+          intensityMap[log.symptom_id].push(log.intensity);
         }
 
         const counts: SymptomCount[] = useBankStore
           .getState()
-          .symptoms.map((s) => ({
-            symptomId: s.id,
-            name: s.name,
-            location: s.location,
-            sensation: s.sensation,
-            count: countMap[s.id] ?? 0,
-          }))
+          .symptoms.map((s) => {
+            const intensities = intensityMap[s.id] ?? [];
+            const avg = intensities.length > 0
+              ? intensities.reduce((a, b) => a + b, 0) / intensities.length
+              : 0;
+            return {
+              symptomId: s.id,
+              name: s.name,
+              location: s.location,
+              sensation: s.sensation,
+              count: countMap[s.id] ?? 0,
+              avgIntensity: Math.round(avg * 10) / 10,
+            };
+          })
           .filter((s) => s.count > 0)
           .sort((a, b) => b.count - a.count);
 
@@ -82,22 +92,6 @@ export function AnalysisScreen() {
           </Text>
         ) : (
           <>
-            {/* Symptom overview: instances vs avg intensity */}
-            {(() => {
-              const scatterData = symptomCounts
-                .map(s => {
-                  const assocs = associationsBySymptom[s.symptomId] ?? [];
-                  if (assocs.length === 0) return null;
-                  const avgIntensity = assocs.reduce((sum, a) => sum + a.average_intensity, 0) / assocs.length;
-                  return { ingredient_name: s.name, exposures: s.count, average_intensity: avgIntensity };
-                })
-                .filter((d): d is NonNullable<typeof d> => d !== null);
-
-              return scatterData.length >= 2 ? (
-                <FrequencyIntensityChart data={scatterData} />
-              ) : null;
-            })()}
-
             <View className="gap-2.5">
               {symptomCounts.map((item, index) => (
                 <SymptomRow key={item.symptomId} rank={index + 1} item={item} />
@@ -123,8 +117,9 @@ function SectionDivider({ label }: { label: string }) {
 
 function SymptomRow({ rank, item }: { rank: number; item: SymptomCount }) {
   const navigation = useAppNavigation();
-  // Add backend route to return avg intensity for symptoms
-  const subtitle = "Average Intensity: "
+  const subtitle = item.avgIntensity > 0
+    ? `Avg severity: ${item.avgIntensity.toFixed(1)} / 10`
+    : null;
 
   return (
     <TouchableOpacity
