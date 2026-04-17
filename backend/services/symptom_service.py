@@ -33,7 +33,6 @@ class SymptomService:
         Raises:
             ValueError: If validation fails
         """
-        print(symptom_data)
         created_symptom = self.symptom_repo.create_symptom(db, symptom_data)
         return SymptomResponse.model_validate(created_symptom)
 

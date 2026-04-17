@@ -190,7 +190,7 @@ export function AssociationHelpButton() {
 
             <Text style={{ fontSize: 14, fontWeight: '600', color: '#333', marginBottom: 4 }}>Comparison bars</Text>
             <Text style={{ fontSize: 13, color: '#555', lineHeight: 20, marginBottom: 14 }}>
-              Shows how often the symptom occurs when you eat the ingredient vs. when you don't. A bigger gap means a stronger connection.
+              Shows how often the symptom occurs when you eat the ingredient vs. when you {"don\'t"}. A bigger gap means a stronger connection.
             </Text>
 
             <TouchableOpacity onPress={() => setVisible(false)} style={{ alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 24 }}>

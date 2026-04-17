@@ -3,10 +3,13 @@ import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'rea
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { SymptomsOverTimeChart } from '../../components/SymptomsOverTimeChart';
 import { symptomLogService, SymptomLogResponse } from '../../api/symptom_log_service';
+import { foodLogService } from '../../api/food_log_service';
 import { useBankStore } from '../../store/bankStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
 import { useAppNavigation } from '../../navigation/hooks';
+
+const MIN_LOGS_FOR_ANALYSIS = 30;
 
 interface SymptomCount {
   symptomId: string;
@@ -23,6 +26,7 @@ export function AnalysisScreen() {
   const { runAlgorithm } = useAlgorithmStore();
   const [symptomCounts, setSymptomCounts] = useState<SymptomCount[]>([]);
   const [symptomLogs, setSymptomLogs] = useState<SymptomLogResponse[]>([]);
+  const [totalLogs, setTotalLogs] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +34,18 @@ export function AnalysisScreen() {
     async function load() {
       try {
         await fetchSymptoms();
-        const logs = await symptomLogService.getMySymptomLogs();
+        const [logs, foodLogs] = await Promise.all([
+          symptomLogService.getMySymptomLogs(),
+          foodLogService.getMyFoodLogs(),
+        ]);
+
+        const total = logs.length + foodLogs.length;
+        setTotalLogs(total);
+
+        if (total < MIN_LOGS_FOR_ANALYSIS) {
+          setSymptomLogs(logs);
+          return;
+        }
 
         const countMap: Record<string, number> = {};
         const intensityMap: Record<string, number[]> = {};
@@ -75,6 +90,8 @@ export function AnalysisScreen() {
     load();
   }, []);
 
+  const belowThreshold = totalLogs < MIN_LOGS_FOR_ANALYSIS;
+
   return (
     <View className="flex-1">
       <BackgroundGradient />
@@ -89,6 +106,17 @@ export function AnalysisScreen() {
           <ActivityIndicator color="#b2939b" style={{ marginTop: 24 }} />
         ) : error ? (
           <Text className="text-remetra-burgundy text-center mt-6">{error}</Text>
+        ) : belowThreshold ? (
+          <View className="bg-white/35 rounded-xl p-5 mt-4">
+            <Text className="text-remetra-mauve text-center text-base font-semibold mb-2">
+              Keep logging to unlock your analysis
+            </Text>
+            <Text className="text-remetra-muted text-center text-sm">
+              You need at least {MIN_LOGS_FOR_ANALYSIS} total logs (food + symptoms) before we can run your analysis.
+              {'\n\n'}
+              You currently have {totalLogs} — {MIN_LOGS_FOR_ANALYSIS - totalLogs} more to go.
+            </Text>
+          </View>
         ) : symptomCounts.length === 0 ? (
           <Text className="text-remetra-muted text-center mt-6 text-sm">
             No symptoms logged yet.
