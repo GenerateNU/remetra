@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+import { SymptomsOverTimeChart } from '../../components/SymptomsOverTimeChart';
+import { symptomLogService, SymptomLogResponse } from '../../api/symptom_log_service';
 import { useBankStore } from '../../store/bankStore';
-import { symptomLogService } from '../../api/symptom_log_service';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
 import { useAppNavigation } from '../../navigation/hooks';
@@ -21,6 +22,7 @@ export function AnalysisScreen() {
   const username = useAuthStore((s) => s.user.name);
   const { runAlgorithm } = useAlgorithmStore();
   const [symptomCounts, setSymptomCounts] = useState<SymptomCount[]>([]);
+  const [symptomLogs, setSymptomLogs] = useState<SymptomLogResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +60,7 @@ export function AnalysisScreen() {
           .sort((a, b) => b.count - a.count);
 
         setSymptomCounts(counts);
+        setSymptomLogs(logs);
 
         if (username) {
           runAlgorithm(username).catch(() => {});
@@ -92,6 +95,12 @@ export function AnalysisScreen() {
           </Text>
         ) : (
           <>
+            <SymptomsOverTimeChart
+              logs={symptomLogs}
+              symptomNames={Object.fromEntries(symptomCounts.map(s => [s.symptomId, s.name]))}
+            />
+
+            <SectionDivider label="Details" />
             <View className="gap-2.5">
               {symptomCounts.map((item, index) => (
                 <SymptomRow key={item.symptomId} rank={index + 1} item={item} />
@@ -130,7 +139,7 @@ function SymptomRow({ rank, item }: { rank: number; item: SymptomCount }) {
       <View className="flex-1">
         <Text className="text-[15px] text-neutral-700 font-semibold">{item.name}</Text>
         {subtitle ? (
-          <Text className="text-xs text-remetra-muted mt-0.5">{subtitle}</Text>
+          <Text className="text-xs text-neutral-700 mt-0.5">{subtitle}</Text>
         ) : null}
       </View>
       <View className="bg-remetra-peach rounded-full px-2.5 py-1 min-w-9 items-center">

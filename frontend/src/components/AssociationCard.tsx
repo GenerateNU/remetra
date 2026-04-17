@@ -120,9 +120,6 @@ export function AssociationCard({
           {/* Stats */}
           <View style={{ flexDirection: 'row', gap: 20 }}>
             <Text style={{ fontSize: 12, color: '#444' }}>
-              Eaten <Text style={{ fontWeight: '600' }}>{exposures}</Text> times
-            </Text>
-            <Text style={{ fontSize: 12, color: '#444' }}>
               Avg severity{' '}
               <Text style={{ fontWeight: '600' }}>{average_intensity.toFixed(1)}</Text>/10
             </Text>
