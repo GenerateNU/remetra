@@ -39,6 +39,16 @@ SEED_USERS = [f"user_{i:03d}" for i in range(1, 41)]
 SEED_PASSWORD = "testpassword"
 SEED_TAG_NAMES = ["gluten", "dairy", "legumes", "shellfish", "soy", "fish", "egg", "peanuts"]
 
+# Maps raw symptom labels from symptom_log.json to the (sensation, location)
+# pairs the frontend expects. Display name is "{sensation} — {location}" to
+# match AddSymptomModal.tsx.
+SYMPTOM_DEFINITIONS: dict[str, dict[str, str]] = {
+    "bloating": {"sensation": "Bloating", "location": "Abdomen"},
+    "cramping": {"sensation": "Cramping", "location": "Abdomen"},
+    "gas": {"sensation": "Pressure", "location": "Abdomen"},
+    "mild_discomfort": {"sensation": "Tenderness", "location": "Abdomen"},
+}
+
 
 def _load_json(filename: str):
     with open(SEED_DATA_DIR / filename) as f:
@@ -117,27 +127,47 @@ def seed_foods(db, tag_map: dict[str, Tag]) -> tuple[dict[tuple[str, str], Food]
 
 
 def seed_symptoms(db) -> tuple[dict[tuple[str, str], Symptom], int]:
-    """Create one Symptom per unique (user_id, symptom_name); return lookup map."""
+    """Create one Symptom per unique (user_id, raw_symptom) using SYMPTOM_DEFINITIONS.
+
+    Returns a map keyed by (username, raw_symptom_label_from_log) so seed_symptom_logs
+    can resolve the right Symptom row when walking symptom_log.json.
+    """
     data = _load_json("symptom_log.json")
     pairs: set[tuple[str, str]] = {(e["user_id"], e["symptom"]) for e in data}
     symptom_map: dict[tuple[str, str], Symptom] = {}
     created = 0
-    for username, symptom_name in pairs:
+    skipped_unknown = 0
+    for username, raw_symptom in pairs:
+        definition = SYMPTOM_DEFINITIONS.get(raw_symptom)
+        if not definition:
+            skipped_unknown += 1
+            continue
+        sensation = definition["sensation"]
+        location = definition["location"]
+        display_name = f"{sensation} — {location}"
         symptom = db.execute(
             select(Symptom).where(
                 Symptom.username == username,
-                Symptom.name == symptom_name,
+                Symptom.name == display_name,
             )
         ).scalar_one_or_none()
         if not symptom:
-            symptom = Symptom(username=username, name=symptom_name)
+            symptom = Symptom(
+                username=username,
+                name=display_name,
+                sensation=sensation,
+                location=location,
+            )
             db.add(symptom)
             db.flush()
             created += 1
-        symptom_map[(username, symptom_name)] = symptom
+        symptom_map[(username, raw_symptom)] = symptom
     db.commit()
-    skipped = len(pairs) - created
-    print(f"  Symptoms: created {created}, skipped {skipped}")
+    skipped = len(pairs) - created - skipped_unknown
+    print(
+        f"  Symptoms: created {created}, skipped {skipped} (existing), "
+        f"{skipped_unknown} unknown raw labels"
+    )
     return symptom_map, created
 
 

@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from models.food import Food
 from schemas.food import FoodCreate
@@ -67,7 +67,7 @@ class FoodRepository:
 
         logging.info(f"Deleting food with ID {food_id} from database")
 
-        food = self.get_food_by_id(db, food_id)
+        food = db.query(Food).options(joinedload(Food.tags)).filter_by(id=food_id).first()
         if not food:
             logging.warning(f"Food with ID {food_id} not found for deletion")
             return None
