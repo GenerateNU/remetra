@@ -1,28 +1,5 @@
 import { apiClient, ApiError } from './client';
 
-export interface CorrelationsRequestParams {
-  days: number;
-  symptom_ids: number[];
-}
-
-export interface CorrelationResult {
-  symptom_id: number;
-  correlation: number;
-}
-
-export type CorrelationsResponse = CorrelationResult[];
-
-export interface AnalyzeRequestPayload {
-  days: number;
-  symptom_ids: number[];
-}
-
-export interface AnalyzeResponse {
-  job_id?: string;
-  status: 'started' | 'in_progress' | 'completed' | 'failed';
-  message?: string;
-}
-
 export interface KeyMetrics {
   exposures: number;
   trigger_rate: number;
@@ -35,8 +12,7 @@ export interface AlgorithmAssociationResponse {
   id: string;
   user_id: string;
   symptom_id: string;
-  associated_food_id: string;
-  ingredients: string[];
+  ingredient_name: string;
   key_metrics: KeyMetrics;
   updated_at: string;
 }
@@ -53,14 +29,16 @@ export interface AlgorithmRunResponse {
 
 export const algorithmService = {
   // GET /algorithm/user/{user_id}?symptom_id=...
-  async getCorrelations(
+  async getAssociations(
     userId: string,
-    symptomId?: string
+    symptomId?: string,
   ): Promise<AlgorithmAssociationResponse[]> {
     try {
+      const params: Record<string, string | number> = {};
+      if (symptomId) params.symptom_id = symptomId;
       const { data } = await apiClient.get<AlgorithmAssociationResponse[]>(
         `/algorithm/user/${userId}`,
-        { params: symptomId ? { symptom_id: symptomId } : undefined }
+        { params: Object.keys(params).length > 0 ? params : undefined }
       );
       return data;
     } catch (err: any) {

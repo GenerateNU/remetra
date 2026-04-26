@@ -17,15 +17,14 @@ class KeyMetrics(BaseModel):
 
 
 class AlgorithmAssociationResponse(BaseModel):
-    """Response schema for one symptom-food association row."""
+    """Response schema for one symptom-ingredient association row."""
 
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
     user_id: str
     symptom_id: UUID
-    associated_food_id: UUID
-    ingredients: list[str]
+    ingredient_name: str
     key_metrics: KeyMetrics
     updated_at: datetime
 

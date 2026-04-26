@@ -1,14 +1,13 @@
-"""Service layer for symptom-food association algorithm."""
+"""Service layer for symptom-ingredient association algorithm."""
 
 from collections.abc import Sequence
 from uuid import UUID
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from analysis.algorithm import get_analysis
 from analysis.models import FoodLogEntry, SymptomLogEntry
-from models.food import Food
 from models.food_log import FoodLog
 from models.metrics import Metrics
 from models.symptom_log import SymptomLog
@@ -17,7 +16,7 @@ from schemas.algorithm import AlgorithmAssociationResponse, AlgorithmRunRequest
 
 
 class AlgorithmService:
-    """Runs symptom-food association analysis and persists results."""
+    """Runs symptom-ingredient association analysis and persists results."""
 
     def __init__(self):
         self.repo: MetricsRepository | None = None
@@ -33,11 +32,11 @@ class AlgorithmService:
             time_window_hours=payload.time_window_hours,
         )
 
-        for symptom_id_str, metrics_by_food_id in metrics_by_symptom.items():
+        for symptom_id_str, metrics_by_ingredient in metrics_by_symptom.items():
             self.repo.upsert_metrics(
                 username=payload.user_id,
                 symptom_id=UUID(symptom_id_str),
-                metrics_by_ingredient=metrics_by_food_id,
+                metrics_by_ingredient=metrics_by_ingredient,
             )
 
         return self.get_associations(db=db, user_id=payload.user_id, symptom_ids=payload.symptom_ids)
@@ -52,17 +51,23 @@ class AlgorithmService:
         metrics_rows: list[Metrics] = []
         if symptom_ids:
             for symptom_id in symptom_ids:
-                metrics_rows.extend(self.repo.get_by_symptom(username=user_id, symptom_id=symptom_id))
+                metrics_rows.extend(
+                    self.repo.get_by_symptom(username=user_id, symptom_id=symptom_id)
+                )
         else:
             metrics_rows = self.repo.get_by_user(username=user_id)
 
-        food_ingredient_map = self._get_food_ingredient_map(db, metrics_rows)
-        return self._serialize_metrics_rows(metrics_rows, food_ingredient_map)
+        return self._serialize_metrics_rows(metrics_rows)
 
     def _get_food_logs_for_user(self, db: Session, user_id: str) -> list[FoodLog]:
-        query = select(FoodLog).where(FoodLog.username == user_id).order_by(FoodLog.timestamp.asc())
+        query = (
+            select(FoodLog)
+            .options(joinedload(FoodLog.food))
+            .where(FoodLog.username == user_id)
+            .order_by(FoodLog.timestamp.asc())
+        )
         result = db.execute(query)
-        return result.scalars().all()
+        return result.unique().scalars().all()
 
     def _get_symptom_logs_for_user(
         self,
@@ -89,9 +94,14 @@ class AlgorithmService:
         if time_window_hours < 0:
             raise ValueError("time_window_hours must be >= 0")
 
-        # Feed algorithm.py with food IDs encoded as pseudo-ingredients and symptom IDs as names.
+        # Use actual ingredient strings from each food so the algorithm
+        # computes per-ingredient associations (not per-food).
         analysis_food_logs = [
-            FoodLogEntry(timestamp=log.timestamp, ingredients=[str(log.food_id)]) for log in food_logs
+            FoodLogEntry(
+                timestamp=log.timestamp,
+                ingredients=log.food.ingredients if log.food and log.food.ingredients else [],
+            )
+            for log in food_logs
         ]
         analysis_symptom_logs = [
             SymptomLogEntry(timestamp=log.timestamp, symptom_name=str(log.symptom_id), intensity=log.intensity)
@@ -103,86 +113,26 @@ class AlgorithmService:
             time_window_hours=time_window_hours,
         )
 
-    def _get_food_ingredient_map(self, db: Session, metrics_rows: list[Metrics]) -> dict[str, list[str]]:
-        """Return a map of food_id_str -> ingredients for all food IDs found in metrics rows."""
-        food_ids: list[UUID] = []
-        for row in metrics_rows:
-            try:
-                food_ids.append(UUID(row.ingredient))
-            except ValueError:
-                continue
-
-        if not food_ids:
-            return {}
-
-        foods = db.execute(select(Food).where(Food.id.in_(food_ids))).scalars().all()
-        return {str(food.id): food.ingredients or [] for food in foods}
-
-    def _build_association_rows(
-        self,
-        user_id: str,
-        food_logs: list[FoodLog],
-        symptom_logs: list[SymptomLog],
-        time_window_hours: float,
-    ) -> list[dict]:
-        metrics_by_symptom = self._build_metrics_by_symptom(
-            food_logs=food_logs,
-            symptom_logs=symptom_logs,
-            time_window_hours=time_window_hours,
-        )
-
-        rows = []
-        for symptom_id_str, metrics_by_food in metrics_by_symptom.items():
-            for food_id_str, metrics in metrics_by_food.items():
-                rows.append(
-                    {
-                        "user_id": user_id,
-                        "symptom_id": UUID(symptom_id_str),
-                        "associated_food_id": UUID(food_id_str),
-                        "key_metrics": {
-                            "exposures": metrics.exposures,
-                            "trigger_rate": metrics.trigger_rate,
-                            "base_rate": metrics.base_rate,
-                            "fishers_p_value": metrics.fishers_p_value,
-                            "average_intensity": metrics.average_intensity,
-                        },
-                    }
-                )
-        return rows
-
     def _serialize_metrics_rows(
         self,
         metrics_rows: list[Metrics],
-        food_ingredient_map: dict[str, list[str]] | None = None,
     ) -> list[AlgorithmAssociationResponse]:
-        if food_ingredient_map is None:
-            food_ingredient_map = {}
-        response_rows: list[AlgorithmAssociationResponse] = []
-        for row in metrics_rows:
-            try:
-                associated_food_id = UUID(row.ingredient)
-            except ValueError:
-                # Ignore non-UUID ingredient rows that may exist from older runs.
-                continue
-
-            response_rows.append(
-                AlgorithmAssociationResponse.model_validate(
-                    {
-                        "id": row.id,
-                        "user_id": row.username,
-                        "symptom_id": row.symptom_id,
-                        "associated_food_id": associated_food_id,
-                        "ingredients": food_ingredient_map.get(str(associated_food_id), []),
-                        "key_metrics": {
-                            "exposures": row.exposures,
-                            "trigger_rate": row.trigger_rate,
-                            "base_rate": row.base_rate,
-                            "fishers_p_value": row.fishers_p_value,
-                            "average_intensity": row.average_intensity,
-                        },
-                        "updated_at": row.updated_at,
-                    }
-                )
+        return [
+            AlgorithmAssociationResponse.model_validate(
+                {
+                    "id": row.id,
+                    "user_id": row.username,
+                    "symptom_id": row.symptom_id,
+                    "ingredient_name": row.ingredient,
+                    "key_metrics": {
+                        "exposures": row.exposures,
+                        "trigger_rate": row.trigger_rate,
+                        "base_rate": row.base_rate,
+                        "fishers_p_value": row.fishers_p_value,
+                        "average_intensity": row.average_intensity,
+                    },
+                    "updated_at": row.updated_at,
+                }
             )
-
-        return response_rows
+            for row in metrics_rows
+        ]

@@ -1,4 +1,5 @@
 export const sensationOptions = [
+  { label: 'Bloating', value: 'Bloating' },
   { label: 'Pain', value: 'Pain' },
   { label: 'Stiffness', value: 'Stiffness' },
   { label: 'Fatigue', value: 'Fatigue' },
