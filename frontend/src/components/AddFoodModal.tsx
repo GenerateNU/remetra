@@ -28,8 +28,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
       return;
     }
 
-    setFoodName('');
-    setIngredients([]);
+    handleClose()
   };
 
   const handleClose = () => {
@@ -52,7 +51,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
       />
       <View className="flex-row justify-between items-baseline">
         <Text className="text-lg font-light font-ptserif text-remetra-accent">Ingredients</Text>
-        <Text className="text-xs font-ptserif text-remetra-muted">Press Enter or tap Add</Text>
+        <Text className="text-xs font-ptserif text-remetra-muted">Press Enter to add</Text>
       </View>
       <Chips
         items={ingredients}

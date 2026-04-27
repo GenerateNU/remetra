@@ -23,6 +23,9 @@ export interface AuthResponse {
 export interface MeResponse {
   username: string;
   email: string;
+  dob?: string 
+  weight?: number
+  gende?: string
 }
 
 export interface UserUpdatePayload {

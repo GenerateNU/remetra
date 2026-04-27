@@ -52,13 +52,14 @@ export const useAuthStore = create<AuthStore>()(
         const response = await authService.login(payload);
         // Set token first so the getMe interceptor can attach it
         set({
-          isAuthenticated: true,
           accessToken: response.access_token,
           user: { ...initialUserProfile, name: response.username },
         });
         const me = await authService.getMe();
         set((state) => ({
           user: { ...state.user, email: me.email },
+          isAuthenticated: true,
+          hasCompletedOnboarding: me.dob != undefined,
         }));
       },
 

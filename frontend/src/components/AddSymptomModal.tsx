@@ -28,8 +28,8 @@ export function AddSymptomModal({ visible, onClose }: Props) {
       setError('Failed to add symptom. Please try again.');
       return;
     }
-    setSensation('');
-    setLocation('');
+    handleClose()
+
   };
 
   const handleClose = () => {
