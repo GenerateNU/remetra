@@ -54,13 +54,8 @@ export const Chips: React.FC<ChipsProps> = ({
           onSubmitEditing={handleSubmit}
           returnKeyType="done"
           style={{ lineHeight: 16}}
+          submitBehavior="submit"
         />
-        <TouchableOpacity
-          onPress={handleSubmit}
-          className="bg-remetra-accent rounded-lg p-2.5"
-        >
-          <Text className="text-white font-semibold text-[13px]">Add</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
