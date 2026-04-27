@@ -28,8 +28,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
       return;
     }
 
-    setFoodName('');
-    setIngredients([]);
+    handleClose()
   };
 
   const handleClose = () => {
