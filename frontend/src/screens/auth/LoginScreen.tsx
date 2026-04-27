@@ -1,4 +1,4 @@
-import { View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, TextInput, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useState } from 'react';
 import { useFonts } from 'expo-font';
 import { useAppNavigation } from '../../navigation/hooks';
@@ -69,6 +69,7 @@ export function LoginScreen() {
   if (!fontsLoaded) return null;
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View className="flex-1">
       <BackgroundGradient />
 
@@ -153,5 +154,6 @@ export function LoginScreen() {
         </View>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 }

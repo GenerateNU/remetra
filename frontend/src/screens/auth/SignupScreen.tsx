@@ -1,4 +1,4 @@
-import { View, Text, Pressable, TextInput } from 'react-native';
+import { View, Text, Pressable, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useState } from 'react'
 import { useAppNavigation } from '../../navigation/hooks';
@@ -76,9 +76,10 @@ export function SignupScreen() {
   };
   if (!fontsLoaded) return null;
     return (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View className="flex-1">
         <BackgroundGradient />
-  
+
         <View className="flex-1 justify-start items-center px-6 pt-[15%]">
         
           <View className="pt-36 items-center mb-16">
@@ -171,5 +172,6 @@ export function SignupScreen() {
           </View>
         </View>
       </View>
+      </TouchableWithoutFeedback>
     );
   }
