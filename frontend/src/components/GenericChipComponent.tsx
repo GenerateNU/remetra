@@ -25,7 +25,7 @@ export const Chips: React.FC<ChipsProps> = ({
   onRemove,
   chipClassName = "bg-neutral-200",
   chipTextClassName = "text-neutral-700",
-  removeTextClassName = "text-neutral-500",
+  removeTextClassName = "text-neutral-500"
 }) => {
   const [input, setInput] = useState("");
 
@@ -53,8 +53,9 @@ export const Chips: React.FC<ChipsProps> = ({
       </View>
       <View className="flex-row items-center gap-2">
         <TextInput
-          className="flex-1 border border-neutral-300 rounded-lg p-2.5 text-sm"
+          className="flex-1 border border-neutral-300 rounded-lg p-2.5 text-sm text-remetra-espresso"
           placeholder={placeholder ?? `Add ${itemName.toLowerCase()}...`}
+          placeholderTextColor= "#aaa"
           value={input}
           onChangeText={setInput}
           onSubmitEditing={handleSubmit}
