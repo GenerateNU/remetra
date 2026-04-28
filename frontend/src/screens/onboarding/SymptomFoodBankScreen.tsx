@@ -40,17 +40,11 @@ export function SymptomFoodBankScreen() {
         contentContainerClassName="flex-grow px-6 pt-[60px] pb-10"
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View className="items-center mb-8">
-          <Text className="text-brand font-light font-ptserif tracking-[3px] text-remetra-accent">
-            R E M E T R A
-          </Text>
-        </View>
+        <View className="items-center mb-16"></View>
 
         <ItemBank
-          title="Build your symptom bank."
+          title="Build Your Symptom Bank."
           subtitle={`Describe Symptoms you experience regularily, breaking them down by location and sensation`}
-          description="Be as specific as possible. You can always add or edit these later."
           items={symptoms}
           emptyMessage="No symptoms added yet"
           onRemove={removeSymptom}
@@ -63,9 +57,8 @@ export function SymptomFoodBankScreen() {
         />
 
         <ItemBank
-          title="Build your food bank."
+          title="Build Your Food Bank."
           subtitle={`Add foods you eat regularly with their key ingredients.\ne.g. Greek Yogurt → milk, live cultures`}
-          description="You can add more as you go — Remetra learns as you log."
           items={foods}
           emptyMessage="No foods added yet"
           onRemove={removeFood}
@@ -76,17 +69,21 @@ export function SymptomFoodBankScreen() {
           visible={showFoodModal}
           onClose={() => setShowFoodModal(false)}
         />
+      </ScrollView>
 
+
+      {/* Sticky CTA */}
+      <View className="px-6 pb-12">
         {/* Done Button */}
         <TouchableOpacity
-          className="bg-white py-4 rounded-[25px] items-center shadow-md mt-auto"
+          className="bg-remetra-burgundy py-4 rounded-[25px] items-center shadow-md mt-auto"
           onPress={handleDone}
         >
-          <Text className="text-remetra-rose font-ptserif text-lg font-semibold">
+          <Text className="text-white font-ptserif text-lg font-semibold">
             Done
           </Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </View>
   );
 }

@@ -48,10 +48,10 @@ export function UserGoalsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1">
-          <Text className="text-xl text-remetra-rose font-ptserif text-center mt-36 mb-2 font-normal">
-            What are you hoping to accomplish with Remetra?
+          <Text className="text-xl text-remetra-espresso font-ptserif text-center mt-36 mb-2 font-normal">
+            What Are You Hoping To Accomplish With Remetra?
           </Text>
-          <Text className="text-base text-remetra-rose font-ptserif text-center mb-8 opacity-80">
+          <Text className="text-base text-remetra-warm-brown font-ptserif text-center mb-8 opacity-80">
             Select all that apply
           </Text>
 
@@ -71,17 +71,21 @@ export function UserGoalsScreen() {
               </TouchableOpacity>
             ))}
           </View>
-
-          <TouchableOpacity 
-            className="bg-white py-4 rounded-[25px] items-center shadow-md mt-auto"
-            onPress={handleDone}
-          >
-            <Text className="text-remetra-rose font-ptserif text-lg font-semibold">
-              Done
-            </Text>
-          </TouchableOpacity>
+          
         </View>
       </ScrollView>
+
+      {/* Sticky CTA */}
+      <View className="px-6 pb-12">
+        <TouchableOpacity 
+          className="bg-remetra-burgundy py-4 rounded-[25px] items-center shadow-md mt-auto"
+          onPress={handleDone}
+        >
+          <Text className="text-white font-ptserif text-lg font-semibold">
+            Next
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
