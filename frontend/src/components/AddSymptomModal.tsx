@@ -30,6 +30,7 @@ export function AddSymptomModal({ visible, onClose }: Props) {
     }
     setSensation('');
     setLocation('');
+    handleClose()
   };
 
   const handleClose = () => {
