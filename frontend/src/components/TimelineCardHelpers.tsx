@@ -80,9 +80,9 @@ export function SaveCancelRow({
     <View className="flex-row gap-2 mt-3.5">
       <TouchableOpacity
         onPress={onCancel}
-        className="flex-1 py-2.5 rounded-lg border border-remetra-border items-center"
+        className="flex-1 py-2.5 rounded-lg border border-remetra-burgundy items-center"
       >
-        <Text className="text-sm text-remetra-muted">Cancel</Text>
+        <Text className="text-sm text-remetra-burgundy">Cancel</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={onSave}

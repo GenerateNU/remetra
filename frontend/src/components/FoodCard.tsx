@@ -58,7 +58,6 @@ export function FoodCard({
         <View className="flex-row justify-between items-start">
           <View className="flex-1">
             <View className="flex-row items-center gap-1.5 mb-1">
-              <Text className="text-base">🍽</Text>
               <Text style={{ fontSize: 16, fontWeight: '600', color: '#7C4A1E' }}>{entry.name}</Text>
             </View>
             {entry.quantity ? (

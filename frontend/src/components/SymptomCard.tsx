@@ -79,7 +79,6 @@ export function SymptomCard({
         <View className="flex-row justify-between items-start">
           <View className="flex-1">
             <View className="flex-row items-center gap-1.5 mb-1">
-              <Text className="text-base">🩺</Text>
               <Text style={{ fontSize: 16, fontWeight: '600', color: '#7B3B4E' }}>{entry.name}</Text>
             </View>
             <View className="flex-row items-center gap-2 mb-0.5">
