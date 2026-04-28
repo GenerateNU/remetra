@@ -108,10 +108,10 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
           onBack
         }
       }>
-        <Text className="text-base font-ptserif text-remetra-accent mb-4">← Back</Text>
+        <Text className="text-base font-ptserif text-remetra-espresso mb-4">← Back</Text>
       </TouchableOpacity>
 
-      <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-accent">
+      <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-espresso">
         Log Symptom
       </Text>
 
@@ -131,15 +131,15 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
           >
             <Text className="font-medium text-base font-ptserif text-white">+ New Symptom</Text>
           </TouchableOpacity>
-          <View className="gap-1 mb-3">
+          <View className="gap-2 mb-3">
             {filtered.map((sy) => (
               <TouchableOpacity
                 key={sy.id}
-                className="border border-remetra-mauve/40 rounded-lg p-3.5 bg-remetra-surface"
+                className="border border-remetra-mauve/40 rounded-lg p-3.5 bg-remetra-surface/30"
                 onPress={() => handleSelectSymptom(sy)}
               >
-                <Text className="text-base font-medium text-remetra-burgundy">{sy.sensation}</Text>
-                <Text className="text-xs text-remetra-muted mt-0.5">Location: {sy.location}</Text>
+                <Text className="text-base font-medium text-remetra-espresso">{sy.sensation}</Text>
+                <Text className="text-xs text-remetra-burgundy/80 mt-0.5">Location: {sy.location}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -148,15 +148,12 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
 
       {/* Selected symptom summary */}
       {selectedSymptom && !isCustom && (
-        <View className="bg-remetra-surface-accent border border-remetra-accent rounded-xl p-3.5 mb-2">
+        <View className="bg-remetra-surface-accent border border-remetra-espresso/80 rounded-xl p-3.5 mb-2">
           <View className="flex-row justify-between items-start">
             <View>
-              <Text className="text-lg font-semibold text-remetra-burgundy">{selectedSymptom.sensation}</Text>
-              <Text className="text-xs text-remetra-muted mt-0.5">Location: {selectedSymptom.location}</Text>
+              <Text className="text-lg font-semibold text-remetra-espresso">{selectedSymptom.sensation}</Text>
+              <Text className="text-xs text-remetra-warm-brown mt-0.5">Location: {selectedSymptom.location}</Text>
             </View>
-            <TouchableOpacity onPress={() => { setSelectedSymptom(null); setSearchQuery(""); }}>
-              <Text className="text-sm font-medium font-ptserif text-remetra-accent">Change</Text>
-            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -174,9 +171,10 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
             searchPlaceholder="Type to search..."
             value={customSensation}
             onChange={item => { setCustomSensation(item.value); if (errors.sensation) clearError(); }}
-            style={{ borderWidth: 1, borderColor: errors.sensation ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 4, backgroundColor: '#fafafa' }}
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 8 }}
             placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-            selectedTextStyle={{ fontSize: 14 }}
+            selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
+            itemTextStyle={{ color: '#5C2E14'}}
           />
           {errors.sensation && (
             <Text className="text-red-400 text-xs mb-2">{errors.sensation}</Text>
@@ -190,9 +188,10 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
             searchPlaceholder="Type to search..."
             value={customLocation}
             onChange={item => { setCustomLocation(item.value); if (errors.location) clearError(); }}
-            style={{ borderWidth: 1, borderColor: errors.location ? '#f87171' : '#ccc', borderRadius: 8, padding: 12, marginBottom: 4, backgroundColor: '#fafafa' }}
+            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8 }}
             placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-            selectedTextStyle={{ fontSize: 14 }}
+            selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
+            itemTextStyle={{ color: '#5C2E14'}}
           />
           {errors.location && (
             <Text className="text-red-400 text-xs mb-2">{errors.location}</Text>
@@ -203,7 +202,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
       {/* Intensity + Timestamp + Duration */}
       {(selectedSymptom || isCustom) && (
         <>
-          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-remetra-warm-brown mt-4 mb-1.5">
             Intensity: {intensity}/10
           </Text>
           <View className="flex-row justify-between gap-1 mb-2">
@@ -215,35 +214,35 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
                 }`}
                 onPress={() => setIntensity(val)}
               >
-                <Text className={`text-xs font-semibold ${val <= intensity ? 'text-white' : 'text-neutral-400'}`}>
+                <Text className={`text-xs font-semibold ${val <= intensity ? 'text-white' : 'text-neutral-500'}`}>
                   {val}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+          <Text className="text-sm font-ptserif text-remetra-espresso mb-1.5">
             Time
           </Text>
           <LogDateTimePicker
             value={timestamp}
             onChange={setTimestamp}
-            accentColor="#eea487" /* remetra-accent */
+            accentColor="#b8624fc0" /* remetra-accent */
           />
 
           {!showDuration ? (
             <TouchableOpacity onPress={() => setShowDuration(true)}>
-              <Text className="text-sm font-medium font-ptserif text-remetra-accent mt-2">
+              <Text className="text-sm font-medium font-ptserif text-remetra-burgundy mt-2">
                 + Add duration
               </Text>
             </TouchableOpacity>
           ) : (
             <View>
-              <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+              <Text className="text-sm font-semibold font-ptserif text-remetra-warm-brown mt-4 mb-1.5">
                 Duration (minutes)
               </Text>
               <TextInput
-                className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
+                className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface text-remetra-espresso"
                 keyboardType="numeric"
                 value={durationMinutes}
                 onChangeText={setDurationMinutes}
@@ -252,11 +251,11 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
             </View>
           )}
 
-          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-remetra-warm-brown mt-2 mb-1.5">
             Notes (optional)
           </Text>
           <TextInput
-            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
+            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface text-remetra-espresso"
             placeholder="Any additional notes..."
             value={notes}
             onChangeText={setNotes}
@@ -264,12 +263,12 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
           />
 
           <TouchableOpacity
-            className="border border-remetra-border rounded-full py-3.5 items-center mt-6"
+            className="border bg-remetra-burgundy/80 border-remetra-burgundy rounded-full py-3.5 items-center mt-6"
             style={{ opacity: isValid ? 1 : 0.4 }}
             onPress={handleSubmit}
             disabled={!isValid}
           >
-            <Text className="text-lg font-ptserif text-remetra-accent">Log Symptom</Text>
+            <Text className="text-lg font-ptserif text-white">Log Symptom</Text>
           </TouchableOpacity>
         </>
       )}
