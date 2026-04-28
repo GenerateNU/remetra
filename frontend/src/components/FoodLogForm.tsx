@@ -101,12 +101,24 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
           setIsCustom(false); setSearchQuery(""); setSelectedFood(null)
         }
         }}>
-        <Text className="text-base font-ptserif text-remetra-accent mb-4">← Back</Text>
+        <Text className="text-base font-ptserif text-remetra-burgundy mb-4">← Back</Text>
       </TouchableOpacity>
-
-      <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-accent">
-        Log Food
-      </Text>
+      <View className="flex-row justify-between items-center mb-3">
+        <Text className="text-2xl font-bold font-ptserif text-remetra-espresso">
+          Log Food
+        </Text>
+        {!selectedFood && !isCustom && (
+          <TouchableOpacity
+            className="border border-remetra-burgundy/80 bg-remetra-burgundy/80 rounded-full py-1 px-2"
+            onPress={() => {
+              onCloseModal();
+              setTimeout(() => navigation.navigate('BarcodeScanner'), 300);
+            }}
+          >
+            <Text className="text-s font-ptserif text-white">Scan Barcode</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Search / Select */}
       {!selectedFood && !isCustom && (
@@ -125,44 +137,30 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
             <Text className="font-medium text-base font-ptserif text-white">+ New Food</Text>
           </TouchableOpacity>
 
-          <View className="gap-1 mb-3">
+          <View className="gap-2 mb-3">
             {filtered.map((food) => (
               <TouchableOpacity
                 key={food.id}
-                className="border border-remetra-mauve/40 rounded-lg p-3.5 bg-remetra-surface"
+                className="border border-remetra-mauve/40 rounded-lg p-3.5 bg-remetra-surface/30"
                 onPress={() => handleSelectFood(food)}
               >
-                <Text className="text-base font-medium text-remetra-burgundy">{food.name}</Text>
-                <Text className="text-xs text-remetra-muted mt-0.5">
+                <Text className="text-base font-medium text-remetra-espresso">{food.name}</Text>
+                <Text className="text-xs text-remetra-burgundy mt-0.5">
                   {food.ingredients.join(", ")}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
-
-          {/* Scan barcode button */}
-          <TouchableOpacity
-            className="border border-remetra-border rounded-full py-3.5 items-center mt-2"
-            onPress={() => {
-              onCloseModal();
-              setTimeout(() => navigation.navigate('BarcodeScanner'), 300);
-            }}
-          >
-            <Text className="text-lg font-ptserif text-remetra-accent">Scan Barcode</Text>
-          </TouchableOpacity>
         </>
       )}
 
       {/* Selected food summary */}
       {selectedFood && !isCustom && (
-        <View className="bg-remetra-surface-accent border border-remetra-accent rounded-xl p-3.5 mb-2">
+        <View className="bg-remetra-surface-accent border border-remetra-espresso/80 rounded-xl p-3.5 mb-2">
           <View className="flex-row justify-between items-center">
-            <Text className="text-lg font-semibold text-neutral-900">{selectedFood.name}</Text>
-            <TouchableOpacity onPress={() => { setSelectedFood(null); setSearchQuery(""); }}>
-              <Text className="text-sm font-medium font-ptserif text-remetra-accent">Change</Text>
-            </TouchableOpacity>
+            <Text className="text-lg font-semibold text-remetra-espresso">{selectedFood.name}</Text>
           </View>
-          <Text className="text-xs text-neutral-400 mt-0.5">
+          <Text className="text-xs text-remetra-warm-brown mt-0.5">
             {selectedFood.ingredients.join(", ")}
           </Text>
         </View>
@@ -172,18 +170,22 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
       {isCustom && (
         <View>
           <TextInput
-            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
+            className="text-sm border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface text-remetra-espresso"
             placeholder="Food name"
             value={customName}
             onChangeText={setCustomName}
           />
-          {customIngredients.length === 0 && (
-            <Text className="text-remetra-accent text-[13px] mb-1">Ingredients</Text>
-          )}
+          <View className="flex-row justify-between items-center">
+            <Text className="text-sm font-ptserif text-remetra-warm-brown mt-2 mb-1">Ingredients</Text>
+            <Text className="text-xs font-ptserif text-remetra-muted mt-2 mb-1">Enter to Add</Text>
+          </View>
           <Chips
             items={customIngredients}
             itemName="Ingredients"
             placeholder="Add Ingredients..."
+            chipClassName='bg-remetra-burgundy/80'
+            chipTextClassName='text-white'
+            removeTextClassName='text-white'
             onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
             onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
           />
@@ -193,31 +195,30 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
       {/* Servings + Timestamp */}
       {(selectedFood || isCustom) && (
         <>
-          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+          <Text className="text-sm font-ptserif text-remetra-warm-brown mt-4 mb-1.5">
             Servings
           </Text>
           <TextInput
-            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
-            keyboardType="numeric"
+            className="text-sm border border-remetra-border rounded-lg p-3 bg-remetra-surface text-remetra-espresso"
             value={servings}
             onChangeText={setServings}
-            placeholder="1"
+            placeholder="e.g. '1 cup', '2 slices'"
           />
 
-          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-remetra-espresso mt-4 mb-1.5">
             Time
           </Text>
           <LogDateTimePicker
             value={timestamp}
             onChange={setTimestamp}
-            accentColor="#eea487"
+            accentColor="#b8624fc0"
           />
 
-          <Text className="text-sm font-semibold font-ptserif text-remetra-accent mt-4 mb-1.5">
+          <Text className="text-sm font-semibold font-ptserif text-remetra-warm-brown mt-4 mb-1.5">
             Notes (optional)
           </Text>
           <TextInput
-            className="border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface"
+            className="text-sm border border-remetra-border rounded-lg p-3 mb-2 bg-remetra-surface text-remetra-espresso"
             placeholder="Any additional notes..."
             value={notes}
             onChangeText={setNotes}
@@ -225,12 +226,12 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
           />
 
           <TouchableOpacity
-            className="border border-remetra-border rounded-full py-3.5 items-center mt-6"
+            className="border bg-remetra-burgundy/80 border-remetra-burgundy rounded-full py-3.5 items-center mt-6"
             style={{ opacity: isValid ? 1 : 0.4 }}
             onPress={handleSubmit}
             disabled={!isValid}
           >
-            <Text className="text-lg font-ptserif text-remetra-accent">Log Food</Text>
+            <Text className="text-lg font-ptserif text-white">Log Food</Text>
           </TouchableOpacity>
         </>
       )}
