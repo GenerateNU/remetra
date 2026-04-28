@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from 'react-native';
 interface ItemBankProps {
   title: string;
   subtitle: string;
-  description: string;
   items: { name: string, id: string }[];
   emptyMessage: string;
   onRemove: (id: string) => void;
@@ -13,22 +12,18 @@ interface ItemBankProps {
 export function ItemBank({
   title,
   subtitle,
-  description,
   items,
   emptyMessage,
   onRemove,
   onAdd,
 }: ItemBankProps) {
   return (
-    <View className="mb-8">
-      <Text className="text-xl text-remetra-rose font-ptserif text-center mb-1 font-normal">
+    <View className="mt-4 mb-8">
+      <Text className="text-xl text-remetra-burgundy font-ptserif text-center mb-1 font-normal">
         {title}
       </Text>
-      <Text className="text-sm text-remetra-rose font-ptserif text-center mb-1 opacity-80">
+      <Text className="text-sm text-remetra-espresso font-ptserif text-center mb-4 opacity-80">
         {subtitle}
-      </Text>
-      <Text className="text-xs text-remetra-mauve font-ptserif text-center mb-4">
-        {description}
       </Text>
 
       <View className="bg-white/60 border border-remetra-mauve/40 rounded-xl min-h-[120px] p-3">
@@ -44,7 +39,7 @@ export function ItemBank({
               >
                 <Text className="text-remetra-rose text-sm mr-2 font-bold">✕</Text>
               </TouchableOpacity>
-              <Text className="text-remetra-burgundy font-ptserif text-sm">
+              <Text className="text-remetra-espresso font-ptserif text-sm">
                 {item.name}
               </Text>
             </View>
@@ -55,7 +50,7 @@ export function ItemBank({
             onPress={onAdd}
             activeOpacity={0.7}
           >
-            <Text className="text-remetra-coral font-ptserif text-sm font-bold">+ Add</Text>
+            <Text className="text-remetra-espresso font-ptserif text-sm font-bold">+ Add</Text>
           </TouchableOpacity>
         </View>
 

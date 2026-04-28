@@ -25,7 +25,7 @@ export function BaseAddModal({ visible, onClose, onAdd, addLabel, error, childre
               <Text className="text-base font-ptserif text-white">{addLabel}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onClose} className="items-center py-1">
-              <Text className="text-sm font-ptserif text-remetra-muted">Cancel</Text>
+              <Text className="text-sm font-ptserif text-remetra-warm-brown">Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>

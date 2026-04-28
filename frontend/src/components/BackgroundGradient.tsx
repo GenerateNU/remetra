@@ -6,7 +6,7 @@ export function BackgroundGradient () {
   return   (    
     <Svg height="100%" width="100%" style={StyleSheet.absoluteFill} pointerEvents="none">
       <Defs>
-        <RadialGradient id="grad" cx="50%" cy="100%" r="80%">
+        <RadialGradient id="grad" cx="50%" cy="100%" r="90%">
           <Stop offset="0%" stopColor="#fd9055" stopOpacity="1" />
           <Stop offset="30%" stopColor="#fdae57" stopOpacity="1" />
           <Stop offset="60%" stopColor="#fee0ab" stopOpacity="1" />

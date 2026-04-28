@@ -32,9 +32,14 @@ export function EditMedicationsScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24 }}>
         <View className="bg-white/70 rounded-xl p-4 gap-4">
           <View>
-            <Text className="text-xs font-bold text-neutral-500 tracking-[1px] mb-1.5">
-              MEDICATIONS
-            </Text>
+            <View className='flex-row items-center justify-between'>
+              <Text className="text-xs font-semibold text-remetra-espresso/80 tracking-[1px] mb-1.5">
+                MEDICATIONS
+              </Text>
+              <Text className="text-xs font-semibold text-remetra-muted tracking-[1px] mb-1.5">
+                Press enter to add
+              </Text>
+            </View>
             <Chips
               items={medication}
               itemName="condition"

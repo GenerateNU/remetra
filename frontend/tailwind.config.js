@@ -17,6 +17,8 @@ module.exports = {
         'remetra-burgundy':       '#B8624F',  // CTAs, save buttons, auth borders
         'remetra-terracotta':     '#ca5e5e',  // chart bar fill
         'remetra-mauve':          '#b2939b',  // screen headers, low intensity, spinners
+        'remetra-espresso':       '#5C2E14',  // Dark text on gradient
+        'remetra-warm-brown':     '#7A4F35',  // Warmer brown for secondary text
         // Structural / semantic
         'remetra-surface':        '#fafafa',  // input & list-item backgrounds
         'remetra-border':         '#ccc',     // generic input / card borders

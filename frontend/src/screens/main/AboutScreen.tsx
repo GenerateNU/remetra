@@ -12,7 +12,7 @@ export function AboutScreen() {
         {/* Hero */}
         <View className="items-center mb-8 mt-2">
           <View className="w-24 h-24 rounded-full bg-remetra-peach justify-center items-center mb-3">
-            <Text className="text-4xl">✨</Text>
+            <Text className="text-5xl">⚕️</Text>
           </View>
           <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[2px]">
             REMETRA

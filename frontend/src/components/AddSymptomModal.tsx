@@ -28,8 +28,8 @@ export function AddSymptomModal({ visible, onClose }: Props) {
       setError('Failed to add symptom. Please try again.');
       return;
     }
-    handleClose()
-
+    setSensation('');
+    setLocation('');
   };
 
   const handleClose = () => {
@@ -41,7 +41,7 @@ export function AddSymptomModal({ visible, onClose }: Props) {
 
   return (
     <BaseAddModal visible={visible} onClose={handleClose} onAdd={handleAdd} addLabel="Add Symptom" error={error}>
-      <Text className="text-lg font-light font-ptserif text-remetra-accent">Sensation</Text>
+      <Text className="text-lg font-light font-ptserif text-remetra-espresso/70 mb-1">Sensation</Text>
       {/* Dropdown is a third-party component that only accepts style, not className */}
       <Dropdown
         data={sensationOptions}
@@ -54,9 +54,10 @@ export function AddSymptomModal({ visible, onClose }: Props) {
         onChange={item => setSensation(item.value)}
         style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
         placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-        selectedTextStyle={{ fontSize: 14 }}
+        selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
+        itemTextStyle={{ color: '#5C2E14'}}
       />
-      <Text className="text-lg font-light font-ptserif text-remetra-accent">Location</Text>
+      <Text className="text-lg font-light font-ptserif text-remetra-espresso/70 mb-1">Location</Text>
       {/* Dropdown is a third-party component that only accepts style, not className */}
       <Dropdown
         data={locationOptions}
@@ -69,7 +70,8 @@ export function AddSymptomModal({ visible, onClose }: Props) {
         onChange={item => setLocation(item.value)}
         style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
         placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-        selectedTextStyle={{ fontSize: 14 }}
+        selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
+        itemTextStyle={{ color: '#5C2E14'}}
       />
     </BaseAddModal>
   );

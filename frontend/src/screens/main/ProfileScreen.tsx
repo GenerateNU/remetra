@@ -23,7 +23,7 @@ export function ProfileScreen() {
       <BackgroundGradient />
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 64 }}>
         {/* Avatar */}
-        <View className="items-center mb-6">
+        <View className="items-center mb-6 mt-8">
           <View className="w-20 h-20 rounded-full bg-remetra-peach justify-center items-center">
             <Text className="text-4xl">🌺</Text>
           </View>
@@ -68,19 +68,10 @@ export function ProfileScreen() {
           <SectionDivider label="App" />
 
           <ActionRow
-            emoji="ℹ️"
+            emoji="ⓘ"
             label="About Remetra"
             onPress={() => navigation.navigate('About')}
           />
-
-          <SectionDivider label="Session" />
-
-          <TouchableOpacity
-            onPress={() => useAuthStore.setState({ hasCompletedOnboarding: false })}
-            className="bg-remetra-surface-accent rounded-xl p-4 flex-row items-center gap-3"
-          >
-            <Text className="text-[15px] text-remetra-burgundy flex-1">Reset Onboarding</Text>
-          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={logout}
@@ -97,10 +88,10 @@ export function ProfileScreen() {
 function SectionDivider({ label }: { label: string }) {
   return (
     <View className="flex-row items-center mt-2 mb-1">
-      <Text className="text-xs font-bold text-neutral-500 mr-2 tracking-[1px]">
+      <Text className="text-xs text-remetra-espresso mr-2 tracking-[1px]">
         {label.toUpperCase()}
       </Text>
-      <View className="flex-1 h-px bg-neutral-100" />
+      <View className="flex-1 h-px bg-white" />
     </View>
   );
 }
@@ -119,9 +110,9 @@ function ActionRow({
       onPress={onPress}
       className="bg-white/70 rounded-xl p-4 flex-row items-center gap-3"
     >
-      <Text className="text-xl">{emoji}</Text>
-      <Text className="text-[15px] text-neutral-700 flex-1">{label}</Text>
-      <Text className="text-lg text-remetra-border">›</Text>
+      <Text className="text-xl font-semibold text-remetra-espresso">{emoji}</Text>
+      <Text className="text-[15px] text-remetra-espresso flex-1">{label}</Text>
+      <Text className="text-lg text-remetra-espresso">›</Text>
     </TouchableOpacity>
   );
 }
@@ -129,10 +120,10 @@ function ActionRow({
 function ReadOnlyRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row justify-between items-center px-4 py-3.5">
-      <Text className="text-xs font-bold text-neutral-500 tracking-[1px]">
+      <Text className="text-xs font-semibold text-remetra-espresso tracking-[1px]">
         {label.toUpperCase()}
       </Text>
-      <Text className="text-[15px] text-neutral-700">{value}</Text>
+      <Text className="text-[15px] text-remetra-espresso">{value}</Text>
     </View>
   );
 }
@@ -151,12 +142,12 @@ function EditableRow({
       onPress={onPress}
       className="flex-row justify-between items-center px-4 py-3.5"
     >
-      <Text className="text-xs font-bold text-neutral-500 tracking-[1px]">
+      <Text className="text-xs font-semibold text-remetra-espresso tracking-[1px]">
         {label.toUpperCase()}
       </Text>
       <View className="flex-row items-center gap-2">
-        <Text className="text-[15px] text-neutral-700">{value}</Text>
-        <Text className="text-lg text-remetra-border">›</Text>
+        <Text className="text-[15px] text-remetra-espresso">{value}</Text>
+        <Text className="text-lg text-remetra-espresso">›</Text>
       </View>
     </TouchableOpacity>
   );
@@ -174,10 +165,10 @@ function EditableChipRow({
   return (
     <TouchableOpacity onPress={onPress} className="px-4 py-3.5">
       <View className="flex-row justify-between items-center mb-1.5">
-        <Text className="text-xs font-bold text-neutral-500 tracking-[1px]">
+        <Text className="text-xs font-semibold text-remetra-espresso tracking-[1px]">
           {label.toUpperCase()}
         </Text>
-        <Text className="text-lg text-remetra-border">›</Text>
+        <Text className="text-lg text-remetra-espresso">›</Text>
       </View>
       {items.length === 0 ? (
         <Text className="text-[15px] text-neutral-400">—</Text>
@@ -188,7 +179,7 @@ function EditableChipRow({
               key={`${item}-${i}`}
               className="bg-remetra-burgundy opacity-80 rounded-full py-1.5 px-3"
             >
-              <Text className="text-sm font-semibold text-remetra-surface-accent">{item}</Text>
+              <Text className="text-sm font-semibold text-white">{item}</Text>
             </View>
           ))}
         </View>

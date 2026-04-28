@@ -40,23 +40,26 @@ export function AddFoodModal({ visible, onClose }: Props) {
 
   return (
     <BaseAddModal visible={visible} onClose={handleClose} onAdd={handleAdd} addLabel="Add Food" error={error}>
-      <Text className="text-lg font-light font-ptserif text-remetra-accent">Food Name</Text>
+      <Text className="text-lg font-light font-ptserif text-remetra-espresso/70 mb-1">Food Name</Text>
       <TextInput
         value={foodName}
         onChangeText={setFoodName}
         placeholder="e.g. Greek Yogurt, Sourdough Bread"
         placeholderTextColor="#aaa"
-        className="border border-remetra-border rounded-lg p-2 mb-4 text-sm"
+        className="border border-remetra-border rounded-lg p-2 mb-4 text-sm text-remetra-espresso"
         style={{ lineHeight: 16}}
       />
       <View className="flex-row justify-between items-baseline">
-        <Text className="text-lg font-light font-ptserif text-remetra-accent">Ingredients</Text>
-        <Text className="text-xs font-ptserif text-remetra-muted">Press Enter to add</Text>
+        <Text className="text-lg font-light font-ptserif text-remetra-espresso/70">Ingredients</Text>
+        <Text className="text-xs font-ptserif text-remetra-espresso/60">Press Enter to add</Text>
       </View>
       <Chips
         items={ingredients}
         itemName="Ingredient"
-        placeholder="e.g. milk, wheat, soy..."
+        placeholder="e.g. Milk, Wheat, Soy..."
+        chipClassName='bg-remetra-burgundy'
+        chipTextClassName='text-white'
+        removeTextClassName='text-white'
         onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
         onRemove={(i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
       />

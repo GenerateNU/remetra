@@ -44,7 +44,7 @@ export function EditWeightScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24 }}>
         <View className="bg-white/70 rounded-xl p-4 gap-4">
           <View>
-            <Text className="text-xs font-bold text-neutral-500 tracking-[1px] mb-1.5">
+            <Text className="text-xs font-semibold text-remetra-espresso/80 tracking-[1px] mb-1.5">
               WEIGHT (LBS)
             </Text>
             <TextInput
@@ -54,6 +54,7 @@ export function EditWeightScreen() {
               value={weight}
               onChangeText={setWeight}
               keyboardType="numeric"
+              inputMode="numeric"
               autoFocus
             />
             {error ? (
