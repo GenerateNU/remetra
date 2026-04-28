@@ -7,6 +7,7 @@ import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 import { sensationOptions, locationOptions } from "../types/symptomOptions";
+import { useUIStore } from "../store/uiStore";
 
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
@@ -74,6 +75,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
         notes: notes.trim() || undefined,
         username,
       });
+      useUIStore.getState().notifyLogCreated()
     } catch (error) {
       console.error("Failed to create symptom log entry:", error);
       return;

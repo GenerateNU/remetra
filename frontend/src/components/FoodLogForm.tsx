@@ -4,6 +4,7 @@ import { Chips } from "./GenericChipComponent";
 import { foodLogService } from "../api/food_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 import { useNavigation } from '@react-navigation/native';
+import { useUIStore } from "../store/uiStore";
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
@@ -74,6 +75,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
         notes: notes.trim() || undefined,
         username,
       });
+      useUIStore.getState().notifyLogCreated()
     } catch (error) {
       console.error("Failed to create food log entry:", error);
       return;
