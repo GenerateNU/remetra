@@ -55,7 +55,7 @@ export function AboutScreen() {
         >
           <Text className="text-xs text-remetra-mauve mb-1 tracking-[1px]">EMAIL</Text>
           <Text selectable className="text-[15px] text-neutral-700">
-            {CONTACT_EMAIL}
+          {CONTACT_EMAIL}
           </Text>
         </TouchableOpacity>
 

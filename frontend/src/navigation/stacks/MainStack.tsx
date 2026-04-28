@@ -22,7 +22,7 @@ export const MainStack = () => (
     <Stack.Screen
       name="About"
       component={AboutScreen}
-      options={{ headerShown: true, title: 'About', gestureEnabled: true }}
+      options={{ headerShown: true, headerBackTitle: 'Back', title: 'About', gestureEnabled: true }}
     />
   </Stack.Navigator>
 );
