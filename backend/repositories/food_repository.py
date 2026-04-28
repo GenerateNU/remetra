@@ -102,7 +102,7 @@ class FoodRepository:
         query = db.query(Food)
         if username:
             query = query.filter(Food.username == username)
-        return query.all()
+        return query.order_by(Food.created_at.desc()).all()
 
     def update_food_by_id(self, db: Session, food_id: UUID, food_data: dict) -> Optional[Food]:
         """

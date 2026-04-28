@@ -62,7 +62,7 @@ export const useBankStore = create<BankStore>((set, get) => ({
         name: response.name,
         ingredients: response.ingredients,
       };
-      set((state) => ({ foods: [...state.foods, food] }));
+      set((state) => ({ foods: [food, ...state.foods] }));
       return food.id;
     } catch (err: any) {
       console.error("addFood failed", err);
@@ -79,7 +79,7 @@ export const useBankStore = create<BankStore>((set, get) => ({
         location: response.location || "",
         sensation: response.sensation || "",
       };
-      set((state) => ({ symptoms: [...state.symptoms, symptom] }));
+      set((state) => ({ symptoms: [symptom, ...state.symptoms] }));
       return symptom.id;
     } catch (err: any) {
       console.error("addSymptom failed", err);

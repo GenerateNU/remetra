@@ -67,7 +67,7 @@ class SymptomRepository:
         query = db.query(Symptom)
         if username:
             query = query.filter(Symptom.username == username)
-        return query.all()
+        return query.order_by(Symptom.created_at.desc()).all()
 
     def update_symptom_by_id(
         self,
