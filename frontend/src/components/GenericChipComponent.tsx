@@ -12,6 +12,9 @@ interface ChipsProps {
   placeholder?: string;
   onAdd: (item: string) => void;
   onRemove: (index: number) => void;
+  chipClassName?: string;
+  chipTextClassName?: string;
+  removeTextClassName?: string;
 }
 
 export const Chips: React.FC<ChipsProps> = ({
@@ -20,6 +23,9 @@ export const Chips: React.FC<ChipsProps> = ({
   placeholder,
   onAdd,
   onRemove,
+  chipClassName = "bg-neutral-200",
+  chipTextClassName = "text-neutral-700",
+  removeTextClassName = "text-neutral-500",
 }) => {
   const [input, setInput] = useState("");
 
@@ -36,11 +42,11 @@ export const Chips: React.FC<ChipsProps> = ({
         {items.map((item, i) => (
           <View
             key={`${item}-${i}`}
-            className="flex-row items-center bg-neutral-200 rounded-full py-1.5 px-3 gap-1.5"
+            className={`flex-row items-center rounded-full py-1.5 px-3 gap-1.5 ${chipClassName}`}
           >
-            <Text className="text-sm text-neutral-700">{item}</Text>
+            <Text className={`text-sm ${chipTextClassName}`}>{item}</Text>
             <TouchableOpacity onPress={() => onRemove(i)}>
-              <Text className="text-sm text-neutral-500 font-semibold">✕</Text>
+              <Text className={`text-sm font-semibold ${removeTextClassName}`}>✕</Text>
             </TouchableOpacity>
           </View>
         ))}
