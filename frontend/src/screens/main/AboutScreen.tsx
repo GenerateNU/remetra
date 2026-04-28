@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+
+const CONTACT_EMAIL = 'hello@remetra.app';
 
 export function AboutScreen() {
   return (
@@ -38,25 +40,35 @@ export function AboutScreen() {
           <InfoRow emoji="📊" label="Sed do eiusmod tempor incididunt" />
         </View>
 
-        {/* Version */}
-        <SectionDivider label="Version" />
-        <View className="bg-white/70 rounded-xl p-4 flex-row items-center justify-between">
-          <Text className="text-[15px] text-neutral-700">App Version</Text>
-          <Text className="text-[15px] text-remetra-muted">0.0.0</Text>
-        </View>
-
         {/* Links */}
         <SectionDivider label="Legal" />
         <View className="gap-3">
           <LinkRow label="Privacy Policy" onPress={() => {}} />
           <LinkRow label="Terms of Service" onPress={() => {}} />
-          <LinkRow label="Contact" onPress={() => {}} />
         </View>
 
+        {/* Contact */}
+        <SectionDivider label="Contact" />
+        <TouchableOpacity
+          onPress={() => Linking.openURL(`mailto:${CONTACT_EMAIL}`)}
+          className="bg-white/70 rounded-xl p-4"
+        >
+          <Text className="text-xs text-remetra-mauve mb-1 tracking-[1px]">EMAIL</Text>
+          <Text selectable className="text-[15px] text-neutral-700">
+            {CONTACT_EMAIL}
+          </Text>
+        </TouchableOpacity>
+
         {/* Footer */}
-        <View className="items-center mt-10 mb-4">
-          <Text className="text-xs text-remetra-muted tracking-[1px]">
-            BUILT BY GENERATE<Text className="font-semibold text-remetra-mauve">NU</Text>
+        <View className="flex-row items-center justify-around mt-10 mb-4">
+          <Text className="text-xs font-semibold text-remetra-surface tracking-[1px]">
+            Version {'0.0.0'}
+          </Text>
+          <Text className="text-xs font-semibold text-remetra-surface tracking-[1px]">
+            BUILT BY{' '}
+            <Text className="font-bold" style={{ color: '#2563eb' }}>
+              GENERATENU
+            </Text>
           </Text>
         </View>
       </ScrollView>
@@ -67,7 +79,7 @@ export function AboutScreen() {
 function SectionDivider({ label }: { label: string }) {
   return (
     <View className="flex-row items-center mt-4 mb-2">
-      <Text className="text-xs font-bold text-remetra-muted mr-2 tracking-[1px]">
+      <Text className="text-xs text-neutral-600 mr-2 tracking-[1px]">
         {label.toUpperCase()}
       </Text>
       <View className="flex-1 h-px bg-neutral-200" />
