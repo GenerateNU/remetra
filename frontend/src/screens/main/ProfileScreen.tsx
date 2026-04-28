@@ -46,7 +46,7 @@ export function ProfileScreen() {
           <ActionRow
             emoji="ℹ️"
             label="About Remetra"
-            onPress={() => {}}
+            onPress={() => navigation.navigate('About')}
           />
 
           <SectionDivider label="Session" />
