@@ -48,7 +48,7 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
           className="bg-white rounded-3xl max-h-[75%] w-full"
           onStartShouldSetResponder={() => true}
         >
-          <View className="flex-row justify-end px-4">
+          <View className="flex-row justify-end px-4 pt-3">
             <TouchableOpacity onPress={handleClose}>
               <Text className="text-xl p-1 font-ptserif text-remetra-accent">✕</Text>
             </TouchableOpacity>
@@ -57,24 +57,24 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
           <ScrollView className="px-5 pb-8" keyboardShouldPersistTaps="handled">
             {step === "select_type" && (
               <View className="items-center pt-4 gap-5 pb-6">
-                <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-accent">
-                  What are you logging?
+                <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-burgundy">
+                  What Are You Logging?
                 </Text>
 
                 <TouchableOpacity
-                  className="w-full flex-row items-center gap-4 border border-remetra-border rounded-2xl p-5"
+                  className="w-full flex-row items-center gap-4 border border-remetra-burgundy rounded-2xl p-5 bg-remetra-orange/10"
                   onPress={() => setStep("food")}
                 >
                   <Text className="text-3xl">🍽</Text>
-                  <Text className="text-lg font-semibold font-ptserif text-remetra-accent">Food</Text>
+                  <Text className="text-lg font-semibold font-ptserif text-remetra-espresso">Food</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className="w-full flex-row items-center gap-4 border border-remetra-border rounded-2xl p-5"
+                  className="w-full flex-row items-center gap-4 border border-remetra-burgundy rounded-2xl p-5 bg-remetra-orange/10"
                   onPress={() => setStep("symptom")}
                 >
                   <Text className="text-3xl">🩺</Text>
-                  <Text className="text-lg font-semibold font-ptserif text-remetra-accent">Symptom</Text>
+                  <Text className="text-lg font-semibold font-ptserif text-remetra-espresso">Symptom</Text>
                 </TouchableOpacity>
               </View>
             )}

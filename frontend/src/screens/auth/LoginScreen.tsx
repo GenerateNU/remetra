@@ -84,7 +84,7 @@ export function LoginScreen() {
             <Text className="text-lg text-remetra-peach italic">
               welcome{' '}
             </Text>
-            <Text className="text-lg text-remetra-peach font-ptserif">
+            <Text className="text-lg text-remetra-peach italic">
               back
             </Text>
           </View>

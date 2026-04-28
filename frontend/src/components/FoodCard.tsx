@@ -58,7 +58,6 @@ export function FoodCard({
         <View className="flex-row justify-between items-start">
           <View className="flex-1">
             <View className="flex-row items-center gap-1.5 mb-1">
-              <Text className="text-base">🍽</Text>
               <Text style={{ fontSize: 16, fontWeight: '600', color: '#7C4A1E' }}>{entry.name}</Text>
             </View>
             {entry.quantity ? (
@@ -85,7 +84,7 @@ export function FoodCard({
       {expanded && (
         <View className="px-3.5 pb-3.5" style={{ borderTopWidth: 1, borderTopColor: '#FAD9C4' }}>
           <EditLabel>Quantity</EditLabel>
-          <EditTextInput value={quantity} onChange={setQuantity} placeholder="e.g. 2" integerOnly />
+          <EditTextInput value={quantity} onChange={setQuantity} placeholder="e.g. 2 servings, 1.5oz"/>
 
           <EditLabel>Date & Time</EditLabel>
           <LogDateTimePicker value={timestamp} onChange={setTimestamp} />

@@ -215,9 +215,9 @@ export function TimelineScreen() {
             {groups.map((group) => (
               <View key={group.dateKey}>
                 <View className="flex-row items-center mb-3 mt-2">
-                  <Text className="text-sm font-bold text-[#7B5B6B] mr-2">{group.label}</Text>
-                  <View className="flex-1 h-px bg-neutral-200" />
-                  <Text className="text-xs text-remetra-muted ml-2">
+                  <Text className="text-sm text-remetra-warm-brown mr-2">{group.label}</Text>
+                  <View className="flex-1 h-px bg-white" />
+                  <Text className="text-xs text-remetra-warm-brown ml-2">
                     {group.items.length} {group.items.length === 1 ? 'entry' : 'entries'}
                   </Text>
                 </View>

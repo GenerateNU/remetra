@@ -53,7 +53,7 @@ export const Chips: React.FC<ChipsProps> = ({
       </View>
       <View className="flex-row items-center gap-2">
         <TextInput
-          className="flex-1 border border-neutral-300 rounded-lg p-2.5 text-sm text-remetra-espresso"
+          className="flex-1 border border-neutral-300 bg-remetra-surface rounded-lg p-3 text-sm text-remetra-espresso"
           placeholder={placeholder ?? `Add ${itemName.toLowerCase()}...`}
           placeholderTextColor= "#aaa"
           value={input}
