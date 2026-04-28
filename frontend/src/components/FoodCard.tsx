@@ -84,7 +84,7 @@ export function FoodCard({
       {expanded && (
         <View className="px-3.5 pb-3.5" style={{ borderTopWidth: 1, borderTopColor: '#FAD9C4' }}>
           <EditLabel>Quantity</EditLabel>
-          <EditTextInput value={quantity} onChange={setQuantity} placeholder="e.g. 2" integerOnly />
+          <EditTextInput value={quantity} onChange={setQuantity} placeholder="e.g. 2 servings, 1.5oz"/>
 
           <EditLabel>Date & Time</EditLabel>
           <LogDateTimePicker value={timestamp} onChange={setTimestamp} />
