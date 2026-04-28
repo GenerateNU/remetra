@@ -23,9 +23,13 @@ export interface AuthResponse {
 export interface MeResponse {
   username: string;
   email: string;
-  dob?: string 
-  weight?: number
-  gende?: string
+  dob?: string | null;
+  disease?: string[] | null;
+  weight?: number | null;
+  gender?: string | null;
+  medication?: string[] | null;
+  created_at: string;
+  updated_at?: string | null;
 }
 
 export interface UserUpdatePayload {
@@ -69,9 +73,10 @@ export const authService = {
   },
 
   // PUT /auth/me -> update_profile()
-  async updateProfile(payload: UserUpdatePayload): Promise<void> {
+  async updateProfile(payload: UserUpdatePayload): Promise<MeResponse> {
     try {
-      await apiClient.put('/auth/me', payload);
+      const { data } = await apiClient.put('/auth/me', payload);
+      return data;
     } catch (err: any) {
       throw new ApiError(err.response?.data?.detail ?? 'Failed to update profile');
     }

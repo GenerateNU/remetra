@@ -22,6 +22,7 @@ module.exports = {
         'remetra-border':         '#ccc',     // generic input / card borders
         'remetra-muted':          '#aaa',     // secondary / meta text
         'remetra-surface-accent': '#fff5f0',  // selected-item card background
+        'remetra-text-holder':    '#676767',  // Placeholder text
       },
       fontSize: {
         // Brand wordmark used across onboarding screens

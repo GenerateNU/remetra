@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService, LoginPayload, RegisterPayload } from '../api/auth_service';
+import { authService, LoginPayload, MeResponse, RegisterPayload } from '../api/auth_service';
 import { useBankStore } from './bankStore';
 
 interface UserProfile {
@@ -10,6 +10,11 @@ interface UserProfile {
   email: string | null;
   name: string | null;
   avatarUrl: string | null;
+  dob: string | null;
+  gender: string | null;
+  weight: number | null;
+  disease: string[];
+  medication: string[];
 }
 
 interface AuthState {
@@ -25,6 +30,8 @@ interface AuthActions {
   logout: () => void;
   completeOnboarding: () => void;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
+  setUserFromMe: (me: MeResponse) => void;
+  refreshProfile: () => Promise<void>;
 }
 
 type AuthStore = AuthState & AuthActions;
@@ -34,7 +41,24 @@ const initialUserProfile: UserProfile = {
   email: null,
   name: null,
   avatarUrl: null,
+  dob: null,
+  gender: null,
+  weight: null,
+  disease: [],
+  medication: [],
 };
+
+const mapMeToUser = (me: MeResponse): UserProfile => ({
+  id: null,
+  email: me.email,
+  name: me.username,
+  avatarUrl: null,
+  dob: me.dob ?? null,
+  gender: me.gender ?? null,
+  weight: me.weight ?? null,
+  disease: me.disease ?? [],
+  medication: me.medication ?? [],
+});
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -56,11 +80,11 @@ export const useAuthStore = create<AuthStore>()(
           user: { ...initialUserProfile, name: response.username },
         });
         const me = await authService.getMe();
-        set((state) => ({
-          user: { ...state.user, email: me.email },
+        set({
+          user: mapMeToUser(me),
           isAuthenticated: true,
-          hasCompletedOnboarding: me.dob != undefined,
-        }));
+          hasCompletedOnboarding: me.dob != null,
+        });
       },
 
       register: async (payload) => {
@@ -89,6 +113,20 @@ export const useAuthStore = create<AuthStore>()(
         set((state) => ({
           user: { ...state.user, ...profile },
         })),
+
+      setUserFromMe: (me) =>
+        set({
+          user: mapMeToUser(me),
+          hasCompletedOnboarding: me.dob != null,
+        }),
+
+      refreshProfile: async () => {
+        const me = await authService.getMe();
+        set({
+          user: mapMeToUser(me),
+          hasCompletedOnboarding: me.dob != null,
+        });
+      },
     }),
     {
       name: 'auth-storage',
