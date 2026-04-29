@@ -1,5 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Linking } from 'react-native';
+import {
+  HeartPlus,
+  NotebookPen,
+  Search,
+  ChartColumn,
+  ChevronRight,
+  type LucideIcon,
+} from 'lucide-react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 
 const CONTACT_EMAIL = 'hello@remetra.app';
@@ -12,7 +20,7 @@ export function AboutScreen() {
         {/* Hero */}
         <View className="items-center mb-8 mt-2">
           <View className="w-24 h-24 rounded-full bg-remetra-peach justify-center items-center mb-3">
-            <Text className="text-5xl">⚕️</Text>
+            <HeartPlus size={44} color="#5C2E14" strokeWidth={1.75} />
           </View>
           <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[2px]">
             REMETRA
@@ -35,9 +43,9 @@ export function AboutScreen() {
         {/* How it works */}
         <SectionDivider label="How It Works" />
         <View className="gap-3">
-          <InfoRow emoji="📝" label="Lorem ipsum dolor sit amet" />
-          <InfoRow emoji="🔍" label="Consectetur adipiscing elit" />
-          <InfoRow emoji="📊" label="Sed do eiusmod tempor incididunt" />
+          <InfoRow Icon={NotebookPen} label="Lorem ipsum dolor sit amet" />
+          <InfoRow Icon={Search} label="Consectetur adipiscing elit" />
+          <InfoRow Icon={ChartColumn} label="Sed do eiusmod tempor incididunt" />
         </View>
 
         {/* Links */}
@@ -87,10 +95,10 @@ function SectionDivider({ label }: { label: string }) {
   );
 }
 
-function InfoRow({ emoji, label }: { emoji: string; label: string }) {
+function InfoRow({ Icon, label }: { Icon: LucideIcon; label: string }) {
   return (
     <View className="bg-white/70 rounded-xl p-4 flex-row items-center gap-3">
-      <Text className="text-xl">{emoji}</Text>
+      <Icon size={20} color="#5C2E14" strokeWidth={2} />
       <Text className="text-[15px] text-neutral-700 flex-1">{label}</Text>
     </View>
   );
@@ -103,7 +111,7 @@ function LinkRow({ label, onPress }: { label: string; onPress: () => void }) {
       className="bg-white/70 rounded-xl p-4 flex-row items-center gap-3"
     >
       <Text className="text-[15px] text-neutral-700 flex-1">{label}</Text>
-      <Text className="text-lg text-remetra-border">›</Text>
+      <ChevronRight size={20} color="#ccc" strokeWidth={2} />
     </TouchableOpacity>
   );
 }

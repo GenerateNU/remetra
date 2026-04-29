@@ -4,6 +4,7 @@ import { symptomLogService } from "../api/symptom_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { ArrowLeft } from "lucide-react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 import { sensationOptions, locationOptions } from "../types/symptomOptions";
@@ -100,17 +101,20 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
 
   return (
     <View className="pb-10">
-      <TouchableOpacity onPress={() => {
-        if (!selectedSymptom && !isCustom) {
-          onBack()
-        } else {
-          setIsCustom(false); setSearchQuery(""); setSelectedSymptom(null);
-          setCustomSensation(""); setCustomLocation("");
-        }
-          onBack
-        }
-      }>
-        <Text className="text-base font-ptserif text-remetra-espresso mb-4">← Back</Text>
+      <TouchableOpacity
+        onPress={() => {
+          if (!selectedSymptom && !isCustom) {
+            onBack()
+          } else {
+            setIsCustom(false); setSearchQuery(""); setSelectedSymptom(null);
+            setCustomSensation(""); setCustomLocation("");
+          }
+        }}
+        className="flex-row items-center gap-1.5 mb-4"
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <ArrowLeft size={18} color="#5C2E14" strokeWidth={2} />
+        <Text className="text-base font-ptserif text-remetra-espresso">Back</Text>
       </TouchableOpacity>
 
       <Text className="text-2xl font-bold font-ptserif mb-3 text-remetra-espresso">

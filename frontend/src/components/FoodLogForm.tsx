@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useUIStore } from "../store/uiStore";
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { ArrowLeft, Camera } from "lucide-react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 
 interface FoodLogFormProps {
@@ -96,14 +97,19 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
 
   return (
     <View className="pb-10">
-      <TouchableOpacity onPress={() => {
-        if (!selectedFood && !isCustom) {
-          onBack()
-        } else {
-          setIsCustom(false); setSearchQuery(""); setSelectedFood(null)
-        }
-        }}>
-        <Text className="text-base font-ptserif text-remetra-burgundy mb-4">← Back</Text>
+      <TouchableOpacity
+        onPress={() => {
+          if (!selectedFood && !isCustom) {
+            onBack()
+          } else {
+            setIsCustom(false); setSearchQuery(""); setSelectedFood(null)
+          }
+        }}
+        className="flex-row items-center gap-1.5 mb-4"
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <ArrowLeft size={18} color="#B8624F" strokeWidth={2} />
+        <Text className="text-base font-ptserif text-remetra-burgundy">Back</Text>
       </TouchableOpacity>
       <View className="flex-row justify-between items-center mb-3">
         <Text className="text-2xl font-bold font-ptserif text-remetra-espresso">
@@ -111,13 +117,15 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
         </Text>
         {!selectedFood && !isCustom && (
           <TouchableOpacity
-            className="border border-remetra-burgundy/80 bg-remetra-burgundy/80 rounded-full py-1 px-2"
+            className="border border-remetra-burgundy/80 bg-remetra-burgundy/80 rounded-full p-2"
             onPress={() => {
               onCloseModal();
               setTimeout(() => navigation.navigate('BarcodeScanner'), 300);
             }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityLabel="Scan Barcode"
           >
-            <Text className="text-s font-ptserif text-white">Scan Barcode</Text>
+            <Camera size={18} color="#ffffff" strokeWidth={2} />
           </TouchableOpacity>
         )}
       </View>
@@ -187,7 +195,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
             placeholder="Add Ingredients..."
             chipClassName='bg-remetra-burgundy/80'
             chipTextClassName='text-white'
-            removeTextClassName='text-white'
+            removeIconColor='#ffffff'
             onAdd={(ing) => setCustomIngredients((prev) => [...prev, ing])}
             onRemove={(i) => setCustomIngredients((prev) => prev.filter((_, idx) => idx !== i))}
           />

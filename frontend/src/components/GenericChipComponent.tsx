@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
+import { X } from "lucide-react-native";
 
 interface ChipsProps {
   items: string[];
@@ -14,7 +15,7 @@ interface ChipsProps {
   onRemove: (index: number) => void;
   chipClassName?: string;
   chipTextClassName?: string;
-  removeTextClassName?: string;
+  removeIconColor?: string;
 }
 
 export const Chips: React.FC<ChipsProps> = ({
@@ -25,7 +26,7 @@ export const Chips: React.FC<ChipsProps> = ({
   onRemove,
   chipClassName = "bg-neutral-200",
   chipTextClassName = "text-neutral-700",
-  removeTextClassName = "text-neutral-500"
+  removeIconColor = "#737373"
 }) => {
   const [input, setInput] = useState("");
 
@@ -45,8 +46,8 @@ export const Chips: React.FC<ChipsProps> = ({
             className={`flex-row items-center rounded-full py-1.5 px-3 gap-1.5 ${chipClassName}`}
           >
             <Text className={`text-sm ${chipTextClassName}`}>{item}</Text>
-            <TouchableOpacity onPress={() => onRemove(i)}>
-              <Text className={`text-sm font-semibold ${removeTextClassName}`}>✕</Text>
+            <TouchableOpacity onPress={() => onRemove(i)} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
+              <X size={14} color={removeIconColor} strokeWidth={2.5} />
             </TouchableOpacity>
           </View>
         ))}

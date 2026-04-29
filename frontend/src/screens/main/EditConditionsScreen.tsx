@@ -46,7 +46,7 @@ export function EditConditionsScreen() {
               placeholder="Add condition..."
               chipClassName='bg-remetra-burgundy opacity-90'
               chipTextClassName='font-semibold text-remetra-surface-accent'
-              removeTextClassName='font-semibold text-remetra-surface-accent'
+              removeIconColor='#fff5f0'
               onAdd={(item) => setDisease((prev) => [...prev, item])}
               onRemove={(i) =>
                 setDisease((prev) => prev.filter((_, idx) => idx !== i))
