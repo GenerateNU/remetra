@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity } from 'react-native';
+import { X } from 'lucide-react-native';
 
 interface ItemBankProps {
   title: string;
@@ -36,8 +37,9 @@ export function ItemBank({
               <TouchableOpacity
                 onPress={() => onRemove(item.id)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                className="mr-2"
               >
-                <Text className="text-remetra-rose text-sm mr-2 font-bold">✕</Text>
+                <X size={14} color="#C85A4A" strokeWidth={2.5} />
               </TouchableOpacity>
               <Text className="text-remetra-espresso font-ptserif text-sm">
                 {item.name}

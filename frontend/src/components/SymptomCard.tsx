@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { Check } from 'lucide-react-native';
 import { symptomLogService } from '../api/symptom_log_service';
 import { LogDateTimePicker } from './LogDateTimePicker';
 import { SymptomTimelineEntry } from '../types/timeline';
@@ -142,7 +143,7 @@ export function SymptomCard({
                 hasDuration ? 'bg-remetra-burgundy border-remetra-burgundy' : 'bg-white border-remetra-border'
               }`}
             >
-              {hasDuration ? <Text className="text-white text-xs">✓</Text> : null}
+              {hasDuration ? <Check size={12} color="#ffffff" strokeWidth={3} /> : null}
             </TouchableOpacity>
             <Text style={{ fontSize: 13, color: '#7B3B4E' }}>Duration (minutes)</Text>
           </View>

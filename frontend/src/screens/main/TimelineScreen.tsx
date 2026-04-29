@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { ClipboardList } from 'lucide-react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { FoodCard } from '../../components/FoodCard';
 import { SymptomCard } from '../../components/SymptomCard';
@@ -178,7 +179,7 @@ export function TimelineScreen() {
             <View className="w-3 h-3 rounded-full bg-remetra-mauve" />
             <Text className="text-xs text-remetra-muted">Symptom</Text>
           </View>
-          <Text className="text-xs text-neutral-300 ml-1">Tap a card to edit</Text>
+          <Text className="text-xs text-remetra-mauve ml-1">Tap a card to edit</Text>
         </View>
 
         {/* Content */}
@@ -198,9 +199,9 @@ export function TimelineScreen() {
           </View>
         ) : entries.length === 0 ? (
           <View className="flex-1 justify-center items-center p-6">
-            <Text className="text-5xl mb-3">📋</Text>
+            <ClipboardList size={56} color="#b2939b" strokeWidth={1.5} style={{ marginBottom: 12 }} />
             <Text className="text-lg text-remetra-mauve font-semibold text-center">No logs yet</Text>
-            <Text className="text-sm text-remetra-muted text-center mt-2">
+            <Text className="text-sm text-remetra-mauve text-center mt-2">
               Tap + Add Log to record your first food or symptom entry.
             </Text>
           </View>

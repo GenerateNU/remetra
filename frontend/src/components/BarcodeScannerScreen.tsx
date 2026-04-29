@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { ArrowLeft } from "lucide-react-native";
 import { useState, useRef } from "react";
 import { useBankStore } from "../store/bankStore";
 
@@ -91,7 +92,10 @@ export const BarcodeScannerScreen = () => {
       <View style={styles.overlay}>
         <Text style={styles.instructions}>Point at a barcode</Text>
         <TouchableOpacity style={styles.cancelBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.cancelText}>← Cancel</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <ArrowLeft size={18} color="#eea487" strokeWidth={2} />
+            <Text style={styles.cancelText}>Cancel</Text>
+          </View>
         </TouchableOpacity>
         {scanned && (
           <TouchableOpacity style={styles.btn} onPress={() => setScanned(false)}>

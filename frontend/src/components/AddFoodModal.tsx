@@ -59,7 +59,7 @@ export function AddFoodModal({ visible, onClose }: Props) {
         placeholder="e.g. Milk, Wheat, Soy..."
         chipClassName='bg-remetra-burgundy'
         chipTextClassName='text-white'
-        removeTextClassName='text-white'
+        removeIconColor='#ffffff'
         onAdd={(ing) => setIngredients((prev) => [...prev, ing])}
         onRemove={(i) => setIngredients((prev) => prev.filter((_, idx) => idx !== i))}
       />

@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Info, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { useAuthStore } from '../../store/useAuthStore';
 import type { MainStackParamList } from '../../navigation/stacks/MainStack';
@@ -68,7 +69,7 @@ export function ProfileScreen() {
           <SectionDivider label="App" />
 
           <ActionRow
-            emoji="ⓘ"
+            Icon={Info}
             label="About Remetra"
             onPress={() => navigation.navigate('About')}
           />
@@ -97,11 +98,11 @@ function SectionDivider({ label }: { label: string }) {
 }
 
 function ActionRow({
-  emoji,
+  Icon,
   label,
   onPress,
 }: {
-  emoji: string;
+  Icon: LucideIcon;
   label: string;
   onPress: () => void;
 }) {
@@ -110,9 +111,9 @@ function ActionRow({
       onPress={onPress}
       className="bg-white/70 rounded-xl p-4 flex-row items-center gap-3"
     >
-      <Text className="text-xl font-semibold text-remetra-espresso">{emoji}</Text>
+      <Icon size={20} color="#5C2E14" strokeWidth={2} />
       <Text className="text-[15px] text-remetra-espresso flex-1">{label}</Text>
-      <Text className="text-lg text-remetra-espresso">›</Text>
+      <ChevronRight size={16} color="#5C2E14" strokeWidth={2} />
     </TouchableOpacity>
   );
 }
@@ -147,7 +148,7 @@ function EditableRow({
       </Text>
       <View className="flex-row items-center gap-2">
         <Text className="text-[15px] text-remetra-espresso">{value}</Text>
-        <Text className="text-lg text-remetra-espresso">›</Text>
+        <ChevronRight size={16} color="#5C2E14" strokeWidth={2} />
       </View>
     </TouchableOpacity>
   );
@@ -168,7 +169,7 @@ function EditableChipRow({
         <Text className="text-xs font-semibold text-remetra-espresso tracking-[1px]">
           {label.toUpperCase()}
         </Text>
-        <Text className="text-lg text-remetra-espresso">›</Text>
+        <ChevronRight size={16} color="#5C2E14" strokeWidth={2} />
       </View>
       {items.length === 0 ? (
         <Text className="text-[15px] text-neutral-400">—</Text>

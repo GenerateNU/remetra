@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import { useEffect, useMemo } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
@@ -43,8 +44,13 @@ export function CorrelationsScreen({ navigation, route }: Props) {
       <View style={{ flex: 1 }}>
         {/* Header */}
         <View style={{ paddingTop: 56, paddingHorizontal: 24, paddingBottom: 8 }}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
-            <Text style={{ color: '#ca5e5e', fontSize: 14 }}>← Back</Text>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <ArrowLeft size={16} color="#ca5e5e" strokeWidth={2} />
+            <Text style={{ color: '#ca5e5e', fontSize: 14 }}>Back</Text>
           </TouchableOpacity>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <Text style={{ fontSize: 24, fontWeight: '600', color: '#b2939b', fontStyle: 'italic', textTransform: 'capitalize' }}>
