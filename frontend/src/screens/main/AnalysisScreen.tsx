@@ -8,6 +8,7 @@ import { useBankStore } from '../../store/bankStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
 import { useAppNavigation } from '../../navigation/hooks';
+import { ChevronRight } from 'lucide-react-native';
 
 const MIN_LOGS_FOR_ANALYSIS = 30;
 
@@ -144,10 +145,10 @@ export function AnalysisScreen() {
 function SectionDivider({ label }: { label: string }) {
   return (
     <View className="flex-row items-center mb-3">
-      <Text className="text-xs font-bold text-remetra-muted mr-2 tracking-[1px]">
+      <Text className="text-xs text-remetra-espresso mr-2 tracking-[1px]">
         {label.toUpperCase()}
       </Text>
-      <View className="flex-1 h-px bg-neutral-200" />
+      <View className="flex-1 h-px bg-white" />
     </View>
   );
 }
@@ -165,15 +166,15 @@ function SymptomRow({ rank, item }: { rank: number; item: SymptomCount }) {
     >
       <Text className="text-sm font-bold text-remetra-mauve w-6 text-center">{rank}</Text>
       <View className="flex-1">
-        <Text className="text-[15px] text-neutral-700 font-semibold">{item.name}</Text>
+        <Text className="text-[15px] text-remetra-espresso font-semibold">{item.name}</Text>
         {subtitle ? (
-          <Text className="text-xs text-neutral-700 mt-0.5">{subtitle}</Text>
+          <Text className="text-xs text-remetra-warm-brown mt-0.5">{subtitle}</Text>
         ) : null}
       </View>
       <View className="bg-remetra-peach rounded-full px-2.5 py-1 min-w-9 items-center">
         <Text className="text-sm font-bold text-remetra-rose">{item.count}</Text>
       </View>
-      <Text className="text-lg text-remetra-border">›</Text>
+      <ChevronRight size={16} color="#5C2E14" strokeWidth={2} />
     </TouchableOpacity>
   );
 }
