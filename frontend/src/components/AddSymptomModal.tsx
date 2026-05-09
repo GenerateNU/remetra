@@ -1,9 +1,9 @@
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { useState } from 'react';
-import { Dropdown } from 'react-native-element-dropdown';
 import { useBankStore } from '../store/bankStore';
 import { BaseAddModal } from './BaseAddModal';
 import { sensationOptions, locationOptions } from '../types/symptomOptions';
+import { ComboBox } from './ComboBox';
 
 interface Props {
   visible: boolean;
@@ -43,37 +43,23 @@ export function AddSymptomModal({ visible, onClose }: Props) {
   return (
     <BaseAddModal visible={visible} onClose={handleClose} onAdd={handleAdd} addLabel="Add Symptom" error={error}>
       <Text className="text-lg font-light font-ptserif text-remetra-espresso/70 mb-1">Sensation</Text>
-      {/* Dropdown is a third-party component that only accepts style, not className */}
-      <Dropdown
-        data={sensationOptions}
-        search
-        labelField="label"
-        valueField="value"
-        placeholder="Select a sensation..."
-        searchPlaceholder="Type to search..."
-        value={sensation}
-        onChange={item => setSensation(item.value)}
-        style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
-        placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-        selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
-        itemTextStyle={{ color: '#5C2E14'}}
-      />
+      <View className="mb-4">
+        <ComboBox
+          options={sensationOptions}
+          value={sensation}
+          placeholder="Select a sensation..."
+          onSelect={setSensation}
+        />
+      </View>
       <Text className="text-lg font-light font-ptserif text-remetra-espresso/70 mb-1">Location</Text>
-      {/* Dropdown is a third-party component that only accepts style, not className */}
-      <Dropdown
-        data={locationOptions}
-        search
-        labelField="label"
-        valueField="value"
-        placeholder="Select a location..."
-        searchPlaceholder="Type to search..."
-        value={location}
-        onChange={item => setLocation(item.value)}
-        style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 16 }}
-        placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-        selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
-        itemTextStyle={{ color: '#5C2E14'}}
-      />
+      <View className="mb-4">
+        <ComboBox
+          options={locationOptions}
+          value={location}
+          placeholder="Select a location..."
+          onSelect={setLocation}
+        />
+      </View>
     </BaseAddModal>
   );
 }
