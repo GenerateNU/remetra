@@ -26,7 +26,7 @@ export function AboutScreen() {
             REMETRA
           </Text>
           <Text className="text-sm text-remetra-muted mt-2 text-center">
-            Lorem ipsum dolor sit amet
+            Est. 2025
           </Text>
         </View>
 
@@ -34,18 +34,18 @@ export function AboutScreen() {
         <SectionDivider label="Our Mission" />
         <View className="bg-white/70 rounded-xl p-4 mb-2">
           <Text className="text-[15px] text-neutral-700 leading-6">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Remetra was founded by Nicole Gaudango after recognizing that many people living with autoimmune and digestive-related conditions 
+            lacked a clear way to understand how their lifestyle choices impact their symptoms. She wanted to create a tool 
+            that helps users gain peace or mind, feel more in control of their health, and improve their overall quality of life. 
           </Text>
         </View>
 
         {/* How it works */}
         <SectionDivider label="How It Works" />
         <View className="gap-3">
-          <InfoRow Icon={NotebookPen} label="Lorem ipsum dolor sit amet" />
-          <InfoRow Icon={Search} label="Consectetur adipiscing elit" />
-          <InfoRow Icon={ChartColumn} label="Sed do eiusmod tempor incididunt" />
+          <InfoRow Icon={NotebookPen} label="Log meals and symptoms in real time" />
+          <InfoRow Icon={ChartColumn} label="Our algorithm uncovers correlations between ingredients and symptoms" />
+          <InfoRow Icon={Search} label="Discover hidden patterns and take control of your health" />
         </View>
 
         {/* Links */}
