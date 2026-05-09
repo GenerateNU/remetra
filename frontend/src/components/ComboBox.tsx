@@ -108,7 +108,7 @@ export function ComboBox({
               ))}
               {allowCustom && trimmed && !exactMatch ? (
                 <TouchableOpacity onPress={handleSubmit} className="px-3 py-3">
-                  <Text className="text-remetra-warm-brown">Add "{trimmed}"</Text>
+                  <Text className="text-remetra-warm-brown">Add &ldquo;{trimmed}&rdquo;</Text>
                 </TouchableOpacity>
               ) : null}
               {filtered.length === 0 && !(allowCustom && trimmed) ? (
