@@ -10,7 +10,7 @@ import {
 } from 'lucide-react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 
-const CONTACT_EMAIL = 'hello@remetra.app';
+const CONTACT_EMAIL = 'nicole@remetra.tech';
 
 export function AboutScreen() {
   return (
