@@ -7,8 +7,8 @@ from pydantic import BaseModel, Field
 
 class SymptomBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    location: Optional[str] = None
-    sensation: Optional[str] = None
+    location: str = Field(..., min_length=1, max_length=255)
+    sensation: str = Field(..., min_length=1, max_length=255)
     username: Optional[str] = None
 
 
@@ -27,8 +27,8 @@ class SymptomUpdate(BaseModel):
     """
 
     name: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    location: Optional[str] = None
-    sensation: Optional[str] = None
+    location: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    sensation: Optional[str] = Field(default=None, min_length=1, max_length=255)
     username: Optional[str] = None
 
 

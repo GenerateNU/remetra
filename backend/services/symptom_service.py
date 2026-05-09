@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from models.symptom import Symptom
 from repositories.symptom_repository import SymptomRepository
 from schemas.symptom import SymptomCreate, SymptomResponse
 
@@ -31,8 +32,23 @@ class SymptomService:
             The created symptom with generated ID and timestamps
 
         Raises:
-            ValueError: If validation fails
+            ValueError: If a symptom with the same (username, location, sensation) already exists.
         """
+        existing = (
+            db.query(Symptom)
+            .filter(
+                Symptom.username == symptom_data.username,
+                Symptom.location == symptom_data.location,
+                Symptom.sensation == symptom_data.sensation,
+            )
+            .first()
+        )
+        if existing is not None:
+            raise ValueError(
+                f"A symptom with location '{symptom_data.location}' and "
+                f"sensation '{symptom_data.sensation}' already exists."
+            )
+
         created_symptom = self.symptom_repo.create_symptom(db, symptom_data)
         return SymptomResponse.model_validate(created_symptom)
 

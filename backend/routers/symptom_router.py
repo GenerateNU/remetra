@@ -31,7 +31,10 @@ async def create_symptom(
 
     symptom.username = current_user.username
     symptom_service = SymptomService()
-    created_symptom = symptom_service.create_symptom(db, symptom)
+    try:
+        created_symptom = symptom_service.create_symptom(db, symptom)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     return created_symptom
 
 
