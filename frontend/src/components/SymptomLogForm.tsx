@@ -5,10 +5,10 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
-import { Dropdown } from "react-native-element-dropdown";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 import { sensationOptions, locationOptions } from "../types/symptomOptions";
 import { useUIStore } from "../store/uiStore";
+import { ComboBox } from "./ComboBox";
 
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
@@ -167,37 +167,22 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
       {/* New symptom inline form */}
       {isCustom && (
         <View>
-          {/* Dropdown is a third-party component that only accepts style, not className */}
-          <Dropdown
-            data={sensationOptions}
-            search
-            labelField="label"
-            valueField="value"
-            placeholder="Select a sensation..."
-            searchPlaceholder="Type to search..."
-            value={customSensation}
-            onChange={item => { setCustomSensation(item.value); if (errors.sensation) clearError(); }}
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8, marginBottom: 8 }}
-            placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-            selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
-            itemTextStyle={{ color: '#5C2E14'}}
-          />
+          <View className="mb-2">
+            <ComboBox
+              options={sensationOptions}
+              value={customSensation}
+              placeholder="Select a sensation..."
+              onSelect={(val) => { setCustomSensation(val); if (errors.sensation) clearError(); }}
+            />
+          </View>
           {errors.sensation && (
             <Text className="text-red-400 text-xs mb-2">{errors.sensation}</Text>
           )}
-          <Dropdown
-            data={locationOptions}
-            search
-            labelField="label"
-            valueField="value"
-            placeholder="Select a location..."
-            searchPlaceholder="Type to search..."
+          <ComboBox
+            options={locationOptions}
             value={customLocation}
-            onChange={item => { setCustomLocation(item.value); if (errors.location) clearError(); }}
-            style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 8 }}
-            placeholderStyle={{ color: '#aaa', fontSize: 14 }}
-            selectedTextStyle={{ fontSize: 14, color: '#5C2E14' }}
-            itemTextStyle={{ color: '#5C2E14'}}
+            placeholder="Select a location..."
+            onSelect={(val) => { setCustomLocation(val); if (errors.location) clearError(); }}
           />
           {errors.location && (
             <Text className="text-red-400 text-xs mb-2">{errors.location}</Text>

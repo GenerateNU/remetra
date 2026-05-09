@@ -2,6 +2,8 @@
 
 import uuid
 
+import pytest
+
 from schemas.symptom import SymptomCreate
 from services.symptom_service import SymptomService
 
@@ -87,3 +89,19 @@ class TestSymptomService:
         symptom = service.get_symptom_by_id(db_session, uuid.UUID(int=0))
 
         assert symptom is None
+
+    def test_create_symptom_duplicate_location_sensation_rejected(
+        self, db_session, authenticated_user, sample_symptom_data
+    ):
+        """Two symptoms for the same user with the same (location, sensation) must be rejected."""
+        service = SymptomService()
+        service.create_symptom(db_session, SymptomCreate(**sample_symptom_data))
+
+        duplicate = SymptomCreate(
+            name="different name but same pair",
+            location=sample_symptom_data["location"],
+            sensation=sample_symptom_data["sensation"],
+            username=sample_symptom_data["username"],
+        )
+        with pytest.raises(ValueError, match="already exists"):
+            service.create_symptom(db_session, duplicate)
