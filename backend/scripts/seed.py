@@ -105,9 +105,7 @@ def seed_foods(db, tag_map: dict[str, Tag]) -> tuple[dict[tuple[str, str], Food]
     for entry in data["foods"]:
         name = entry["food_name"]
         for username in SEED_USERS:
-            food = db.execute(
-                select(Food).where(Food.name == name, Food.username == username)
-            ).scalar_one_or_none()
+            food = db.execute(select(Food).where(Food.name == name, Food.username == username)).scalar_one_or_none()
             if food:
                 food_map[(username, name)] = food
                 continue
@@ -164,10 +162,7 @@ def seed_symptoms(db) -> tuple[dict[tuple[str, str], Symptom], int]:
         symptom_map[(username, raw_symptom)] = symptom
     db.commit()
     skipped = len(pairs) - created - skipped_unknown
-    print(
-        f"  Symptoms: created {created}, skipped {skipped} (existing), "
-        f"{skipped_unknown} unknown raw labels"
-    )
+    print(f"  Symptoms: created {created}, skipped {skipped} (existing), {skipped_unknown} unknown raw labels")
     return symptom_map, created
 
 
