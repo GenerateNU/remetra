@@ -6,10 +6,14 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from database import get_db
+from routers.auth import get_current_user
 from schemas.algorithm import AlgorithmAssociationResponse, AlgorithmRunRequest, AlgorithmRunResponse
 from services.algorithm_service import AlgorithmService
 
-router = APIRouter(prefix="/algorithm", tags=["Algorithm"])
+router = APIRouter(prefix="/algorithm", 
+                   tags=["Algorithm"],
+                   dependencies=[Depends(get_current_user)]
+                )
 
 
 @router.post("/run", response_model=AlgorithmRunResponse)

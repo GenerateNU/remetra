@@ -14,6 +14,7 @@ from services.symptom_service import SymptomService
 router = APIRouter(
     prefix="/symptom",
     tags=["Symptom"],
+    dependencies=[Depends(get_current_user)]
 )
 
 

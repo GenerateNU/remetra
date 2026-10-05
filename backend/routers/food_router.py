@@ -13,7 +13,7 @@ from schemas.user import UserResponse
 from services.food_service import FoodService
 from services.RAGTaggingService import RAGTaggingService
 
-router = APIRouter(prefix="/food", tags=["Food"])
+router = APIRouter(prefix="/food", tags=["Food"], dependencies=[Depends(get_current_user)])
 
 
 # create food
