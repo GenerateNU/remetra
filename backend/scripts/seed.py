@@ -32,11 +32,9 @@ from models.symptom import Symptom
 from models.symptom_log import SymptomLog
 from models.tag import FoodTag, Tag
 from models.user import User
-from services.auth_service import get_password_hash
 
 SEED_DATA_DIR = Path("/seed_data")
 SEED_USERS = [f"user_{i:03d}" for i in range(1, 41)]
-SEED_PASSWORD = "testpassword"
 SEED_TAG_NAMES = ["gluten", "dairy", "legumes", "shellfish", "soy", "fish", "egg", "peanuts"]
 
 # Maps raw symptom labels from symptom_log.json to the (sensation, location)
@@ -78,8 +76,7 @@ def seed_tags(db) -> dict[str, Tag]:
 
 
 def seed_users(db) -> int:
-    """Create 40 test users; skip if username already exists."""
-    password_hash = get_password_hash(SEED_PASSWORD)
+    """Create 40 local profile rows. Sign-in is handled by Clerk, not these rows."""
     created = 0
     for username in SEED_USERS:
         exists = db.execute(select(User).where(User.username == username)).scalar_one_or_none()
@@ -88,7 +85,6 @@ def seed_users(db) -> int:
                 User(
                     username=username,
                     email=f"{username}@seed.remetra.test",
-                    password_hash=password_hash,
                 )
             )
             created += 1
@@ -105,9 +101,7 @@ def seed_foods(db, tag_map: dict[str, Tag]) -> tuple[dict[tuple[str, str], Food]
     for entry in data["foods"]:
         name = entry["food_name"]
         for username in SEED_USERS:
-            food = db.execute(
-                select(Food).where(Food.name == name, Food.username == username)
-            ).scalar_one_or_none()
+            food = db.execute(select(Food).where(Food.name == name, Food.username == username)).scalar_one_or_none()
             if food:
                 food_map[(username, name)] = food
                 continue
@@ -164,10 +158,7 @@ def seed_symptoms(db) -> tuple[dict[tuple[str, str], Symptom], int]:
         symptom_map[(username, raw_symptom)] = symptom
     db.commit()
     skipped = len(pairs) - created - skipped_unknown
-    print(
-        f"  Symptoms: created {created}, skipped {skipped} (existing), "
-        f"{skipped_unknown} unknown raw labels"
-    )
+    print(f"  Symptoms: created {created}, skipped {skipped} (existing), {skipped_unknown} unknown raw labels")
     return symptom_map, created
 
 

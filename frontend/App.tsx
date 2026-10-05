@@ -1,19 +1,20 @@
-import { RootNavigator } from './src/navigation/RootNavigator';
-import { setOnUnauthenticated } from './src/api/client';
-import { useAuthStore } from './src/store/useAuthStore';
+import { ClerkProvider } from '@clerk/expo';
+import { tokenCache } from '@clerk/expo/token-cache';
 import { useNetInfo } from '@react-native-community/netinfo';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { ClerkSessionBridge } from './src/auth/ClerkSessionBridge';
 import { NoConnectionScreen } from './src/screens/NoConnectionScreen';
 import "./global.css";
 
-// Register synchronously so any 401 — including the very first API call —
-// triggers a logout before React has a chance to render a broken state.
-setOnUnauthenticated(() => useAuthStore.getState().logout());
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 export default function App() {
   const netInfo = useNetInfo();
 
-  if (netInfo.isConnected === false) {
-    return <NoConnectionScreen />;
-  }
-  return <RootNavigator />;
+  return (
+    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <ClerkSessionBridge />
+      {netInfo.isConnected === false ? <NoConnectionScreen /> : <RootNavigator />}
+    </ClerkProvider>
+  );
 }
