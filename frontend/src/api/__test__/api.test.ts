@@ -1,9 +1,8 @@
 import { apiClient } from "../client";
-import { useAuthStore } from "../../store/useAuthStore";
+import { setClerkTokenGetter } from "../clerkToken";
 
-test('attaches Authorization header when token is present', async () => {
-  // Directly set auth state — avoids making a real network call to /auth/login
-  useAuthStore.setState({ isAuthenticated: true, accessToken: 'test-jwt-token-123' });
+test('attaches Authorization header when a Clerk token is available', async () => {
+  setClerkTokenGetter(async () => 'test-jwt-token-123');
 
   let capturedConfig: any;
   const id = apiClient.interceptors.request.use((config) => {
@@ -17,14 +16,14 @@ test('attaches Authorization header when token is present', async () => {
     // Ignore network errors — we only care about the request config
   }
 
-  expect(capturedConfig.headers.Authorization).toMatch(/^Bearer .+/);
+  expect(capturedConfig.headers.Authorization).toBe('Bearer test-jwt-token-123');
 
   apiClient.interceptors.request.eject(id);
-  useAuthStore.getState().logout();
+  setClerkTokenGetter(null);
 });
 
-test('omits Authorization header when no token is present', async () => {
-  useAuthStore.setState({ isAuthenticated: false, accessToken: null });
+test('omits Authorization header when no Clerk token is available', async () => {
+  setClerkTokenGetter(null);
 
   let capturedConfig: any;
   const id = apiClient.interceptors.request.use((config) => {
