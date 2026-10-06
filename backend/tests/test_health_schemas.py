@@ -3,7 +3,6 @@ from pydantic import ValidationError
 
 from schemas.health import HealthDayEntry, HealthEventEntry, HealthSyncRequest
 
-
 VALID_DAY = {
     "date": "2026-09-28",
     "sleep_total_min": 412,

@@ -25,6 +25,6 @@ class DailyHealthMetrics(Base):
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
     __table_args__ = (
-    UniqueConstraint("username", "date", name="uq_daily_health_user_date"), # Unique Constraint stops duplicates in these columns
+    UniqueConstraint("username", "date", name="uq_daily_health_user_date"),
     )
     
