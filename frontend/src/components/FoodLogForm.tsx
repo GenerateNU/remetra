@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { ArrowLeft, Camera } from "lucide-react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
+import * as Notifications from "expo-notifications";
 
 interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
@@ -69,7 +70,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
     }
 
     try {
-      await foodLogService.createFoodLog({
+      const created =await foodLogService.createFoodLog({
         food_id: foodId,
         quantity: `${servings} serving(s)`,
         timestamp: timestamp.toISOString(),
@@ -77,6 +78,25 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
         username,
       });
       useUIStore.getState().notifyLogCreated()
+
+      try {
+        const mealFollowUp = await foodLogService.getMealFollowUp(created.id);
+        if (mealFollowUp.should_schedule) {
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: mealFollowUp.title,
+              body: mealFollowUp.body,
+              data: { ...mealFollowUp.data},
+            },
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.DATE,
+              date: new Date(mealFollowUp.fire_at),
+            },
+          });
+        }
+      } catch (followUpError) {
+        console.warn("Failed to schedule meal follow-up:", followUpError);
+      }
     } catch (error) {
       console.error("Failed to create food log entry:", error);
       return;

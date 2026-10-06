@@ -24,6 +24,19 @@ export interface FoodLogResponse {
   created_at: string;
 }
 
+export interface MealFollowUpData {
+  log_type: "symptom";
+  food_log_id: string;
+}
+
+export interface MealFollowUpResponse {
+  should_schedule: boolean;
+  fire_at: string;
+  title: string;
+  body: string;
+  data: MealFollowUpData;
+}
+
 // service functions
 
 export const foodLogService = {
@@ -75,6 +88,16 @@ export const foodLogService = {
       return data;
     } catch (err: any) {
       throw new ApiError(err.response?.data?.detail ?? `Failed to delete food log ${foodLogId}`);
+    }
+  },
+
+  // get_my_meal_follow_up()
+  async getMealFollowUp(foodLogId: string): Promise<MealFollowUpResponse> {
+    try {
+      const { data } = await apiClient.get<MealFollowUpResponse>(`/meal-follow-ups/${foodLogId}`);
+      return data;
+    } catch (err: any) {
+      throw new ApiError(err.response?.data?.detail ?? 'Failed to fetch meal follow-ups');
     }
   },
 };
