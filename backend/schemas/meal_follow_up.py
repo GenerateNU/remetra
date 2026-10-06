@@ -5,7 +5,6 @@ from datetime import datetime
 from typing import Literal
 from pydantic import BaseModel, Field
 
-# returns the notification details: when to send it, the message, where tapping it should go 
 
 class MealFollowUpResponse(BaseModel):
     """Schema for returning a meal follow up entry."""
