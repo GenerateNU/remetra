@@ -18,7 +18,6 @@ def test_create_symptom_log_intensity_too_low():
     """Pydantic should reject intensity < 1."""
     with pytest.raises(ValueError):
         SymptomLogCreate(
-            username="testuser",
             symptom_id=uuid4(),
             intensity=0,
             timestamp=datetime(2025, 1, 15, 10, 30),
@@ -29,7 +28,6 @@ def test_create_symptom_log_intensity_too_high():
     """Pydantic should reject intensity > 10."""
     with pytest.raises(ValueError):
         SymptomLogCreate(
-            username="testuser",
             symptom_id=uuid4(),
             intensity=11,
             timestamp=datetime(2025, 1, 15, 10, 30),
@@ -40,7 +38,6 @@ def test_create_symptom_log_negative_duration():
     """Pydantic should reject duration < 0."""
     with pytest.raises(ValueError):
         SymptomLogCreate(
-            username="testuser",
             symptom_id=uuid4(),
             intensity=5,
             timestamp=datetime(2025, 1, 15, 10, 30),

@@ -14,7 +14,6 @@ from services.food_log_service import FoodLogService
 def sample_food_log_data(authenticated_user, created_food):
     """FoodLogCreate with real FK-valid username and food_id."""
     return FoodLogCreate(
-        username=authenticated_user["username"],
         food_id=created_food.id,
         timestamp=datetime(2025, 3, 1, 12, 0),
         quantity="1 serving",
@@ -25,20 +24,20 @@ def sample_food_log_data(authenticated_user, created_food):
 class TestFoodLogRepository:
     """Integration tests for FoodLogRepository."""
 
-    def test_create_food_log(self, db_session, sample_food_log_data):
+    def test_create_food_log(self, db_session, authenticated_user, sample_food_log_data):
         """Creating a food log returns a FoodLog ORM object with all fields populated."""
         repo = FoodLogRepository()
 
         result = repo.create_food_log(db_session, sample_food_log_data)
 
         assert result.id is not None
-        assert result.username == sample_food_log_data.username
+        assert result.username == authenticated_user["username"]
         assert result.food_id == sample_food_log_data.food_id
         assert result.quantity == sample_food_log_data.quantity
         assert result.notes == sample_food_log_data.notes
         assert result.created_at is not None
 
-    def test_get_food_log_by_id(self, db_session, sample_food_log_data):
+    def test_get_food_log_by_id(self, db_session, authenticated_user, sample_food_log_data):
         """Retrieving a food log by ID returns the correct row."""
         repo = FoodLogRepository()
         created = repo.create_food_log(db_session, sample_food_log_data)
@@ -47,7 +46,7 @@ class TestFoodLogRepository:
 
         assert result is not None
         assert result.id == created.id
-        assert result.username == sample_food_log_data.username
+        assert result.username == authenticated_user["username"]
 
     def test_get_food_log_by_id_not_found(self, db_session):
         """get_food_log_by_id returns None for a non-existent ID."""
@@ -64,7 +63,6 @@ class TestFoodLogRepository:
 
         for i in range(3):
             data = FoodLogCreate(
-                username=username,
                 food_id=created_food.id,
                 timestamp=datetime(2025, 3, i + 1, 12, 0),
             )
@@ -106,7 +104,7 @@ class TestFoodLogRepository:
 class TestFoodLogService:
     """Integration tests for FoodLogService."""
 
-    def test_create_food_log(self, db_session, sample_food_log_data):
+    def test_create_food_log(self, db_session, authenticated_user, sample_food_log_data):
         """create_food_log returns a FoodLogResponse with correct fields."""
         service = FoodLogService()
 
@@ -114,7 +112,7 @@ class TestFoodLogService:
 
         assert isinstance(result, FoodLogResponse)
         assert result.id is not None
-        assert result.username == sample_food_log_data.username
+        assert result.username == authenticated_user["username"]
         assert result.food_id == sample_food_log_data.food_id
         assert result.quantity == sample_food_log_data.quantity
         assert result.created_at is not None
@@ -144,7 +142,6 @@ class TestFoodLogService:
 
         for i in range(2):
             data = FoodLogCreate(
-                username=username,
                 food_id=created_food.id,
                 timestamp=datetime(2025, 3, i + 1, 12, 0),
             )

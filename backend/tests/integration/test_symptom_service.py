@@ -101,7 +101,6 @@ class TestSymptomService:
             name="different name but same pair",
             location=sample_symptom_data["location"],
             sensation=sample_symptom_data["sensation"],
-            username=sample_symptom_data["username"],
         )
         with pytest.raises(ValueError, match="already exists"):
             service.create_symptom(db_session, duplicate)

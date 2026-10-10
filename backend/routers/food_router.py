@@ -21,10 +21,8 @@ router = APIRouter(prefix="/food", tags=["Food"], dependencies=[Depends(get_curr
 async def create_food(
     food: FoodCreate,
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user),
 ) -> FoodResponse:
     """Creates new food item with ID, name, ingredients."""
-    food.username = current_user.username
     food_service = FoodService()
     created_food = food_service.create_food(db, food)
     return created_food

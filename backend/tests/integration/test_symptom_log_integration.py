@@ -23,7 +23,6 @@ def created_symptom(db_session, authenticated_user, sample_symptom_data):
 def sample_log_data(authenticated_user, created_symptom):
     """Sample symptom log creation data using real user and symptom IDs."""
     return SymptomLogCreate(
-        username=authenticated_user["username"],
         symptom_id=created_symptom.id,
         intensity=5,
         timestamp=datetime(2025, 1, 15, 10, 30),
@@ -35,7 +34,7 @@ def sample_log_data(authenticated_user, created_symptom):
 class TestSymptomLogRepository:
     """Integration tests for SymptomLogRepository."""
 
-    def test_create_symptom_log(self, db_session, sample_log_data):
+    def test_create_symptom_log(self, db_session, authenticated_user, sample_log_data):
         """Test creating a symptom log in the database."""
         repo = SymptomLogRepository()
         created = repo.create(db_session, sample_log_data)
@@ -45,7 +44,7 @@ class TestSymptomLogRepository:
 
         assert result is not None
         assert result.id == created.id
-        assert result.username == sample_log_data.username
+        assert result.username == authenticated_user["username"]
         assert result.symptom_id == sample_log_data.symptom_id
         assert result.intensity == sample_log_data.intensity
         assert result.duration == sample_log_data.duration
@@ -93,7 +92,7 @@ class TestSymptomLogRepository:
 class TestSymptomLogService:
     """Integration tests for SymptomLogService."""
 
-    def test_create_symptom_log(self, db_session, sample_log_data):
+    def test_create_symptom_log(self, db_session, authenticated_user, sample_log_data):
         """Test creating a symptom log via the service."""
         service = SymptomLogService()
         created = service.create_symptom_log(db_session, sample_log_data)
@@ -103,7 +102,7 @@ class TestSymptomLogService:
 
         assert result is not None
         assert result.id == created.id
-        assert result.username == sample_log_data.username
+        assert result.username == authenticated_user["username"]
         assert result.intensity == sample_log_data.intensity
         assert result.created_at is not None
 
@@ -144,7 +143,7 @@ class TestSymptomLogService:
         result = service.delete_symptom_log(db_session, uuid4())
         assert result is False
 
-    def test_get_symptom_logs_by_username(self, db_session, sample_log_data):
+    def test_get_symptom_logs_by_username(self, db_session, authenticated_user, sample_log_data):
         """get_symptom_logs_by_username returns all logs for the user."""
         from schemas.symptom_log import SymptomLogResponse
 
@@ -152,11 +151,11 @@ class TestSymptomLogService:
         service.create_symptom_log(db_session, sample_log_data)
         service.create_symptom_log(db_session, sample_log_data)
 
-        results = service.get_symptom_logs_by_username(db_session, sample_log_data.username)
+        results = service.get_symptom_logs_by_username(db_session, authenticated_user["username"])
 
         assert len(results) == 2
         assert all(isinstance(r, SymptomLogResponse) for r in results)
-        assert all(r.username == sample_log_data.username for r in results)
+        assert all(r.username == authenticated_user["username"] for r in results)
 
     def test_update_symptom_log(self, db_session, sample_log_data):
         """update_symptom_log returns an updated SymptomLogResponse."""

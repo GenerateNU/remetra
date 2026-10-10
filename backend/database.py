@@ -19,6 +19,10 @@ else:
 
 Base = declarative_base()
 
+from auth_context import register_ownership_filter  # noqa: E402
+
+register_ownership_filter()
+
 
 def get_db():
     """
