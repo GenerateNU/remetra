@@ -19,6 +19,7 @@ from routers.algorithm_router import router as algorithm_router
 from routers.auth import router as auth_router
 from routers.food_log_router import router as food_log_router
 from routers.food_router import router as food_router
+from routers.health_router import router as health_router
 from routers.ingest_router import router as ingest_router
 from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
@@ -124,6 +125,7 @@ app.include_router(food_router)
 app.include_router(ingest_router)
 app.include_router(food_log_router)
 app.include_router(tag_router)
+app.include_router(health_router)
 
 
 @app.get("/scalar", include_in_schema=False)

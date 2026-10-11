@@ -21,6 +21,4 @@ class HealthKitEvent(Base):
     date = Column(Date, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    __table_args__ = (
-        UniqueConstraint("username", "hk_uuid", name="uq_healthkit_user_hkuuid"),
-    )
+    __table_args__ = (UniqueConstraint("username", "hk_uuid", name="uq_healthkit_user_hkuuid"),)

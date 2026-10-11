@@ -16,6 +16,6 @@ class HealthSyncService:
         events_skipped = len(request.events) - events_added
         return HealthSyncResponse(
             days_saved=days_saved,
-            events_added=events_added, 
+            events_added=events_added,
             events_skipped=events_skipped,
-            )
+        )
