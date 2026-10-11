@@ -1,7 +1,8 @@
 """Test that every route except health checks requires authentication."""
 
-from routers.auth import get_current_user
 from main import app
+from routers.auth import get_current_user
+
 
 def route_requires_auth(route):
     for dependency in route.dependant.dependencies:
