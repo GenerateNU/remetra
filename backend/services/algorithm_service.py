@@ -51,9 +51,7 @@ class AlgorithmService:
         metrics_rows: list[Metrics] = []
         if symptom_ids:
             for symptom_id in symptom_ids:
-                metrics_rows.extend(
-                    self.repo.get_by_symptom(username=user_id, symptom_id=symptom_id)
-                )
+                metrics_rows.extend(self.repo.get_by_symptom(username=user_id, symptom_id=symptom_id))
         else:
             metrics_rows = self.repo.get_by_user(username=user_id)
 

@@ -1,8 +1,14 @@
 from models import (
+    daily_health_metrics as daily_health_metrics,
+)
+from models import (
     food as food,
 )
 from models import (
     food_log as food_log,
+)
+from models import (
+    healthkit_event as healthkit_event,
 )
 from models import (
     knowledge_chunk as knowledge_chunk,
