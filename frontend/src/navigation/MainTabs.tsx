@@ -1,5 +1,5 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TimelineScreen } from '../screens/main/TimelineScreen';
 import { AnalysisScreen } from '../screens/main/AnalysisScreen';
@@ -7,12 +7,22 @@ import { ProfileScreen } from '../screens/main/ProfileScreen';
 import LogEntryModal from '../components/LogEntryModal';
 import { useUIStore } from '../store/uiStore';
 import { ClipboardList, ChartColumn, User, type LucideIcon } from 'lucide-react-native';
+import * as Notifications from "expo-notifications";
 
 export type MainTabParamList = {
   History: undefined;
   Analysis: undefined;
   Profile: undefined;
 };
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -29,6 +39,30 @@ function TabIcon({ Icon, focused }: { Icon: LucideIcon; focused: boolean }) {
 
 export function MainTabs() {
   const { showLogModal, closeLogModal, initialLogType } = useUIStore();
+  const lastResponse = Notifications.useLastNotificationResponse();
+  const handledId = useRef<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS === 'android') { // added android support bc of my windows laptop i need android emulator
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.DEFAULT,
+        });
+      }
+      await Notifications.requestPermissionsAsync();
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (!lastResponse) return;
+    const id = lastResponse.notification.request.identifier;
+    if (handledId.current === id) return;
+    if (lastResponse.notification.request.content.data?.log_type === 'symptom') {
+      handledId.current = id;
+      useUIStore.getState().openLogModal('symptom');
+    }
+  }, [lastResponse]);
 
   return (
     <>
