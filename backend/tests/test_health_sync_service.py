@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 from schemas.health import HealthDayEntry, HealthEventEntry, HealthSyncRequest, HealthSyncResponse
 from services.health_sync_service import HealthSyncService
 
-
 VALID_DAY = {
     "date": "2026-09-28",
     "sleep_total_min": 412,

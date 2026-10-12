@@ -35,7 +35,17 @@ class TestHealthRouter:
         invalid = {
             "timezone": "America/New_York",
             "days": [],
-            "events": [{"hk_uuid": "bad", "category": "banana", "type": "x", "value": "y", "start_at": "x", "end_at": "x", "date": "x"}],
+            "events": [
+                {
+                    "hk_uuid": "bad",
+                    "category": "banana",
+                    "type": "x",
+                    "value": "y",
+                    "start_at": "x",
+                    "end_at": "x",
+                    "date": "x",
+                }
+            ],
         }
         response = test_client.post(
             "/health/sync",
