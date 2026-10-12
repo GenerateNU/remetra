@@ -8,6 +8,8 @@ from database import Base
 
 
 class DailyHealthMetrics(Base):
+    """One row per user per day of aggregated Apple Health metrics."""
+
     __tablename__ = "daily_health_metrics"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

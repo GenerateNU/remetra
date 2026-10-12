@@ -8,6 +8,8 @@ from database import Base
 
 
 class HealthKitEvent(Base):
+    """One row per discrete Apple Health event (symptom or menstrual flow)."""
+
     __tablename__ = "healthkit_events"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
