@@ -25,6 +25,7 @@ from routers.meal_follow_up_router import router as meal_follow_up_router
 from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
+from routers.voice_router import router as voice_router
 
 logger = logging.getLogger(__name__)
 
@@ -127,6 +128,7 @@ app.include_router(food_log_router)
 app.include_router(tag_router)
 app.include_router(health_router)
 app.include_router(meal_follow_up_router)
+app.include_router(voice_router)
 
 
 @app.get("/scalar", include_in_schema=False)
