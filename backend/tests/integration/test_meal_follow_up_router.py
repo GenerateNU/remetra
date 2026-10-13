@@ -5,9 +5,11 @@ from uuid import uuid4
 
 import pytest
 
+from main import app
+from repositories.user_repository import UserRepository
+from routers.auth import get_current_user
 from schemas.food_log import FoodLogCreate
-from schemas.user import UserCreate
-from services.auth_service import AuthService
+from schemas.user import UserResponse
 from services.food_log_service import FoodLogService
 from services.meal_follow_up_service import FOLLOW_UP_DELAY
 
@@ -21,8 +23,8 @@ def _create_food_log(db_session, username, food_id, timestamp):
 
 @pytest.fixture
 def auth_headers(authenticated_user):
-    """Bearer auth header for the authenticated test user."""
-    return {"Authorization": f"Bearer {authenticated_user['token']}"}
+    """Bearer auth header; get_current_user is overridden by authenticated_user, so the token is not verified."""
+    return {"Authorization": "Bearer test-token"}
 
 
 @pytest.fixture
@@ -74,21 +76,25 @@ class TestGetMealFollowUp:
 
     def test_other_users_log_returns_404(self, test_client, db_session, recent_food_log):
         """A user cannot fetch the follow up for another user's food log."""
-        auth_service = AuthService()
-        auth_service.register_user(
-            db_session, UserCreate(username="otheruser", email="other@example.com", password="password123")
+        other_user = UserRepository().create(
+            db=db_session,
+            username="otheruser",
+            email="other@example.com",
+            clerk_user_id="user_otherclerk",
         )
-        token = auth_service.authenticate_user(db_session, "otheruser", "password123")["access_token"]
+        app.dependency_overrides[get_current_user] = lambda: UserResponse.model_validate(other_user)
 
         response = test_client.get(
             f"/meal-follow-ups/{recent_food_log.id}",
-            headers={"Authorization": f"Bearer {token}"},
+            headers={"Authorization": "Bearer test-token"},
         )
 
         assert response.status_code == 404
 
     def test_unauthenticated_request_returns_401(self, test_client, recent_food_log):
         """Requests without a bearer token are rejected."""
+        app.dependency_overrides.pop(get_current_user, None)
+
         response = test_client.get(f"/meal-follow-ups/{recent_food_log.id}")
 
         assert response.status_code == 401
