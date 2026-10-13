@@ -1,11 +1,15 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
 
 class VoiceBase(BaseModel):
     """Schema for voice food logs."""
 
-    transcript: str = None
-    name: str = None
-    ingredients: list[str] = None
+    transcript: str = ""
+    name: str = ""
+    ingredients: list[str] = []
+
 
 class VoiceParseResponse(VoiceBase):
-    """ Voice parse response """
+    """Voice parse response"""
+
+    model_config = ConfigDict(from_attributes=True)
