@@ -15,7 +15,7 @@ export function CorrelationsScreen({ navigation, route }: Props) {
   const { associationsBySymptom, symptoms, isLoading, error, fetchAssociations, minExposures, setMinExposures } = useAlgorithmStore();
 
   useEffect(() => {
-    if (userId) fetchAssociations(userId);
+    if (userId) fetchAssociations();
   }, [userId]);
   const selectedSymptomId = route.params?.initialSymptomId ?? null;
 

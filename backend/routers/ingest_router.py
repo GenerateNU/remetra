@@ -5,11 +5,12 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from database import get_db
+from routers.auth import get_current_user
 from services.ingest_service import IngestService
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/ingest", tags=["Ingest"])
+router = APIRouter(prefix="/ingest", tags=["Ingest"], dependencies=[Depends(get_current_user)])
 
 RAW_DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
 

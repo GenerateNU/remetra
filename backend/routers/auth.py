@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
+from auth_context import current_username
 from database import get_db
 from schemas.user import UserResponse, UserUpdate
 from services.auth_service import AuthService, clerk_auth_options
@@ -33,7 +34,12 @@ async def get_current_user(
     if not clerk_user_id:
         raise credentials_exception
 
-    return AuthService().resolve_user(db, clerk_user_id)
+    user = AuthService().resolve_user(db, clerk_user_id)
+    token = current_username.set(user.username)
+    try:
+        yield user
+    finally:
+        current_username.reset(token)
 
 
 @router.get("/me", response_model=UserResponse)

@@ -5,6 +5,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from auth_context import current_username
 from models.symptom import Symptom
 from repositories.symptom_repository import SymptomRepository
 from schemas.symptom import SymptomCreate, SymptomResponse
@@ -37,7 +38,7 @@ class SymptomService:
         existing = (
             db.query(Symptom)
             .filter(
-                Symptom.username == symptom_data.username,
+                Symptom.username == current_username.get(),
                 Symptom.location == symptom_data.location,
                 Symptom.sensation == symptom_data.sensation,
             )
