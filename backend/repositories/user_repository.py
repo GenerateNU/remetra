@@ -37,7 +37,18 @@ class UserRepository:
         """
         return db.query(User).filter(User.email == email).first()
 
-    def create(self, db: Session, username: str, email: str, password_hash: str) -> User:
+    def get_by_clerk_id(self, db: Session, clerk_user_id: str) -> Optional[User]:
+        """Retrieve a user by their Clerk user id."""
+        return db.query(User).filter(User.clerk_user_id == clerk_user_id).first()
+
+    def create(
+        self,
+        db: Session,
+        username: str,
+        email: str,
+        clerk_user_id: str | None = None,
+        password_hash: str | None = None,
+    ) -> User:
         """
         Create a new user in the database.
 
@@ -45,19 +56,29 @@ class UserRepository:
             db: SQLAlchemy database session
             username: Unique username for the new user
             email: Unique email address for the new user
-            password_hash: Bcrypt hashed password
+            clerk_user_id: Clerk user id
+            password_hash: Unused for Clerk users, nullable
 
         Returns:
             User: The newly created user object with all fields populated
 
         Raises:
-            IntegrityError: If username or email already exists
+            IntegrityError: If username, email, or clerk_user_id already exists
         """
-        user = User(username=username, email=email, password_hash=password_hash)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-        return user
+        user = User(
+            username=username,
+            email=email,
+            clerk_user_id=clerk_user_id,
+            password_hash=password_hash,
+        )
+        try:
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+            return user
+        except Exception:
+            db.rollback()
+            raise
 
     def update_user(self, db: Session, username: str, user_update: UserUpdate) -> User:
         """

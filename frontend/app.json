@@ -20,6 +20,7 @@
       }
     },
     "android": {
+      "package": "com.remetra",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -32,7 +33,10 @@
     },
     "plugins": [
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "@clerk/expo",
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

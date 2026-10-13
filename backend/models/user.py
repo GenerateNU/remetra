@@ -7,13 +7,14 @@ from database import Base
 
 
 class User(Base):
-    """User ORM model mapped to existing Supabase users table."""
+    """User ORM model mapped to the users table."""
 
     __tablename__ = "users"
 
     username = Column(String, primary_key=True)
     email = Column(String, unique=True, nullable=False)
-    password_hash = Column(String, nullable=False)
+    clerk_user_id = Column(String, unique=True, nullable=True)
+    password_hash = Column(String, nullable=True)
     dob = Column(Date, nullable=True)
     disease = Column(ARRAY(String), nullable=True)
     weight = Column(Float, nullable=True)
