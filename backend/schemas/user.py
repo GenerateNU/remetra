@@ -3,15 +3,7 @@
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
-
-
-class UserCreate(BaseModel):
-    """Schema for user registration."""
-
-    username: str
-    email: EmailStr
-    password: str
+from pydantic import BaseModel
 
 
 class UserUpdate(BaseModel):

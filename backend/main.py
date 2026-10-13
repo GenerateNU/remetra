@@ -83,9 +83,8 @@ def custom_openapi():
         description=app.description,
         routes=app.routes,
     )
-    # Replace the auto-generated OAuth2PasswordBearer scheme with a simple
-    # HTTPBearer scheme so the Scalar/Swagger "Authorize" button accepts a
-    # raw token instead of attempting an OAuth2 form-based password flow.
+    # Document protected routes as HTTP bearer so Scalar's Authorize button
+    # accepts a Clerk session token.
     schema.setdefault("components", {})["securitySchemes"] = {
         "BearerAuth": {
             "type": "http",

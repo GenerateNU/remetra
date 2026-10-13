@@ -17,21 +17,14 @@ Common use cases (Most likely what we'll do):
 import os
 
 import pytest
-from passlib.context import CryptContext
 from sqlalchemy import create_engine, text
 
-import services.auth_service as _auth_svc
 from database import Base
-
-# Use minimal bcrypt rounds in tests — default 12 rounds takes ~200ms per hash,
-# 4 rounds takes ~5ms. Patched here before any test imports auth_service.
-_auth_svc.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=4)
-
-from models.food import Food  # noqa: E402
-from models.food_log import FoodLog  # noqa: E402
-from models.symptom import Symptom  # noqa: E402
-from models.symptom_log import SymptomLog  # noqa: E402
-from models.user import User  # noqa: E402
+from models.food import Food
+from models.food_log import FoodLog
+from models.symptom import Symptom
+from models.symptom_log import SymptomLog
+from models.user import User
 
 __all__ = ["User", "Symptom", "SymptomLog", "Food", "FoodLog"]
 
@@ -109,28 +102,42 @@ def sample_user_data():
     Any test can use this by adding 'sample_user_data' as a parameter.
     Keeps test data consistent across all tests.
     """
-    return {"username": "testuser", "email": "test@example.com", "password": "password123"}
+    return {"username": "testuser", "email": "test@example.com"}
 
 
 @pytest.fixture
 def authenticated_user(db_session, sample_user_data):
     """
-    Create and return an authenticated user with token.
+    Create a local user and treat them as the authenticated Clerk user.
 
-    Useful for tests that need a logged-in user.
-    Returns dict with user and access_token.
+    Protected routes resolve through get_current_user. Tests override that
+    dependency so they do not call Clerk.
     """
-    from schemas.user import UserCreate
-    from services.auth_service import AuthService
+    from main import app
+    from repositories.user_repository import UserRepository
+    from routers.auth import get_current_user
+    from schemas.user import UserResponse
 
-    service = AuthService()
+    user = UserRepository().create(
+        db=db_session,
+        username=sample_user_data["username"],
+        email=sample_user_data["email"],
+        clerk_user_id="user_testclerk",
+    )
+    profile = UserResponse.model_validate(user)
 
-    user_create = UserCreate(**sample_user_data)
-    register_data = service.register_user(db_session, user_create)
+    def override_current_user():
+        return profile
 
-    token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
-
-    return {"user": register_data, "token": token_data["access_token"], "username": register_data["username"]}
+    app.dependency_overrides[get_current_user] = override_current_user
+    try:
+        yield {
+            "username": user.username,
+            "email": user.email,
+            "clerk_user_id": user.clerk_user_id,
+        }
+    finally:
+        app.dependency_overrides.pop(get_current_user, None)
 
 
 @pytest.fixture
