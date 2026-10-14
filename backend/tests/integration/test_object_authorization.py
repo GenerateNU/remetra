@@ -1,7 +1,8 @@
 """A signed-in user can only see and change their own rows."""
 
-from auth_context import current_username
+from auth_context import current_username, system_access
 from main import app
+from models.food import Food
 from repositories.user_repository import UserRepository
 from routers.auth import get_current_user
 from schemas.user import UserResponse
@@ -49,6 +50,12 @@ def test_user_cannot_read_or_change_another_users_records(db_session, test_clien
         assert food.json()["username"] == "alice"
         food_id = food.json()["id"]
 
+        tag = test_client.post("/tags", json={"name": "alice-gluten"})
+        assert tag.status_code == 201, tag.text
+        tag_id = tag.json()["id"]
+        attached = test_client.post(f"/food/{food_id}/tags", json={"tag_ids": [tag_id]})
+        assert attached.status_code == 201, attached.text
+
         symptom = test_client.post(
             "/symptom/",
             json={"name": "headache", "location": "jaw", "sensation": "ache", "username": "bob"},
@@ -87,6 +94,8 @@ def test_user_cannot_read_or_change_another_users_records(db_session, test_clien
             test_client.get(f"/food/{food_id}"),
             test_client.put(f"/food/{food_id}", json={"name": "stolen", "ingredients": ["nope"]}),
             test_client.delete(f"/food/{food_id}"),
+            test_client.get(f"/food/{food_id}/tags"),
+            test_client.post(f"/food/{food_id}/tags", json={"tag_ids": [tag_id]}),
             test_client.get(f"/symptom/{symptom_id}"),
             test_client.put(
                 f"/symptom/{symptom_id}",
@@ -126,6 +135,33 @@ def test_user_cannot_read_or_change_another_users_records(db_session, test_clien
 
         sign_in("alice")
         assert test_client.get(f"/food/{food_id}").json()["name"] == "alice soup"
+        assert [row["name"] for row in test_client.get(f"/food/{food_id}/tags").json()] == ["alice-gluten"]
         assert test_client.get("/algorithm/associations").json()
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+
+
+def test_query_with_no_user_returns_no_rows(db_session):
+    """Owned rows stay hidden until a user is set. system_access() can still see them."""
+    UserRepository().create(
+        db=db_session,
+        username="carol",
+        email="carol@example.com",
+        clerk_user_id="user_carol",
+    )
+    token = current_username.set("carol")
+    try:
+        food = Food(name="carol soup", ingredients=["salt"], username="carol")
+        db_session.add(food)
+        db_session.flush()
+        food_id = food.id
+    finally:
+        current_username.reset(token)
+
+    assert current_username.get() is None
+    db_session.expire_all()
+    assert db_session.query(Food).filter(Food.id == food_id).all() == []
+
+    with system_access():
+        visible = db_session.query(Food).filter(Food.id == food_id).one()
+        assert visible.name == "carol soup"
