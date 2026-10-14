@@ -8,6 +8,8 @@ from database import Base
 
 
 class HealthKitEvent(Base):
+    """One row per discrete Apple Health event (symptom or menstrual flow)."""
+
     __tablename__ = "healthkit_events"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -21,6 +23,4 @@ class HealthKitEvent(Base):
     date = Column(Date, nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    __table_args__ = (
-        UniqueConstraint("username", "hk_uuid", name="uq_healthkit_user_hkuuid"),
-    )
+    __table_args__ = (UniqueConstraint("username", "hk_uuid", name="uq_healthkit_user_hkuuid"),)
