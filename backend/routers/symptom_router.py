@@ -14,6 +14,7 @@ from services.symptom_service import SymptomService
 router = APIRouter(
     prefix="/symptom",
     tags=["Symptom"],
+    dependencies=[Depends(get_current_user)]
 )
 
 
@@ -22,14 +23,12 @@ router = APIRouter(
 async def create_symptom(
     symptom: SymptomCreate,
     db: Session = Depends(get_db),
-    current_user: UserResponse = Depends(get_current_user),
 ) -> SymptomResponse:
     """
     Creates new symptom item with ID, name, location, sensation.
 
     """
 
-    symptom.username = current_user.username
     symptom_service = SymptomService()
     try:
         created_symptom = symptom_service.create_symptom(db, symptom)

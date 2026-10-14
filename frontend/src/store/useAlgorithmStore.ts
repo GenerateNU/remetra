@@ -21,9 +21,9 @@ interface AlgorithmState {
 }
 
 interface AlgorithmActions {
-  fetchAssociations: (userId: string) => Promise<void>;
+  fetchAssociations: () => Promise<void>;
   setMinExposures: (minExposures: number) => void;
-  runAlgorithm: (userId: string) => Promise<void>;
+  runAlgorithm: () => Promise<void>;
 }
 
 type AlgorithmStore = AlgorithmState & AlgorithmActions;
@@ -86,11 +86,11 @@ const initialState: AlgorithmState = {
 export const useAlgorithmStore = create<AlgorithmStore>((set) => ({
   ...initialState,
 
-  fetchAssociations: async (userId: string) => {
+  fetchAssociations: async () => {
     set({ isLoading: true, error: null });
     try {
       const [rawAssociations, symptomMap] = await Promise.all([
-        algorithmService.getAssociations(userId),
+        algorithmService.getAssociations(),
         buildSymptomMap(),
       ]);
 
@@ -105,11 +105,11 @@ export const useAlgorithmStore = create<AlgorithmStore>((set) => ({
     set({ minExposures: Math.max(1, minExposures) });
   },
 
-  runAlgorithm: async (userId: string) => {
+  runAlgorithm: async () => {
     set({ isLoading: true, error: null });
     try {
       const [rawAssociations, symptomMap] = await Promise.all([
-        algorithmService.analyze({ user_id: userId, time_window_hours: 6.0 }),
+        algorithmService.analyze({ time_window_hours: 6.0 }),
         buildSymptomMap(),
       ]);
 

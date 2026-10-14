@@ -79,7 +79,7 @@ export function AnalysisScreen() {
         setSymptomLogs(logs);
 
         if (username) {
-          runAlgorithm(username).catch(() => {});
+          runAlgorithm().catch(() => {});
         }
       } catch (err: any) {
         setError(err.message ?? 'Failed to load analysis');
