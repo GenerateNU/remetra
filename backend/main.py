@@ -21,6 +21,7 @@ from routers.food_log_router import router as food_log_router
 from routers.food_router import router as food_router
 from routers.health_router import router as health_router
 from routers.ingest_router import router as ingest_router
+from routers.meal_follow_up_router import router as meal_follow_up_router
 from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
@@ -84,9 +85,8 @@ def custom_openapi():
         description=app.description,
         routes=app.routes,
     )
-    # Replace the auto-generated OAuth2PasswordBearer scheme with a simple
-    # HTTPBearer scheme so the Scalar/Swagger "Authorize" button accepts a
-    # raw token instead of attempting an OAuth2 form-based password flow.
+    # Document protected routes as HTTP bearer so Scalar's Authorize button
+    # accepts a Clerk session token.
     schema.setdefault("components", {})["securitySchemes"] = {
         "BearerAuth": {
             "type": "http",
@@ -126,6 +126,7 @@ app.include_router(ingest_router)
 app.include_router(food_log_router)
 app.include_router(tag_router)
 app.include_router(health_router)
+app.include_router(meal_follow_up_router)
 
 
 @app.get("/scalar", include_in_schema=False)

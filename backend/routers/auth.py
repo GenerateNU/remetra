@@ -1,85 +1,39 @@
 """Authentication routes for user registration and login."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from clerk_backend_api import authenticate_request_async
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from database import get_db
-from schemas.auth import LoginRequest, TokenResponse
-from schemas.user import UserCreate, UserResponse, UserUpdate
-from services.auth_service import AuthService, decode_access_token
+from schemas.user import UserResponse, UserUpdate
+from services.auth_service import AuthService, clerk_auth_options
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+http_bearer = HTTPBearer(auto_error=False)
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> UserResponse:
+async def get_current_user(
+    request: Request,
+    db: Session = Depends(get_db),
+    _credentials: HTTPAuthorizationCredentials | None = Depends(http_bearer),
+) -> UserResponse:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    payload = decode_access_token(token)
-    if not payload:
+
+    state = await authenticate_request_async(request, clerk_auth_options())
+    if not state.is_signed_in or not state.payload:
         raise credentials_exception
-    username = payload.get("sub")
-    if not username:
+
+    clerk_user_id = state.payload.get("sub")
+    if not clerk_user_id:
         raise credentials_exception
-    user = AuthService().get_current_user(db, username)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
 
-
-@router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
-    """
-    Register a new user and return an access token.
-
-    Args:
-        user_data: User registration data (username, email, password, etc.)
-        db: Database session (injected by FastAPI)
-
-    Returns:
-        TokenResponse: Access token issued immediately after registration
-
-    Raises:
-        HTTPException 400: If username or email already exists
-    """
-    service = AuthService()
-    return service.register_user(db, user_data)
-
-
-@router.post("/login", response_model=TokenResponse)
-async def login(credentials: LoginRequest, db: Session = Depends(get_db)):
-    """
-    Login with username and password.
-
-    Args:
-        credentials: Login credentials containing username and password
-        db: Database session (injected by FastAPI)
-
-    Returns:
-        TokenResponse: Access token, token type, and username
-
-    Raises:
-        HTTPException 401: If credentials are invalid
-    """
-    service = AuthService()
-    token_data = service.authenticate_user(db, credentials.username, credentials.password)
-
-    if not token_data:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-        )
-
-    return token_data
+    return AuthService().resolve_user(db, clerk_user_id)
 
 
 @router.get("/me", response_model=UserResponse)

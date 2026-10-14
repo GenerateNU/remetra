@@ -32,11 +32,9 @@ from models.symptom import Symptom
 from models.symptom_log import SymptomLog
 from models.tag import FoodTag, Tag
 from models.user import User
-from services.auth_service import get_password_hash
 
 SEED_DATA_DIR = Path("/seed_data")
 SEED_USERS = [f"user_{i:03d}" for i in range(1, 41)]
-SEED_PASSWORD = "testpassword"
 SEED_TAG_NAMES = ["gluten", "dairy", "legumes", "shellfish", "soy", "fish", "egg", "peanuts"]
 
 # Maps raw symptom labels from symptom_log.json to the (sensation, location)
@@ -78,8 +76,7 @@ def seed_tags(db) -> dict[str, Tag]:
 
 
 def seed_users(db) -> int:
-    """Create 40 test users; skip if username already exists."""
-    password_hash = get_password_hash(SEED_PASSWORD)
+    """Create 40 local profile rows. Sign-in is handled by Clerk, not these rows."""
     created = 0
     for username in SEED_USERS:
         exists = db.execute(select(User).where(User.username == username)).scalar_one_or_none()
@@ -88,7 +85,6 @@ def seed_users(db) -> int:
                 User(
                     username=username,
                     email=f"{username}@seed.remetra.test",
-                    password_hash=password_hash,
                 )
             )
             created += 1

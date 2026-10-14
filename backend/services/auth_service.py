@@ -1,172 +1,62 @@
-"""Authentication service for user registration and login."""
+"""Authentication service.
+
+Clerk owns credentials. This service resolves a verified Clerk user id to the
+local profile row and updates health fields that stay in our database.
+"""
 
 import os
-from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 
+from clerk_backend_api import AuthenticateRequestOptions, Clerk
 from fastapi import HTTPException, status
-from jose import JWTError, jwt
-from passlib.context import CryptContext
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from repositories.user_repository import UserRepository
-from schemas.user import UserCreate, UserResponse, UserUpdate
-
-SECRET_KEY = os.getenv("SECRET_KEY", "Ch@ng31tN0W!")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Verify a password against its hash.
-
-    Args:
-        plain_password: The plain text password to verify
-        hashed_password: The bcrypt hashed password to compare against
-
-    Returns:
-        bool: True if password matches hash, False otherwise
-    """
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password: str) -> str:
-    """
-    Hash a password using bcrypt.
-
-    Args:
-        password: The plain text password to hash
-
-    Returns:
-        str: The bcrypt hashed password
-    """
-    return pwd_context.hash(password)
-
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """
-    Create a JWT access token.
-
-    Args:
-        data: Dictionary of claims to encode in the token (e.g., {"sub": username})
-        expires_delta: Optional custom expiration time. If None, defaults to 15 minutes
-
-    Returns:
-        str: Encoded JWT token
-    """
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-
-def decode_access_token(token: str) -> Optional[dict]:
-    """
-    Decode and verify a JWT token.
-
-    Args:
-        token: The JWT token string to decode
-
-    Returns:
-        Optional[dict]: Dictionary containing the token payload if valid, None if invalid or expired
-    """
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError:
-        return None
+from schemas.user import UserResponse, UserUpdate
 
 
 class AuthService:
-    """Service layer for authentication operations."""
+    """Service layer for resolving Clerk users to local profiles."""
 
     def __init__(self):
         self.user_repo = UserRepository()
 
-    def register_user(self, db: Session, user_data: UserCreate) -> dict:
-        """
-        Register a new user and return an access token.
+    def resolve_user(self, db: Session, clerk_user_id: str) -> UserResponse:
+        """Return the local user for a Clerk id, creating the row on first sight."""
+        existing = self.user_repo.get_by_clerk_id(db, clerk_user_id)
+        if existing:
+            return UserResponse.model_validate(existing)
 
-        Args:
-            db: Database session
-            user_data: User registration data including username, email, password, and optional fields
+        username, email = fetch_clerk_profile(clerk_user_id)
+        return self.provision_user(db, clerk_user_id, username, email)
 
-        Returns:
-            dict: access_token, token_type, and username (same shape as authenticate_user)
-
-        Raises:
-            HTTPException 400: If username or email already exists in the database
-        """
-        if self.user_repo.get_by_username(db, user_data.username):
+    def provision_user(self, db: Session, clerk_user_id: str, username: str, email: str) -> UserResponse:
+        """Insert a local user linked to a Clerk account."""
+        if self.user_repo.get_by_username(db, username):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already registered")
 
-        if self.user_repo.get_by_email(db, user_data.email):
+        if self.user_repo.get_by_email(db, email):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
-        password_hash = get_password_hash(user_data.password)
-
-        user = self.user_repo.create(
-            db=db, username=user_data.username, email=user_data.email, password_hash=password_hash
-        )
-
-        access_token = create_access_token(
-            data={"sub": user.username},
-            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-        )
-        return {"access_token": access_token, "token_type": "bearer", "username": user.username}
-
-    def authenticate_user(self, db: Session, username: str, password: str) -> Optional[dict]:
-        """
-        Authenticate a user and return access token.
-
-        Args:
-            db: Database session
-            username: Username to authenticate
-            password: Plain text password to verify
-
-        Returns:
-            Optional[dict]: Dictionary containing access_token, token_type, and username if
-                          authentication successful, None if credentials are invalid
-        """
-        user = self.user_repo.get_by_username(db, username)
-        if not user:
-            return None
-
-        if not verify_password(password, user.password_hash):
-            return None
-
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-
-        return {"access_token": access_token, "token_type": "bearer", "username": user.username}
-
-    def get_current_user(self, db: Session, username: str) -> Optional[UserResponse]:
-        """
-        Get current user by username from JWT token.
-
-        Args:
-            db: Database session
-            username: Username extracted from JWT token payload
-
-        Returns:
-            Optional[UserResponse]: User data without password if found, None otherwise
-        """
-        user = self.user_repo.get_by_username(db, username)
-        if not user:
-            return None
+        try:
+            user = self.user_repo.create(
+                db=db,
+                username=username,
+                email=email,
+                clerk_user_id=clerk_user_id,
+            )
+        except IntegrityError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username or email already registered",
+            ) from exc
 
         return UserResponse.model_validate(user)
 
     def update_user(self, db: Session, username: str, user_update: UserUpdate) -> UserResponse:
         """
-        Update user's profile.
+        Update a user's health profile.
 
         Args:
             db: database session
@@ -174,10 +64,87 @@ class AuthService:
             user_update: UserUpdate schema containing fields to update
 
         Returns:
-            UserResponse: The updated user data without password hash
+            UserResponse: The updated user data
 
         Raises:
-            HTTPException 404: If the user with the given username does not exist
+            ValueError: If the user with the given username does not exist
         """
         updated_user = self.user_repo.update_user(db, username, user_update)
         return UserResponse.model_validate(updated_user)
+
+
+def fetch_clerk_profile(clerk_user_id: str) -> tuple[str, str]:
+    """Load username and primary email for a Clerk user. Called once per new account."""
+    secret = os.getenv("CLERK_SECRET_KEY")
+    if not secret:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="CLERK_SECRET_KEY is not configured",
+        )
+
+    try:
+        with Clerk(bearer_auth=secret) as clerk:
+            clerk_user = clerk.users.get(user_id=clerk_user_id)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Could not load Clerk user",
+        ) from exc
+
+    if clerk_user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+
+    return profile_from_clerk_user(clerk_user)
+
+
+def profile_from_clerk_user(clerk_user: Any) -> tuple[str, str]:
+    """Read the username and primary email off a Clerk user object."""
+    username = getattr(clerk_user, "username", None)
+    email = _primary_email(clerk_user)
+    if not username or not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Clerk user is missing a username or email",
+        )
+    return username, email
+
+
+def _primary_email(clerk_user: Any) -> Optional[str]:
+    emails = getattr(clerk_user, "email_addresses", None) or []
+    primary_id = getattr(clerk_user, "primary_email_address_id", None)
+    for address in emails:
+        if _email_id(address) == primary_id and _email_address(address):
+            return _email_address(address)
+    for address in emails:
+        email = _email_address(address)
+        if email:
+            return email
+    return None
+
+
+def _email_id(address: Any) -> Optional[str]:
+    if isinstance(address, dict):
+        return address.get("id")
+    return getattr(address, "id", None)
+
+
+def _email_address(address: Any) -> Optional[str]:
+    if isinstance(address, dict):
+        return address.get("email_address")
+    return getattr(address, "email_address", None)
+
+
+def clerk_auth_options() -> AuthenticateRequestOptions:
+    """Build Clerk request-verification options from the environment."""
+    raw_parties = os.getenv("CLERK_AUTHORIZED_PARTIES", "")
+    parties = [part.strip() for part in raw_parties.split(",") if part.strip()]
+    jwt_key = os.getenv("CLERK_JWT_KEY")
+    if jwt_key:
+        jwt_key = jwt_key.replace("\\n", "\n")
+
+    return AuthenticateRequestOptions(
+        secret_key=os.getenv("CLERK_SECRET_KEY"),
+        jwt_key=jwt_key,
+        authorized_parties=parties or None,
+        accepts_token=["session_token"],
+    )

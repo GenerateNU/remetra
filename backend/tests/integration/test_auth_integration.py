@@ -1,178 +1,254 @@
-"""Integration tests for authentication with real database."""
+"""Integration tests for Clerk."""
+
+from types import SimpleNamespace
 
 import pytest
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 
 from repositories.user_repository import UserRepository
-from schemas.user import UserCreate, UserUpdate
-from services.auth_service import AuthService, decode_access_token
+from schemas.user import UserUpdate
+from services.auth_service import AuthService, clerk_auth_options, fetch_clerk_profile, profile_from_clerk_user
+
+
+def _clerk_user(username="ada", email="ada@example.com", primary_id="em_1"):
+    return SimpleNamespace(
+        username=username,
+        primary_email_address_id=primary_id,
+        email_addresses=[SimpleNamespace(id=primary_id, email_address=email)],
+    )
 
 
 class TestAuthServiceIntegration:
     """Integration tests for auth service with real database."""
 
-    def test_register_user_success(self, db_session, sample_user_data):
-        """Test successful user registration returns token response."""
+    def test_provision_user_success(self, db_session):
         service = AuthService()
 
-        user_create = UserCreate(**sample_user_data)
-        token_data = service.register_user(db_session, user_create)
+        user = service.provision_user(db_session, "user_clerk_1", "ada", "ada@example.com")
 
-        assert "access_token" in token_data
-        assert token_data["token_type"] == "bearer"
-        assert token_data["username"] == sample_user_data["username"]
+        assert user.username == "ada"
+        assert user.email == "ada@example.com"
+        stored = UserRepository().get_by_clerk_id(db_session, "user_clerk_1")
+        assert stored is not None
+        assert stored.username == "ada"
 
-        # Verify token is valid and contains correct subject
-        payload = decode_access_token(token_data["access_token"])
-        assert payload is not None
-        assert payload["sub"] == sample_user_data["username"]
-
-    def test_register_user_duplicate_username(self, db_session, sample_user_data):
-        """Test that duplicate usernames are prevented."""
+    def test_provision_user_duplicate_username(self, db_session):
         service = AuthService()
-
-        user_create = UserCreate(**sample_user_data)
-        service.register_user(db_session, user_create)
-
-        duplicate_data = sample_user_data.copy()
-        duplicate_data["email"] = "different@example.com"
-        user_create2 = UserCreate(**duplicate_data)
+        service.provision_user(db_session, "user_clerk_1", "ada", "ada@example.com")
 
         with pytest.raises(HTTPException) as exc_info:
-            service.register_user(db_session, user_create2)
+            service.provision_user(db_session, "user_clerk_2", "ada", "other@example.com")
 
         assert exc_info.value.status_code == 400
         assert "Username already registered" in exc_info.value.detail
 
-    def test_register_user_duplicate_email(self, db_session, sample_user_data):
-        """Test that duplicate emails are prevented."""
+    def test_provision_user_duplicate_email(self, db_session):
         service = AuthService()
-
-        user_create = UserCreate(**sample_user_data)
-        service.register_user(db_session, user_create)
-
-        duplicate_email_data = sample_user_data.copy()
-        duplicate_email_data["username"] = "different_user"
-        user_create2 = UserCreate(**duplicate_email_data)
+        service.provision_user(db_session, "user_clerk_1", "ada", "ada@example.com")
 
         with pytest.raises(HTTPException) as exc_info:
-            service.register_user(db_session, user_create2)
+            service.provision_user(db_session, "user_clerk_2", "other", "ada@example.com")
 
         assert exc_info.value.status_code == 400
         assert "Email already registered" in exc_info.value.detail
 
-    def test_authenticate_user_success(self, db_session, sample_user_data):
-        """Test successful user authentication."""
+    def test_provision_user_integrity_error(self, db_session, monkeypatch):
         service = AuthService()
 
-        user_create = UserCreate(**sample_user_data)
-        service.register_user(db_session, user_create)
+        def raise_integrity(*_args, **_kwargs):
+            raise IntegrityError("insert", {}, Exception("duplicate"))
 
-        token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
+        monkeypatch.setattr(service.user_repo, "create", raise_integrity)
 
-        assert token_data is not None
-        assert "access_token" in token_data
-        assert token_data["token_type"] == "bearer"
-        assert token_data["username"] == sample_user_data["username"]
+        with pytest.raises(HTTPException) as exc_info:
+            service.provision_user(db_session, "user_clerk_1", "ada", "ada@example.com")
 
-        # Verify token is valid
-        payload = decode_access_token(token_data["access_token"])
-        assert payload is not None
-        assert payload["sub"] == sample_user_data["username"]
+        assert exc_info.value.status_code == 400
 
-    def test_authenticate_user_wrong_password(self, db_session, sample_user_data):
-        """Test authentication fails with wrong password."""
+    def test_resolve_user_returns_existing_without_clerk_call(self, db_session, monkeypatch):
         service = AuthService()
+        service.provision_user(db_session, "user_clerk_1", "ada", "ada@example.com")
 
-        user_create = UserCreate(**sample_user_data)
-        service.register_user(db_session, user_create)
+        def fail_fetch(_clerk_user_id):
+            raise AssertionError("Clerk should not be called for an existing user")
 
-        token_data = service.authenticate_user(db_session, sample_user_data["username"], "wrongpassword")
+        monkeypatch.setattr("services.auth_service.fetch_clerk_profile", fail_fetch)
 
-        assert token_data is None
+        user = service.resolve_user(db_session, "user_clerk_1")
+        assert user.username == "ada"
+        assert user.email == "ada@example.com"
 
-    def test_authenticate_user_not_found(self, db_session):
-        """Test authentication fails when user doesn't exist."""
+    def test_resolve_user_provisions_on_first_sight(self, db_session, monkeypatch):
+        monkeypatch.setattr(
+            "services.auth_service.fetch_clerk_profile",
+            lambda _clerk_user_id: ("ada", "ada@example.com"),
+        )
+
+        user = AuthService().resolve_user(db_session, "user_clerk_1")
+
+        assert user.username == "ada"
+        assert user.email == "ada@example.com"
+        assert UserRepository().get_by_clerk_id(db_session, "user_clerk_1") is not None
+
+    def test_update_user_success(self, db_session):
         service = AuthService()
+        service.provision_user(db_session, "user_clerk_1", "ada", "ada@example.com")
 
-        token_data = service.authenticate_user(db_session, "nonexistent", "password")
-
-        assert token_data is None
-
-    def test_get_current_user_success(self, db_session, sample_user_data):
-        """Test getting current user after registration."""
-        service = AuthService()
-
-        user_create = UserCreate(**sample_user_data)
-        token_data = service.register_user(db_session, user_create)
-
-        user = service.get_current_user(db_session, token_data["username"])
-
-        assert user is not None
-        assert user.username == sample_user_data["username"]
-        assert user.email == sample_user_data["email"]
-
-    def test_get_current_user_not_found(self, db_session):
-        """Test get current user returns None when user doesn't exist."""
-        service = AuthService()
-
-        user = service.get_current_user(db_session, "nonexistent")
-
-        assert user is None
-
-    def test_update_user_success(self, db_session, sample_user_data):
-        """Test updating user profile fields after registration."""
-        service = AuthService()
-
-        user_create = UserCreate(**sample_user_data)
-        service.register_user(db_session, user_create)
-
-        user_update = UserUpdate(disease=["lupus"], weight=150.0, gender="Female")
-        updated_user = service.update_user(db_session, sample_user_data["username"], user_update)
+        updated_user = service.update_user(
+            db_session,
+            "ada",
+            UserUpdate(disease=["lupus"], weight=150.0, gender="Female"),
+        )
 
         assert updated_user.disease == ["lupus"]
         assert updated_user.weight == 150.0
         assert updated_user.gender == "Female"
 
-    def test_complete_registration_and_login_flow(self, db_session, sample_user_data):
-        """Test complete user flow from registration to getting current user."""
-        service = AuthService()
+    def test_update_user_not_found(self, db_session):
+        with pytest.raises(ValueError):
+            AuthService().update_user(db_session, "missing", UserUpdate(weight=120.0))
 
-        # 1. Register — returns token response directly
-        user_create = UserCreate(**sample_user_data)
-        register_token = service.register_user(db_session, user_create)
-        assert register_token["username"] == sample_user_data["username"]
 
-        # 2. Login
-        token_data = service.authenticate_user(db_session, sample_user_data["username"], sample_user_data["password"])
-        assert token_data is not None
+class TestClerkAuthOptions:
+    def test_reads_env(self, monkeypatch):
+        monkeypatch.setenv("CLERK_SECRET_KEY", "sk_test")
+        monkeypatch.setenv("CLERK_JWT_KEY", "line1\\nline2")
+        monkeypatch.setenv("CLERK_AUTHORIZED_PARTIES", "http://localhost:8081, https://app.example")
 
-        # 3. Decode token and get user
-        payload = decode_access_token(token_data["access_token"])
-        username = payload["sub"]
+        options = clerk_auth_options()
 
-        current_user = service.get_current_user(db_session, username)
-        assert current_user.username == sample_user_data["username"]
-        assert current_user.email == sample_user_data["email"]
+        assert options.secret_key == "sk_test"
+        assert options.jwt_key == "line1\nline2"
+        assert options.authorized_parties == ["http://localhost:8081", "https://app.example"]
+        assert options.accepts_token == ["session_token"]
+
+    def test_empty_parties_are_unset(self, monkeypatch):
+        monkeypatch.delenv("CLERK_SECRET_KEY", raising=False)
+        monkeypatch.delenv("CLERK_JWT_KEY", raising=False)
+        monkeypatch.setenv("CLERK_AUTHORIZED_PARTIES", " , ")
+
+        options = clerk_auth_options()
+
+        assert options.secret_key is None
+        assert options.jwt_key is None
+        assert options.authorized_parties is None
+
+
+class TestClerkProfile:
+    def test_profile_from_primary_email(self):
+        username, email = profile_from_clerk_user(_clerk_user())
+        assert username == "ada"
+        assert email == "ada@example.com"
+
+    def test_profile_falls_back_to_first_email(self):
+        clerk_user = SimpleNamespace(
+            username="ada",
+            primary_email_address_id="missing",
+            email_addresses=[{"id": "em_2", "email_address": "ada@example.com"}],
+        )
+        assert profile_from_clerk_user(clerk_user) == ("ada", "ada@example.com")
+
+    def test_profile_missing_username(self):
+        with pytest.raises(HTTPException) as exc_info:
+            profile_from_clerk_user(_clerk_user(username=None))
+        assert exc_info.value.status_code == 400
+
+    def test_profile_missing_email(self):
+        clerk_user = SimpleNamespace(username="ada", primary_email_address_id=None, email_addresses=[])
+        with pytest.raises(HTTPException) as exc_info:
+            profile_from_clerk_user(clerk_user)
+        assert exc_info.value.status_code == 400
+
+    def test_fetch_requires_secret(self, monkeypatch):
+        monkeypatch.delenv("CLERK_SECRET_KEY", raising=False)
+        with pytest.raises(HTTPException) as exc_info:
+            fetch_clerk_profile("user_clerk_1")
+        assert exc_info.value.status_code == 500
+
+    def test_fetch_loads_user(self, monkeypatch):
+        monkeypatch.setenv("CLERK_SECRET_KEY", "sk_test")
+        clerk_user = _clerk_user()
+
+        class Users:
+            @staticmethod
+            def get(user_id):
+                assert user_id == "user_clerk_1"
+                return clerk_user
+
+        class FakeClerk:
+            def __init__(self, bearer_auth):
+                assert bearer_auth == "sk_test"
+                self.users = Users()
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+        monkeypatch.setattr("services.auth_service.Clerk", FakeClerk)
+        assert fetch_clerk_profile("user_clerk_1") == ("ada", "ada@example.com")
+
+    def test_fetch_missing_user(self, monkeypatch):
+        monkeypatch.setenv("CLERK_SECRET_KEY", "sk_test")
+
+        class Users:
+            @staticmethod
+            def get(user_id):
+                return None
+
+        class FakeClerk:
+            def __init__(self, bearer_auth):
+                self.users = Users()
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+        monkeypatch.setattr("services.auth_service.Clerk", FakeClerk)
+        with pytest.raises(HTTPException) as exc_info:
+            fetch_clerk_profile("user_clerk_1")
+        assert exc_info.value.status_code == 401
+
+    def test_fetch_clerk_error(self, monkeypatch):
+        monkeypatch.setenv("CLERK_SECRET_KEY", "sk_test")
+
+        class FakeClerk:
+            def __init__(self, bearer_auth):
+                pass
+
+            def __enter__(self):
+                raise RuntimeError("clerk down")
+
+            def __exit__(self, *_args):
+                return False
+
+        monkeypatch.setattr("services.auth_service.Clerk", FakeClerk)
+        with pytest.raises(HTTPException) as exc_info:
+            fetch_clerk_profile("user_clerk_1")
+        assert exc_info.value.status_code == 502
 
 
 class TestUserRepositoryIntegration:
     """Integration tests for user repository."""
 
     def test_create_user(self, db_session):
-        """Test creating a user through repository."""
         repo = UserRepository()
 
-        user = repo.create(db=db_session, username="repotest", email="repo@test.com", password_hash="hashed_password")
+        user = repo.create(db=db_session, username="repotest", email="repo@test.com", clerk_user_id="user_repo")
 
         assert user.username == "repotest"
         assert user.email == "repo@test.com"
+        assert user.clerk_user_id == "user_repo"
+        assert user.password_hash is None
 
     def test_get_by_username(self, db_session):
-        """Test retrieving user by username."""
         repo = UserRepository()
 
-        repo.create(db=db_session, username="findme", email="findme@test.com", password_hash="hash")
+        repo.create(db=db_session, username="findme", email="findme@test.com", clerk_user_id="user_find")
 
         user = repo.get_by_username(db_session, "findme")
 
@@ -181,7 +257,6 @@ class TestUserRepositoryIntegration:
         assert user.email == "findme@test.com"
 
     def test_get_by_username_not_found(self, db_session):
-        """Test get_by_username returns None when user doesn't exist."""
         repo = UserRepository()
 
         user = repo.get_by_username(db_session, "doesnotexist")
@@ -189,10 +264,9 @@ class TestUserRepositoryIntegration:
         assert user is None
 
     def test_get_by_email(self, db_session):
-        """Test retrieving user by email."""
         repo = UserRepository()
 
-        repo.create(db=db_session, username="emailtest", email="find@email.com", password_hash="hash")
+        repo.create(db=db_session, username="emailtest", email="find@email.com", clerk_user_id="user_email")
 
         user = repo.get_by_email(db_session, "find@email.com")
 
@@ -201,42 +275,36 @@ class TestUserRepositoryIntegration:
         assert user.email == "find@email.com"
 
     def test_get_by_email_not_found(self, db_session):
-        """Test get_by_email returns None when email doesn't exist."""
         repo = UserRepository()
 
         user = repo.get_by_email(db_session, "notfound@example.com")
 
         assert user is None
 
+    def test_get_by_clerk_id(self, db_session):
+        repo = UserRepository()
+        repo.create(db=db_session, username="clerktest", email="clerk@test.com", clerk_user_id="user_lookup")
+
+        user = repo.get_by_clerk_id(db_session, "user_lookup")
+
+        assert user is not None
+        assert user.username == "clerktest"
+
+    def test_get_by_clerk_id_not_found(self, db_session):
+        assert UserRepository().get_by_clerk_id(db_session, "user_missing") is None
+
 
 class TestMeEndpoint:
     """HTTP-level integration tests for GET /auth/me."""
 
-    def _register_and_get_token(self, client, username: str, email: str) -> str:
-        """Register a user via /auth/signup and return the access token."""
-        response = client.post(
-            "/auth/signup",
-            json={
-                "username": username,
-                "email": email,
-                "password": "password123",
-                "disease": ["lupus"],
-                "weight": 150.0,
-            },
-        )
-        assert response.status_code == 201
-        return response.json()["access_token"]
-
-    def test_me_success(self, test_client):
-        """Test /me returns user info for a valid token."""
-        token = self._register_and_get_token(test_client, "me_test_user", "me_test@example.com")
-
-        response = test_client.get("/auth/me", headers={"authorization": f"Bearer {token}"})
+    def test_me_success(self, test_client, authenticated_user):
+        """Test /me returns the user injected by the auth dependency."""
+        response = test_client.get("/auth/me")
 
         assert response.status_code == 200
         data = response.json()
-        assert data["username"] == "me_test_user"
-        assert data["email"] == "me_test@example.com"
+        assert data["username"] == authenticated_user["username"]
+        assert data["email"] == authenticated_user["email"]
         assert "password_hash" not in data
         assert "created_at" in data
 
@@ -248,8 +316,7 @@ class TestMeEndpoint:
 
     def test_me_missing_bearer_prefix(self, test_client):
         """Test /me returns 401 when Authorization header lacks 'Bearer ' prefix."""
-        token = self._register_and_get_token(test_client, "me_nobearer_user", "me_nobearer@example.com")
-        response = test_client.get("/auth/me", headers={"authorization": token})
+        response = test_client.get("/auth/me", headers={"authorization": "invalidtoken"})
 
         assert response.status_code == 401
 
