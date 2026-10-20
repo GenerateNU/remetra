@@ -275,8 +275,16 @@ class TestGetAssociations:
 
 
 class TestRunAlgorithm:
+    @pytest.fixture(autouse=True)
+    def _signed_in_as_alice(self):
+        from auth_context import current_username
+
+        token = current_username.set("alice")
+        yield
+        current_username.reset(token)
+
     def test_returns_empty_list_when_no_food_logs(self):
-        payload = AlgorithmRunRequest(user_id="alice", symptom_ids=[uuid4()])
+        payload = AlgorithmRunRequest(symptom_ids=[uuid4()])
         service = AlgorithmService()
         with (
             patch.object(service, "_get_food_logs_for_user", return_value=[]),
@@ -288,7 +296,7 @@ class TestRunAlgorithm:
         assert result == []
 
     def test_returns_empty_list_when_no_symptom_logs(self):
-        payload = AlgorithmRunRequest(user_id="alice", symptom_ids=[uuid4()])
+        payload = AlgorithmRunRequest(symptom_ids=[uuid4()])
         service = AlgorithmService()
         with (
             patch.object(service, "_get_food_logs_for_user", return_value=[_food_log(ingredients=["gluten"])]),
@@ -300,7 +308,7 @@ class TestRunAlgorithm:
         assert result == []
 
     def test_upsert_not_called_when_no_metrics_produced(self):
-        payload = AlgorithmRunRequest(user_id="alice", symptom_ids=[uuid4()])
+        payload = AlgorithmRunRequest(symptom_ids=[uuid4()])
         service = AlgorithmService()
         with (
             patch.object(service, "_get_food_logs_for_user", return_value=[]),
@@ -313,7 +321,7 @@ class TestRunAlgorithm:
 
     def test_upsert_called_once_per_symptom_with_associations(self):
         symptom_a, symptom_b = uuid4(), uuid4()
-        payload = AlgorithmRunRequest(user_id="alice", symptom_ids=[symptom_a, symptom_b])
+        payload = AlgorithmRunRequest(symptom_ids=[symptom_a, symptom_b])
         service = AlgorithmService()
         with (
             patch.object(
@@ -337,7 +345,7 @@ class TestRunAlgorithm:
 
     def test_get_associations_called_with_payload_symptom_ids(self):
         symptom_id = uuid4()
-        payload = AlgorithmRunRequest(user_id="alice", symptom_ids=[symptom_id])
+        payload = AlgorithmRunRequest(symptom_ids=[symptom_id])
         service = AlgorithmService()
         with (
             patch.object(service, "_get_food_logs_for_user", return_value=[]),
@@ -350,7 +358,7 @@ class TestRunAlgorithm:
         assert mock_get.call_args.kwargs["symptom_ids"] == [symptom_id]
 
     def test_empty_symptom_ids_fetches_all_symptom_logs(self):
-        payload = AlgorithmRunRequest(user_id="alice")
+        payload = AlgorithmRunRequest()
         service = AlgorithmService()
         with (
             patch.object(service, "_get_food_logs_for_user", return_value=[]),

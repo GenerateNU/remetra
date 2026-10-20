@@ -14,7 +14,7 @@ class SymptomLogBase(BaseModel):
 
 
 class SymptomLogCreate(SymptomLogBase):
-    username: str = Field(..., description="Username of the person logging the symptom")
+    """Schema for creating a symptom log. The owner is the signed-in user."""
 
 
 class SymptomLogUpdate(BaseModel):
