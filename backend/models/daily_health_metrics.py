@@ -8,6 +8,8 @@ from database import Base
 
 
 class DailyHealthMetrics(Base):
+    """One row per user per day of aggregated Apple Health metrics."""
+
     __tablename__ = "daily_health_metrics"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -24,7 +26,4 @@ class DailyHealthMetrics(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
-    __table_args__ = (
-    UniqueConstraint("username", "date", name="uq_daily_health_user_date"),
-    )
-    
+    __table_args__ = (UniqueConstraint("username", "date", name="uq_daily_health_user_date"),)
