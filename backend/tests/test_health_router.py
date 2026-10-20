@@ -50,7 +50,6 @@ class TestHealthRouter:
         response = test_client.post(
             "/health/sync",
             json=invalid,
-            headers={"Authorization": f"Bearer {authenticated_user['token']}"},
         )
         assert response.status_code == 422
 
@@ -58,7 +57,6 @@ class TestHealthRouter:
         response = test_client.post(
             "/health/sync",
             json=VALID_REQUEST,
-            headers={"Authorization": f"Bearer {authenticated_user['token']}"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -67,9 +65,8 @@ class TestHealthRouter:
         assert data["events_skipped"] == 0
 
     def test_duplicate_request_skips_events(self, test_client, authenticated_user):
-        headers = {"Authorization": f"Bearer {authenticated_user['token']}"}
-        test_client.post("/health/sync", json=VALID_REQUEST, headers=headers)
-        response = test_client.post("/health/sync", json=VALID_REQUEST, headers=headers)
+        test_client.post("/health/sync", json=VALID_REQUEST)
+        response = test_client.post("/health/sync", json=VALID_REQUEST)
         data = response.json()
         assert data["days_saved"] == 1
         assert data["events_added"] == 0
