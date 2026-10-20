@@ -117,7 +117,14 @@ class FoodRepository:
         """
         logging.info(f"Updating food with ID {food_id} in database")
 
-        db.query(Food).filter(Food.id == food_id).update(food_data)
-        db.commit()
         food = db.query(Food).filter(Food.id == food_id).first()
+        if not food:
+            return None
+
+        for field, value in food_data.items():
+            if field == "username":
+                continue
+            setattr(food, field, value)
+        db.commit()
+        db.refresh(food)
         return food

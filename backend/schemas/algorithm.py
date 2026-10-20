@@ -32,7 +32,6 @@ class AlgorithmAssociationResponse(BaseModel):
 class AlgorithmRunRequest(BaseModel):
     """Request payload for running and persisting algorithm associations."""
 
-    user_id: str = Field(..., description="User identifier")
     symptom_ids: list[UUID] = Field(default=[], description="Optional symptom IDs to scope the algorithm")
     time_window_hours: float = Field(
         default=4.0,

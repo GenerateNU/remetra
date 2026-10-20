@@ -6,6 +6,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from auth_context import current_username
 from repositories.food_log_repository import FoodLogRepository
 from schemas.food_log import FoodLogCreate, FoodLogResponse, FoodLogUpdate
 
@@ -17,7 +18,7 @@ class FoodLogService:
         self.food_log_repo = FoodLogRepository()
 
     def create_food_log(self, db: Session, food_log_data: FoodLogCreate) -> FoodLogResponse:
-        logging.info(f"Creating food log for user: {food_log_data.username}")
+        logging.info("Creating food log for user: %s", current_username.get())
         created = self.food_log_repo.create_food_log(db, food_log_data)
         return FoodLogResponse.model_validate(created)
 
