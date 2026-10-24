@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import StrEnum
 from typing import Optional
 from uuid import UUID
 
@@ -30,3 +31,22 @@ class SymptomLogResponse(SymptomLogBase):
     id: UUID = Field(..., description="Unique ID for this symptom log")
     username: str = Field(..., description="Username")
     created_at: datetime = Field(..., description="When this log was created")
+
+
+class SymptomFamily(StrEnum):
+    GI = "gi"
+    SKIN = "skin"
+    HEAD = "head"
+    OTHER = "other"
+
+
+class SymptomRouteType(StrEnum):
+    RED_FLAG = "red_flag"
+    ALLERGY_LIKE = "allergy_like"
+    MODEL = "model"
+
+
+class SymptomRoute(BaseModel):
+    family: Optional[SymptomFamily] = Field(None, description="Symptom family; only set when route is model")
+    route: SymptomRouteType = Field(..., description="Where to route this symptom")
+    safety_message: Optional[str] = Field(None, description="Safety message for allergy-like and red flag symptoms")

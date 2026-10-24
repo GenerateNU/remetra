@@ -1,0 +1,55 @@
+# data/symptom_routing.yaml
+# Routes a logged symptom (location + sensation) to a SymptomRoute.
+# Rules are checked in order and the first match wins, so safety rules come first.
+# A rule with no locations or no sensations matches any value for that field.
+# Values are lowercase versions of the options in frontend/src/types/symptomOptions.ts.
+# route: red_flag | allergy_like | model   (SymptomRouteType)
+# family: gi | skin | head | other         (SymptomFamily; only set when route is model)
+# Every red_flag and allergy_like rule cites its sources.
+
+safety_messages:
+  red_flag: "This symptom can be a sign of something serious. If it is severe, sudden or getting worse, call emergency services or get medical care right away."
+  allergy_like: "This symptom can be a sign of an allergic reaction. If you have trouble breathing or swallowing, or swelling is spreading, call emergency services right away."
+
+rules:
+  # Safety routes
+  - id: chest_pain
+    locations: [chest]
+    sensations: [pain, pressure, tightness]
+    route: red_flag
+    sources: ["https://medlineplus.gov/ency/article/003079.htm"]
+  - id: blood
+    sensations: [bleeding]
+    route: red_flag
+    sources: ["https://medlineplus.gov/ency/article/000045.htm"]
+  - id: throat_swelling
+    locations: [throat]
+    sensations: [swelling, tightness, itching]
+    route: allergy_like
+    sources: ["https://medlineplus.gov/ency/article/000005.htm", "https://acaai.org/allergies/symptoms/anaphylaxis/", "https://medlineplus.gov/ency/article/000817.htm"]
+  - id: eye_swelling
+    locations: [eyes]
+    sensations: [swelling]
+    route: allergy_like
+    sources: ["https://medlineplus.gov/ency/article/000005.htm", "https://medlineplus.gov/ency/article/000844.htm"]
+
+  # Model routes
+  - id: gi
+    locations: [abdomen]
+    route: model
+    family: gi
+  - id: skin
+    locations: [skin]
+    sensations: [itching, burning, swelling]
+    route: model
+    family: skin
+  - id: head
+    locations: [head]
+    sensations: [pain, throbbing, pressure]
+    route: model
+    family: head
+
+# Used when no rule matches (joints, fatigue, whole body, ...)
+default:
+  route: model
+  family: other
