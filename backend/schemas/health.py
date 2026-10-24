@@ -50,3 +50,11 @@ class HealthSyncResponse(BaseModel):
     days_saved: int = Field(..., description="Number of days inserted or updated")
     events_added: int = Field(..., description="Number of new events inserted")
     events_skipped: int = Field(..., description="Number of duplicate events skipped")
+
+class HealthTrendDay(BaseModel):
+    date: date
+    sleep_total_min: Optional[int] = Field(None, description="Total sleep in minutes, null if no data that day")
+    hrv_avg_ms: Optional[float] = Field(None, description="Average heart rate variability in ms, null if no data")
+    resting_hr_bpm: Optional[float] = Field(None, description="Restng heart rate in bpm, null if no data")
+    symptom_count: int = Field(0, ge=0, description="Number of symptom logs that day")
+    max_intensity: Optional[int] = Field(None, description="Highest symptom intensity that day, null if no symptoms")
