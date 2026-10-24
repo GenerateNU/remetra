@@ -1,11 +1,14 @@
 import logging
+from datetime import UTC, date, datetime, time, timedelta
 
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 
 from models.daily_health_metrics import DailyHealthMetrics
 from models.healthkit_event import HealthKitEvent
+from models.symptom_log import SymptomLog
 from schemas.health import HealthDayEntry, HealthEventEntry
 
 DAY_METRIC_FIELDS = (
@@ -96,3 +99,35 @@ class HealthRepository:
             logging.error(f"Error saving HealthKit events: {e}")
             db.rollback()
             raise e
+
+    def get_days_in_range(self, db: Session, username: str, start: date, end: date) -> list[DailyHealthMetrics]:
+        """
+        Fetch a user's daily health metrics between the start and end date (inclusive). Days with no
+        synced data have no row.
+        """
+        stmt = (
+            select(DailyHealthMetrics)
+            .where(
+                DailyHealthMetrics.username == username,
+                DailyHealthMetrics.date >= start,
+                DailyHealthMetrics.date <= end,
+            )
+            .order_by(DailyHealthMetrics.date)
+        )
+        return list(db.execute(stmt).scalars().all())
+
+    def get_symptom_logs_in_range(self, db: Session, username: str, start: date, end: date) -> list[SymptomLog]:
+        """
+        Fetch a user's symptom logs that could fall on a local date between start and end.
+        Made sure window is padded by a day on each side because a log's local date can differ from its UTC date. The
+        service filters each log down to its exact local date.
+        """
+        window_start = datetime.combine(start - timedelta(days=1), time.min, tzinfo=UTC)
+        window_end = datetime.combine(end + timedelta(days=2), time.min, tzinfo=UTC)
+
+        stmt = select(SymptomLog).where(
+            SymptomLog.username == username,
+            SymptomLog.timestamp >= window_start,
+            SymptomLog.timestamp < window_end,
+        )
+        return list(db.execute(stmt).scalars().all())
