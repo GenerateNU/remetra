@@ -3,7 +3,7 @@ import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'rea
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { SymptomsOverTimeChart } from '../../components/SymptomsOverTimeChart';
 import { HealthTrendsChart } from '../../components/HealthTrendsChart';
-import { SleepLengthPieChart } from '../../components/SleepLengthPieChart';
+import { HealthBreakdownPieChart } from '../../components/HealthBreakdownPieChart';
 import { symptomLogService, SymptomLogResponse } from '../../api/symptom_log_service';
 import { foodLogService } from '../../api/food_log_service';
 import { healthService, HealthDayResponse } from '../../api/health_service';
@@ -170,7 +170,7 @@ export function AnalysisScreen() {
           ) : (
             <>
               <HealthTrendsChart days={healthDays} end={healthRange.end} />
-              <SleepLengthPieChart days={healthDays} end={healthRange.end} />
+              <HealthBreakdownPieChart days={healthDays} end={healthRange.end} />
             </>
           )}
         </View>

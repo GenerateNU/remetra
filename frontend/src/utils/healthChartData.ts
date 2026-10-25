@@ -95,54 +95,82 @@ export function buildHealthChartData(
   };
 }
 
-export type SleepBucketKey = 'under6' | '6to7' | '7to8' | 'over8' | 'noData';
+export type BreakdownBandKey = 'band0' | 'band1' | 'band2' | 'band3' | 'noData';
 
-export interface SleepBucket {
-  key: SleepBucketKey;
+export interface BreakdownBand {
+  key: BreakdownBandKey; // band0 = lowest values ... band3 = highest
   label: string;
   count: number;
 }
 
-export interface SleepBreakdown {
-  buckets: SleepBucket[]; // fixed order, zero counts included
-  nightsTracked: number; // nights with a sleep reading
-  totalNights: number; // = rangeDays
+export interface MetricBreakdown {
+  bands: BreakdownBand[]; // fixed order, zero counts included
+  daysTracked: number; // days with a reading for this metric
+  totalDays: number; // = rangeDays
 }
 
-const SLEEP_BUCKETS: { key: Exclude<SleepBucketKey, 'noData'>; label: string; maxMin: number }[] = [
-  { key: 'under6', label: 'Under 6h', maxMin: 360 },
-  { key: '6to7', label: '6–7h', maxMin: 420 },
-  { key: '7to8', label: '7–8h', maxMin: 480 },
-  { key: 'over8', label: '8h+', maxMin: Infinity },
-];
+// Upper bounds are exclusive, so a value exactly on a boundary falls in the higher band.
+// Sleep bounds are in minutes (raw sleep_total_min), HRV in ms, resting HR in bpm.
+const BREAKDOWN_BANDS: Record<HealthMetric, { label: string; below: number }[]> = {
+  sleep: [
+    { label: 'Under 6h', below: 360 },
+    { label: '6–7h', below: 420 },
+    { label: '7–8h', below: 480 },
+    { label: '8h+', below: Infinity },
+  ],
+  hrv: [
+    { label: 'Under 30 ms', below: 30 },
+    { label: '30–45 ms', below: 45 },
+    { label: '45–60 ms', below: 60 },
+    { label: '60+ ms', below: Infinity },
+  ],
+  restingHr: [
+    { label: 'Under 55 bpm', below: 55 },
+    { label: '55–65 bpm', below: 65 },
+    { label: '65–75 bpm', below: 75 },
+    { label: '75+ bpm', below: Infinity },
+  ],
+};
+
+function rawMetricValue(day: HealthDayResponse, metric: HealthMetric): number | null {
+  if (metric === 'sleep') return day.sleep_total_min;
+  return metric === 'hrv' ? day.hrv_avg_ms : day.resting_hr_bpm;
+}
 
 /**
- * Groups the nights in the last `rangeDays` days ending on `end` by total sleep.
- * Lower bounds are inclusive (exactly 6h → "6–7h"); nights without a reading count as "No data",
- * so the buckets always add up to the whole range.
+ * Groups the days in the last `rangeDays` days ending on `end` into value bands for `metric`.
+ * Days without a reading count as "No data", so the bands always add up to the whole range.
  */
-export function buildSleepBreakdown(days: HealthDayResponse[], rangeDays: HealthRange, end: string): SleepBreakdown {
+export function buildMetricBreakdown(
+  days: HealthDayResponse[],
+  metric: HealthMetric,
+  rangeDays: HealthRange,
+  end: string,
+): MetricBreakdown {
   const byDate = new Map(days.map((d) => [d.date, d]));
   const { start } = rangeBounds(end, rangeDays);
-  const counts: Record<SleepBucketKey, number> = { under6: 0, '6to7': 0, '7to8': 0, over8: 0, noData: 0 };
+  const config = BREAKDOWN_BANDS[metric];
+  const counts = [0, 0, 0, 0];
+  let noData = 0;
 
   const cursor = parseDayKey(start);
   for (let i = 0; i < rangeDays; i++) {
-    const minutes = byDate.get(toDayKey(cursor))?.sleep_total_min;
-    if (minutes == null) {
-      counts.noData += 1;
+    const day = byDate.get(toDayKey(cursor));
+    const value = day ? rawMetricValue(day, metric) : null;
+    if (value == null) {
+      noData += 1;
     } else {
-      counts[SLEEP_BUCKETS.find((b) => minutes < b.maxMin)!.key] += 1;
+      counts[config.findIndex((b) => value < b.below)] += 1;
     }
     cursor.setDate(cursor.getDate() + 1);
   }
 
   return {
-    buckets: [
-      ...SLEEP_BUCKETS.map((b) => ({ key: b.key, label: b.label, count: counts[b.key] })),
-      { key: 'noData', label: 'No data', count: counts.noData },
+    bands: [
+      ...config.map((b, i) => ({ key: `band${i}` as BreakdownBandKey, label: b.label, count: counts[i] })),
+      { key: 'noData', label: 'No data', count: noData },
     ],
-    nightsTracked: rangeDays - counts.noData,
-    totalNights: rangeDays,
+    daysTracked: rangeDays - noData,
+    totalDays: rangeDays,
   };
 }
