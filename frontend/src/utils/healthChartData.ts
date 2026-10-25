@@ -132,6 +132,16 @@ const BREAKDOWN_BANDS: Record<HealthMetric, { label: string; below: number }[]> 
   ],
 };
 
+/** Labels for the four value bands of `metric`, lowest first. */
+export function bandLabels(metric: HealthMetric): string[] {
+  return BREAKDOWN_BANDS[metric].map((b) => b.label);
+}
+
+/** Index (0 = lowest) of the band a raw value falls in; sleep is in minutes. */
+export function bandIndex(metric: HealthMetric, raw: number): number {
+  return BREAKDOWN_BANDS[metric].findIndex((b) => raw < b.below);
+}
+
 function rawMetricValue(day: HealthDayResponse, metric: HealthMetric): number | null {
   if (metric === 'sleep') return day.sleep_total_min;
   return metric === 'hrv' ? day.hrv_avg_ms : day.resting_hr_bpm;
@@ -160,7 +170,7 @@ export function buildMetricBreakdown(
     if (value == null) {
       noData += 1;
     } else {
-      counts[config.findIndex((b) => value < b.below)] += 1;
+      counts[bandIndex(metric, value)] += 1;
     }
     cursor.setDate(cursor.getDate() + 1);
   }
@@ -173,4 +183,75 @@ export function buildMetricBreakdown(
     daysTracked: rangeDays - noData,
     totalDays: rangeDays,
   };
+}
+
+export interface CalendarCell {
+  date: Date;
+  inRange: boolean; // false for padding cells before the range starts / after it ends
+  value: number | null; // display value (sleep in hours), null = no reading
+  band: number | null; // 0..3, null = no reading
+  hasSymptom: boolean;
+}
+
+export interface CalendarGrid {
+  weeks: CalendarCell[][]; // columns, oldest first; each has 7 cells, Monday -> Sunday
+  monthLabels: (string | null)[]; // per week: month name where a month starts, else null
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** 0 = Monday ... 6 = Sunday */
+function weekdayIndex(d: Date): number {
+  return (d.getDay() + 6) % 7;
+}
+
+/**
+ * Lays the last `rangeDays` days ending on `end` out as a calendar: one column per week
+ * (Monday-first), each day carrying its value band for `metric` and whether a symptom was logged.
+ */
+export function buildCalendarGrid(
+  days: HealthDayResponse[],
+  metric: HealthMetric,
+  rangeDays: HealthRange,
+  end: string,
+): CalendarGrid {
+  const byDate = new Map(days.map((d) => [d.date, d]));
+  const { start } = rangeBounds(end, rangeDays);
+  const first = parseDayKey(start);
+  const last = parseDayKey(end);
+
+  // Pad back to the Monday of the first week and forward to the Sunday of the last
+  const cursor = new Date(first);
+  cursor.setDate(cursor.getDate() - weekdayIndex(first));
+  const gridEnd = new Date(last);
+  gridEnd.setDate(gridEnd.getDate() + (6 - weekdayIndex(last)));
+
+  const weeks: CalendarCell[][] = [];
+  const monthLabels: (string | null)[] = [];
+  while (cursor <= gridEnd) {
+    const week: CalendarCell[] = [];
+    let label: string | null = null;
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(cursor);
+      const inRange = date >= first && date <= last;
+      const day = inRange ? byDate.get(toDayKey(date)) : undefined;
+      const raw = day ? rawMetricValue(day, metric) : null;
+      week.push({
+        date,
+        inRange,
+        value: day ? metricValue(day, metric) : null,
+        band: raw == null ? null : bandIndex(metric, raw),
+        hasSymptom: !!day && day.symptom_count > 0,
+      });
+      // Label the first column, and any column where an in-range month starts
+      if (inRange && (weeks.length === 0 || date.getDate() === 1) && label === null) {
+        label = MONTHS[date.getMonth()];
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    weeks.push(week);
+    monthLabels.push(label);
+  }
+
+  return { weeks, monthLabels };
 }

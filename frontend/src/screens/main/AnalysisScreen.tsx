@@ -4,6 +4,7 @@ import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { SymptomsOverTimeChart } from '../../components/SymptomsOverTimeChart';
 import { HealthTrendsChart } from '../../components/HealthTrendsChart';
 import { HealthBreakdownPieChart } from '../../components/HealthBreakdownPieChart';
+import { HealthCalendarHeatmap } from '../../components/HealthCalendarHeatmap';
 import { symptomLogService, SymptomLogResponse } from '../../api/symptom_log_service';
 import { foodLogService } from '../../api/food_log_service';
 import { healthService, HealthDayResponse } from '../../api/health_service';
@@ -171,6 +172,7 @@ export function AnalysisScreen() {
             <>
               <HealthTrendsChart days={healthDays} end={healthRange.end} />
               <HealthBreakdownPieChart days={healthDays} end={healthRange.end} />
+              <HealthCalendarHeatmap days={healthDays} end={healthRange.end} />
             </>
           )}
         </View>
