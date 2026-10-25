@@ -6,8 +6,9 @@
  */
 import { useMemo, useState } from 'react';
 import { VictoryChart, VictoryLine, VictoryScatter, VictoryAxis, VictoryTheme } from 'victory-native';
-import { View, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, useWindowDimensions } from 'react-native';
 import type { HealthDayResponse } from '../api/health_service';
+import { SegmentedControl } from './SegmentedControl';
 import {
   buildHealthChartData,
   hasAnyHealthData,
@@ -156,37 +157,6 @@ export function HealthTrendsChart({ days, end }: Props) {
           <Text style={{ fontSize: 11, color: '#666' }}>Symptom logged</Text>
         </View>
       </View>
-    </View>
-  );
-}
-
-function SegmentedControl<T extends string | number>({
-  options,
-  selected,
-  onSelect,
-}: {
-  options: { value: T; label: string }[];
-  selected: T;
-  onSelect: (value: T) => void;
-}) {
-  return (
-    <View className="flex-row bg-remetra-surface rounded-full p-1">
-      {options.map((o) => {
-        const active = o.value === selected;
-        return (
-          <TouchableOpacity
-            key={String(o.value)}
-            accessibilityRole="button"
-            accessibilityState={{ selected: active }}
-            onPress={() => onSelect(o.value)}
-            className={`flex-1 items-center rounded-full py-1.5 border ${active ? 'bg-remetra-surface-accent border-remetra-accent' : 'border-transparent'}`}
-          >
-            <Text className={`text-xs ${active ? 'text-remetra-espresso font-semibold' : 'text-remetra-muted'}`}>
-              {o.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
     </View>
   );
 }
