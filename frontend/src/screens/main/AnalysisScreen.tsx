@@ -5,7 +5,8 @@ import { SymptomsOverTimeChart } from '../../components/SymptomsOverTimeChart';
 import { HealthTrendsChart } from '../../components/HealthTrendsChart';
 import { symptomLogService, SymptomLogResponse } from '../../api/symptom_log_service';
 import { foodLogService } from '../../api/food_log_service';
-import { healthService, HealthDayResponse, toDayKey } from '../../api/health_service';
+import { healthService, HealthDayResponse } from '../../api/health_service';
+import { rangeBounds, toDayKey } from '../../utils/healthChartData';
 import { useBankStore } from '../../store/bankStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
@@ -13,13 +14,11 @@ import { useAppNavigation } from '../../navigation/hooks';
 import { ChevronRight } from 'lucide-react-native';
 
 const MIN_LOGS_FOR_ANALYSIS = 30;
-const HEALTH_TREND_DAYS = 30;
+// Fetch the longest chart range once; the 7/30-day toggles slice it client-side
+const HEALTH_TREND_DAYS = 90;
 
 function getHealthTrendRange(): { start: string; end: string } {
-  const end = new Date();
-  const start = new Date();
-  start.setDate(end.getDate() - (HEALTH_TREND_DAYS - 1));
-  return { start: toDayKey(start), end: toDayKey(end) };
+  return rangeBounds(toDayKey(new Date()), HEALTH_TREND_DAYS);
 }
 
 interface SymptomCount {
@@ -108,7 +107,7 @@ export function AnalysisScreen() {
   // Loaded separately so a health-data failure doesn't block the symptom analysis
   useEffect(() => {
     healthService
-      .getMyHealthDays(healthRange.start, healthRange.end)
+      .getHealthTrends(healthRange.start, healthRange.end)
       .then(setHealthDays)
       .catch((err: any) => setHealthError(err.message ?? 'Failed to load health data'))
       .finally(() => setHealthLoading(false));
@@ -163,17 +162,12 @@ export function AnalysisScreen() {
 
         <View className="mt-6">
           <SectionDivider label="Health Trends" />
-          {healthLoading || loading ? (
+          {healthLoading ? (
             <ActivityIndicator color="#b2939b" style={{ marginTop: 24 }} />
           ) : healthError ? (
             <Text className="text-remetra-burgundy text-center mt-6">{healthError}</Text>
           ) : (
-            <HealthTrendsChart
-              healthDays={healthDays}
-              symptomLogs={symptomLogs}
-              start={healthRange.start}
-              end={healthRange.end}
-            />
+            <HealthTrendsChart days={healthDays} end={healthRange.end} />
           )}
         </View>
       </ScrollView>
