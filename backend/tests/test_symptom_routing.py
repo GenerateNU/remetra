@@ -58,6 +58,14 @@ def test_model_routes_set_family(sensation, location, family):
     assert result.safety_message is None
 
 
+@pytest.mark.parametrize("location", ["Chest", "chest", " CHEST "])
+def test_chest_tightness_is_red_flag_not_allergy_like(location):
+    # Act
+    result = route_symptom("Tightness", location)
+    # Assert
+    assert result.route == SymptomRouteType.RED_FLAG
+
+
 def test_matching_ignores_case_and_whitespace():
     # Act
     result = route_symptom("  PAIN ", " chest")

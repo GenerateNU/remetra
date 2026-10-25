@@ -6,10 +6,11 @@
 # route: red_flag | allergy_like | model   (SymptomRouteType)
 # family: gi | skin | head | other         (SymptomFamily; only set when route is model)
 # Every red_flag and allergy_like rule cites its sources.
+# Safety messages never name a food: they are about getting care, not about what caused the symptom.
 
 safety_messages:
-  red_flag: "This symptom can be a sign of something serious. If it is severe, sudden or getting worse, call emergency services or get medical care right away."
-  allergy_like: "This symptom can be a sign of an allergic reaction. If you have trouble breathing or swallowing, or swelling is spreading, call emergency services right away."
+  red_flag: "This symptom can be a sign of something serious. Get medical care now, or call emergency services if it is severe or getting worse."
+  allergy_like: "If you have swelling of your lips, tongue or throat, or trouble breathing, get emergency care now."
 
 rules:
   # Safety routes
