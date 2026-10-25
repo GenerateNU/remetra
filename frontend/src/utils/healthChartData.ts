@@ -94,3 +94,55 @@ export function buildHealthChartData(
     domain: { x: [parseDayKey(start), parseDayKey(end)], y: yDomain(values) },
   };
 }
+
+export type SleepBucketKey = 'under6' | '6to7' | '7to8' | 'over8' | 'noData';
+
+export interface SleepBucket {
+  key: SleepBucketKey;
+  label: string;
+  count: number;
+}
+
+export interface SleepBreakdown {
+  buckets: SleepBucket[]; // fixed order, zero counts included
+  nightsTracked: number; // nights with a sleep reading
+  totalNights: number; // = rangeDays
+}
+
+const SLEEP_BUCKETS: { key: Exclude<SleepBucketKey, 'noData'>; label: string; maxMin: number }[] = [
+  { key: 'under6', label: 'Under 6h', maxMin: 360 },
+  { key: '6to7', label: '6–7h', maxMin: 420 },
+  { key: '7to8', label: '7–8h', maxMin: 480 },
+  { key: 'over8', label: '8h+', maxMin: Infinity },
+];
+
+/**
+ * Groups the nights in the last `rangeDays` days ending on `end` by total sleep.
+ * Lower bounds are inclusive (exactly 6h → "6–7h"); nights without a reading count as "No data",
+ * so the buckets always add up to the whole range.
+ */
+export function buildSleepBreakdown(days: HealthDayResponse[], rangeDays: HealthRange, end: string): SleepBreakdown {
+  const byDate = new Map(days.map((d) => [d.date, d]));
+  const { start } = rangeBounds(end, rangeDays);
+  const counts: Record<SleepBucketKey, number> = { under6: 0, '6to7': 0, '7to8': 0, over8: 0, noData: 0 };
+
+  const cursor = parseDayKey(start);
+  for (let i = 0; i < rangeDays; i++) {
+    const minutes = byDate.get(toDayKey(cursor))?.sleep_total_min;
+    if (minutes == null) {
+      counts.noData += 1;
+    } else {
+      counts[SLEEP_BUCKETS.find((b) => minutes < b.maxMin)!.key] += 1;
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return {
+    buckets: [
+      ...SLEEP_BUCKETS.map((b) => ({ key: b.key, label: b.label, count: counts[b.key] })),
+      { key: 'noData', label: 'No data', count: counts.noData },
+    ],
+    nightsTracked: rangeDays - counts.noData,
+    totalNights: rangeDays,
+  };
+}
