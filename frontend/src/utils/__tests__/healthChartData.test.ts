@@ -1,7 +1,7 @@
 import type { HealthDayResponse } from '../../api/health_service';
 import {
   buildHealthChartData,
-  buildSleepBreakdown,
+  buildMetricBreakdown,
   hasAnyHealthData,
   parseDayKey,
   rangeBounds,
@@ -150,55 +150,87 @@ test('parseDayKey gives local midnight and round-trips with toDayKey', () => {
   expect(toDayKey(d)).toBe('2026-03-08');
 });
 
-describe('buildSleepBreakdown', () => {
-  const countsOf = (b: ReturnType<typeof buildSleepBreakdown>) =>
-    Object.fromEntries(b.buckets.map((x) => [x.key, x.count]));
+describe('buildMetricBreakdown', () => {
+  const countsOf = (b: ReturnType<typeof buildMetricBreakdown>) =>
+    Object.fromEntries(b.bands.map((x) => [x.label, x.count]));
 
-  test('groups nights by sleep length with inclusive lower bounds', () => {
-    const breakdown = buildSleepBreakdown(
+  test('groups sleep by length; a night exactly on a boundary goes in the higher band', () => {
+    const breakdown = buildMetricBreakdown(
       [
-        day('2026-10-01', { sleep_total_min: 359 }), // under 6h
-        day('2026-10-02', { sleep_total_min: 360 }), // exactly 6h -> 6–7h
-        day('2026-10-03', { sleep_total_min: 419 }), // 6–7h
-        day('2026-10-04', { sleep_total_min: 420 }), // exactly 7h -> 7–8h
-        day('2026-10-05', { sleep_total_min: 480 }), // exactly 8h -> 8h+
-        day('2026-10-06', { sleep_total_min: 655 }), // 8h+
+        day('2026-10-01', { sleep_total_min: 359 }),
+        day('2026-10-02', { sleep_total_min: 360 }), // exactly 6h
+        day('2026-10-03', { sleep_total_min: 419 }),
+        day('2026-10-04', { sleep_total_min: 420 }), // exactly 7h
+        day('2026-10-05', { sleep_total_min: 480 }), // exactly 8h
+        day('2026-10-06', { sleep_total_min: 655 }),
       ],
+      'sleep',
       7,
       '2026-10-07',
     );
 
-    expect(countsOf(breakdown)).toEqual({ under6: 1, '6to7': 2, '7to8': 1, over8: 2, noData: 1 });
+    expect(countsOf(breakdown)).toEqual({ 'Under 6h': 1, '6–7h': 2, '7–8h': 1, '8h+': 2, 'No data': 1 });
   });
 
-  test('buckets always add up to the whole range', () => {
-    const breakdown = buildSleepBreakdown([day('2026-10-07', { sleep_total_min: 450 })], 30, '2026-10-07');
-
-    expect(breakdown.totalNights).toBe(30);
-    expect(breakdown.buckets.reduce((sum, b) => sum + b.count, 0)).toBe(30);
-    expect(breakdown.nightsTracked).toBe(1);
-  });
-
-  test('days with only heart data or only symptoms count as no sleep data', () => {
-    const breakdown = buildSleepBreakdown(
-      [day('2026-10-06', { hrv_avg_ms: 40, resting_hr_bpm: 60 }), day('2026-10-07', { symptom_count: 2 })],
+  test('groups HRV into ms bands', () => {
+    const breakdown = buildMetricBreakdown(
+      [
+        day('2026-10-04', { hrv_avg_ms: 19.5 }),
+        day('2026-10-05', { hrv_avg_ms: 30 }),
+        day('2026-10-06', { hrv_avg_ms: 59.9 }),
+        day('2026-10-07', { hrv_avg_ms: 72 }),
+      ],
+      'hrv',
       7,
       '2026-10-07',
     );
 
-    expect(breakdown.nightsTracked).toBe(0);
-    expect(countsOf(breakdown).noData).toBe(7);
+    expect(countsOf(breakdown)).toEqual({
+      'Under 30 ms': 1, '30–45 ms': 1, '45–60 ms': 1, '60+ ms': 1, 'No data': 3,
+    });
   });
 
-  test('ignores nights outside the range', () => {
-    const breakdown = buildSleepBreakdown([day('2026-09-01', { sleep_total_min: 420 })], 7, '2026-10-07');
+  test('groups resting HR into bpm bands', () => {
+    const breakdown = buildMetricBreakdown(
+      [
+        day('2026-10-05', { resting_hr_bpm: 54.9 }),
+        day('2026-10-06', { resting_hr_bpm: 65 }),
+        day('2026-10-07', { resting_hr_bpm: 84 }),
+      ],
+      'restingHr',
+      7,
+      '2026-10-07',
+    );
 
-    expect(breakdown.nightsTracked).toBe(0);
+    expect(countsOf(breakdown)).toEqual({
+      'Under 55 bpm': 1, '55–65 bpm': 0, '65–75 bpm': 1, '75+ bpm': 1, 'No data': 4,
+    });
   });
 
-  test('keeps a fixed bucket order with zero counts, so colors stay attached to each bucket', () => {
-    const breakdown = buildSleepBreakdown([], 7, '2026-10-07');
+  test('bands always add up to the whole range', () => {
+    const breakdown = buildMetricBreakdown([day('2026-10-07', { sleep_total_min: 450 })], 'sleep', 30, '2026-10-07');
 
-    expect(breakdown.buckets.map((b) => b.key)).toEqual(['under6', '6to7', '7to8', 'over8', 'noData']);
+    expect(breakdown.totalDays).toBe(30);
+    expect(breakdown.bands.reduce((sum, b) => sum + b.count, 0)).toBe(30);
+    expect(breakdown.daysTracked).toBe(1);
+  });
+
+  test('a day missing one metric counts as no data for that metric only', () => {
+    const days = [day('2026-10-07', { hrv_avg_ms: 40, resting_hr_bpm: 60, symptom_count: 2 })];
+
+    expect(buildMetricBreakdown(days, 'sleep', 7, '2026-10-07').daysTracked).toBe(0);
+    expect(buildMetricBreakdown(days, 'hrv', 7, '2026-10-07').daysTracked).toBe(1);
+  });
+
+  test('ignores days outside the range', () => {
+    const breakdown = buildMetricBreakdown([day('2026-09-01', { hrv_avg_ms: 40 })], 'hrv', 7, '2026-10-07');
+
+    expect(breakdown.daysTracked).toBe(0);
+  });
+
+  test('keeps a fixed band order with zero counts, so colors stay attached to each band', () => {
+    const breakdown = buildMetricBreakdown([], 'restingHr', 7, '2026-10-07');
+
+    expect(breakdown.bands.map((b) => b.key)).toEqual(['band0', 'band1', 'band2', 'band3', 'noData']);
   });
 });
