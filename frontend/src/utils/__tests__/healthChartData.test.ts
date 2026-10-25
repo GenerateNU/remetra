@@ -2,6 +2,8 @@ import type { HealthDayResponse } from '../../api/health_service';
 import {
   buildHealthChartData,
   buildMetricBreakdown,
+  buildCalendarGrid,
+  bandIndex,
   hasAnyHealthData,
   parseDayKey,
   rangeBounds,
@@ -233,4 +235,83 @@ describe('buildMetricBreakdown', () => {
 
     expect(breakdown.bands.map((b) => b.key)).toEqual(['band0', 'band1', 'band2', 'band3', 'noData']);
   });
+});
+
+describe('buildCalendarGrid', () => {
+  // 2026-10-07 is a Wednesday
+  const flat = (g: ReturnType<typeof buildCalendarGrid>) => g.weeks.flat();
+  const cell = (g: ReturnType<typeof buildCalendarGrid>, key: string) => flat(g).find((c) => toDayKey(c.date) === key)!;
+
+  test('lays days out in Monday-first week columns of 7', () => {
+    const grid = buildCalendarGrid([], 'sleep', 7, '2026-10-07'); // Thu 10-01 .. Wed 10-07
+
+    expect(grid.weeks).toHaveLength(2);
+    expect(grid.weeks.every((w) => w.length === 7)).toBe(true);
+    expect(toDayKey(grid.weeks[0][0].date)).toBe('2026-09-28'); // Monday
+    expect(toDayKey(grid.weeks[1][6].date)).toBe('2026-10-11'); // Sunday
+  });
+
+  test('padding cells outside the range are flagged and carry no data', () => {
+    const grid = buildCalendarGrid(
+      [day('2026-09-29', { sleep_total_min: 420, symptom_count: 1 })], // before range
+      'sleep',
+      7,
+      '2026-10-07',
+    );
+
+    expect(flat(grid).filter((c) => c.inRange)).toHaveLength(7);
+    const padded = cell(grid, '2026-09-29');
+    expect(padded.inRange).toBe(false);
+    expect(padded.value).toBeNull();
+    expect(padded.hasSymptom).toBe(false);
+  });
+
+  test('cells carry display value and band; missing days are null, not 0', () => {
+    const grid = buildCalendarGrid(
+      [day('2026-10-05', { sleep_total_min: 359 }), day('2026-10-06', { sleep_total_min: 480 })],
+      'sleep',
+      7,
+      '2026-10-07',
+    );
+
+    expect(cell(grid, '2026-10-05')).toMatchObject({ value: 6, band: 0 }); // 5h59m shows as 6.0h but is band "Under 6h"
+    expect(cell(grid, '2026-10-06')).toMatchObject({ value: 8, band: 3 });
+    expect(cell(grid, '2026-10-07')).toMatchObject({ value: null, band: null });
+  });
+
+  test('marks symptom days, including days with no health data', () => {
+    const grid = buildCalendarGrid(
+      [day('2026-10-02', { symptom_count: 2, max_intensity: 6 }), day('2026-10-03', { hrv_avg_ms: 40 })],
+      'hrv',
+      7,
+      '2026-10-07',
+    );
+
+    expect(cell(grid, '2026-10-02')).toMatchObject({ hasSymptom: true, value: null });
+    expect(cell(grid, '2026-10-03').hasSymptom).toBe(false);
+  });
+
+  test('90 days fit in 13-14 week columns, ending on the last day', () => {
+    const grid = buildCalendarGrid([], 'restingHr', 90, '2026-10-07');
+
+    expect(grid.weeks.length).toBeGreaterThanOrEqual(13);
+    expect(grid.weeks.length).toBeLessThanOrEqual(14);
+    const inRange = flat(grid).filter((c) => c.inRange);
+    expect(inRange).toHaveLength(90);
+    expect(toDayKey(inRange[inRange.length - 1].date)).toBe('2026-10-07');
+  });
+
+  test('labels the first column and each column where a month starts', () => {
+    const grid = buildCalendarGrid([], 'sleep', 30, '2026-10-07'); // 09-08 .. 10-07
+
+    expect(grid.monthLabels[0]).toBe('Sep');
+    expect(grid.monthLabels.filter(Boolean)).toEqual(['Sep', 'Oct']);
+  });
+});
+
+test('bandIndex matches the breakdown bands at the boundaries', () => {
+  expect(bandIndex('sleep', 359)).toBe(0);
+  expect(bandIndex('sleep', 360)).toBe(1);
+  expect(bandIndex('hrv', 60)).toBe(3);
+  expect(bandIndex('restingHr', 54.9)).toBe(0);
 });
