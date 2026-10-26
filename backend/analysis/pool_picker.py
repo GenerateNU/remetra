@@ -17,7 +17,8 @@ Lookup = Callable[[str | None], IngredientMatch]
 
 ALLERGEN_HISTORY_DAYS = 30
 _CELIAC_TERMS = ("celiac", "coeliac")
-
+POOL_SIZE = 12
+_PRIOR_WEIGHTS = {"high": 3, "medium": 2, "low": 1}
 
 @dataclass(frozen=True)
 class UserContext:
@@ -109,3 +110,58 @@ def _as_utc(timestamp: datetime) -> datetime:
     if timestamp.tzinfo is None:
         return timestamp.replace(tzinfo=timezone.utc)
     return timestamp.astimezone(timezone.utc)
+
+
+def rank_pool(
+    eligible: list[str],
+    taxonomy: TaxonomyData,
+    recent_component_counts: dict[str, int],
+    size=POOL_SIZE,
+) -> list[str]:
+    if size <= 0:
+        return []
+
+    def _ingredient_score(ingredient_id: str) -> float:
+        score = 0.0
+
+        for component, level in _levels(taxonomy, ingredient_id).items():
+            if level <= 0:
+                continue
+
+            prior_tier = taxonomy.components[component]["prior_tier"]
+            prior_weight = _PRIOR_WEIGHTS[prior_tier]
+            times_logged = recent_component_counts.get(component, 0)
+
+            score += prior_weight / (1 + times_logged)
+
+        return score
+
+    ranked = sorted(eligible, key=lambda ingredient_id: 
+                    (-_ingredient_score(ingredient_id), ingredient_id))
+
+    pool: list[str] = []
+    highest_component_counts: dict[str, int] = {}
+
+    for ingredient_id in ranked:
+        if len(pool) >= size:
+            break
+
+        highest_components = _highest_level_components(taxonomy, ingredient_id)
+        if any(highest_component_counts.get(component, 0) >= 2 for component in highest_components):
+            continue
+        pool.append(ingredient_id)
+        
+        for component in highest_components:
+            highest_component_counts[component] = highest_component_counts.get(component, 0) + 1
+    
+    return pool
+
+
+def _highest_level_components(taxonomy: TaxonomyData, ingredient_id: str) -> list[str]:
+    levels = {
+        component: level
+        for component, level in _levels(taxonomy, ingredient_id).items()
+        if level > 0
+    }
+    max_level = max(levels.values(), default=0)
+    return [component for component, level in levels.items() if level == max_level]
