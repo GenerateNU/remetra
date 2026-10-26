@@ -37,10 +37,10 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run linting
-        run: docker compose run --rm --no-build backend uv run ruff check .
+        run: docker compose run --rm backend uv run ruff check .
 
       - name: Run tests with coverage
-        run: docker compose run --rm --no-build backend uv run pytest --cov=services --cov=main --cov-report=term-missing --cov-report=xml --cov-report=html --cov-fail-under=90
+        run: docker compose run --rm backend uv run pytest --cov=services --cov=main --cov-report=term-missing --cov-report=xml --cov-report=html --cov-fail-under=90
       
       - name: Upload coverage report
         if: always()
