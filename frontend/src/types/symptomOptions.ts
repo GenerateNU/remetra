@@ -20,6 +20,7 @@ export const sensationOptions = [
   'Spasms',
   'Prickling',
   'Pressure',
+  'Bleeding',
   'Other',
 ];
 
