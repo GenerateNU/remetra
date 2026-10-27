@@ -9,6 +9,7 @@ import pytest
 from models.food import Food
 from models.food_log import FoodLog
 from models.metrics import Metrics
+from models.symptom import Symptom
 from models.symptom_log import SymptomLog
 from schemas.algorithm import AlgorithmAssociationResponse, AlgorithmRunRequest
 from services.algorithm_service import AlgorithmService
@@ -33,13 +34,26 @@ def _food_log(username="alice", food_id=None, timestamp="2024-01-01T08:00:00", i
     return log
 
 
-def _symptom_log(username="alice", symptom_id=None, intensity=5, timestamp="2024-01-01T10:00:00") -> SymptomLog:
+def _symptom_log(
+    username="alice",
+    symptom_id=None,
+    intensity=5,
+    timestamp="2024-01-01T10:00:00",
+    location="Abdomen",
+    sensation="Bloating",
+) -> SymptomLog:
     log = SymptomLog()
     log.id = uuid4()
     log.username = username
     log.symptom_id = symptom_id or uuid4()
     log.intensity = intensity
     log.timestamp = _dt(timestamp)
+    # Attach a Symptom so the log can be routed; Abdomen + Bloating routes to the model
+    symptom = Symptom()
+    symptom.id = log.symptom_id
+    symptom.location = location
+    symptom.sensation = sensation
+    log.symptom = symptom
     return log
 
 
@@ -368,6 +382,54 @@ class TestRunAlgorithm:
         ):
             service.run_algorithm(db=MagicMock(), payload=payload)
         assert mock_symp.call_args.args[2] == []
+
+    def test_skips_symptom_logs_not_routed_to_model(self):
+        gi, chest_pain, throat_swelling = uuid4(), uuid4(), uuid4()
+        payload = AlgorithmRunRequest()
+        service = AlgorithmService()
+        with (
+            patch.object(
+                service,
+                "_get_food_logs_for_user",
+                return_value=[_food_log(timestamp="2024-01-01T08:00:00", ingredients=["gluten"])],
+            ),
+            patch.object(
+                service,
+                "_get_symptom_logs_for_user",
+                return_value=[
+                    _symptom_log(symptom_id=gi),
+                    _symptom_log(symptom_id=chest_pain, location="Chest", sensation="Pain"),
+                    _symptom_log(symptom_id=throat_swelling, location="Throat", sensation="Swelling"),
+                ],
+            ),
+            patch("services.algorithm_service.MetricsRepository") as MockRepo,
+        ):
+            MockRepo.return_value.get_by_user.return_value = []
+            service.run_algorithm(db=MagicMock(), payload=payload)
+        upserted = [c.kwargs["symptom_id"] for c in MockRepo.return_value.upsert_metrics.call_args_list]
+        assert upserted == [gi]
+
+
+# ---------------------------------------------------------------------------
+# _model_routed
+# ---------------------------------------------------------------------------
+
+
+class TestModelRouted:
+    @pytest.mark.parametrize(
+        ("location", "sensation", "kept"),
+        [
+            ("Abdomen", "Bloating", True),
+            ("Joints (Multiple)", "Aching", True),
+            ("Chest", "Pain", False),
+            ("Knees", "Bleeding", False),
+            ("Throat", "Itching", False),
+            ("Eyes", "Swelling", False),
+        ],
+    )
+    def test_keeps_only_model_routed_logs(self, location, sensation, kept):
+        log = _symptom_log(location=location, sensation=sensation)
+        assert AlgorithmService()._model_routed([log]) == ([log] if kept else [])
 
 
 # ---------------------------------------------------------------------------

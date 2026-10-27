@@ -11,6 +11,9 @@ from models import (
     healthkit_event as healthkit_event,
 )
 from models import (
+    ingredient_pool as ingredient_pool,
+)
+from models import (
     knowledge_chunk as knowledge_chunk,
 )
 from models import (
