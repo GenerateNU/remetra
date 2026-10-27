@@ -1,3 +1,5 @@
+"""Ingredient pool database model."""
+
 import uuid
 
 from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, String, UniqueConstraint

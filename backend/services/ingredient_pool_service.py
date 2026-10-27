@@ -1,3 +1,5 @@
+"""Builds and stores the signed-in user's daily ingredient pool."""
+
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 
@@ -11,6 +13,7 @@ from analysis.pool_picker import (
     rank_pool,
 )
 from auth_context import current_username
+from models.ingredient_pool import IngredientPool
 from repositories.food_log_repository import FoodLogRepository
 from repositories.ingredient_pool_repository import IngredientPoolRepository
 from repositories.user_repository import UserRepository
@@ -20,6 +23,8 @@ from services.taxonomy_service import TaxonomyService
 
 
 class IngredientPoolService:
+    """Gathers user data, runs the pool picker, and saves one pool per user per UTC day."""
+
     def __init__(self):
         self.ingredient_pool_repo = IngredientPoolRepository()
         self.user_repo = UserRepository()
@@ -28,6 +33,12 @@ class IngredientPoolService:
         self.taxonomy = TaxonomyService()
 
     def get_today_pool(self, db: Session) -> IngredientPoolResponse:
+        """
+        Return today's pool for the signed-in user, creating it on the first call of the day.
+
+        Raises:
+            ValueError: If no user is signed in, or the signed-in user does not exist.
+        """
         username = current_username.get()
         if not username:
             raise ValueError("Authenticated user is required")
@@ -37,7 +48,7 @@ class IngredientPoolService:
 
         existing = self.ingredient_pool_repo.get_by_user_and_date(db, username, today)
         if existing:
-            return IngredientPoolResponse.model_validate(existing)
+            return self._to_response(existing)
 
         user = self.user_repo.get_by_username(db, username)
         if user is None:
@@ -92,13 +103,23 @@ class IngredientPoolService:
             ingredient_ids,
             washout.active,
         )
-        return IngredientPoolResponse.model_validate(saved)
+        return self._to_response(saved)
+
+    def _to_response(self, pool: IngredientPool) -> IngredientPoolResponse:
+        """Swap stored ingredient ids for display names; ids missing from the taxonomy are dropped."""
+        ingredients = self.taxonomy.data.ingredients
+        return IngredientPoolResponse(
+            id=pool.id,
+            pool_date=pool.pool_date,
+            ingredients=[ingredients[iid]["canonical_name"] for iid in pool.ingredient_ids if iid in ingredients],
+        )
 
     def _count_recent_components(
         self,
         food_logs: list[FoodLogEntry],
         now: datetime,
     ) -> dict[str, int]:
+        """Component id -> number of food logs in the last 14 days that contained it."""
         start = now - timedelta(days=14)
         counts: Counter[str] = Counter()
 
@@ -110,7 +131,6 @@ class IngredientPoolService:
                 timestamp = timestamp.astimezone(timezone.utc)
 
             if start <= timestamp <= now:
-                # Count each component at most once per food-log event.
                 counts.update(components_in_log(log.ingredients, self.taxonomy.lookup))
 
         return dict(counts)

@@ -1,5 +1,6 @@
 """Safety filters and food-log component history for the daily ingredient pool."""
 
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
@@ -7,14 +8,18 @@ import pytest
 
 from analysis.models import FoodLogEntry
 from analysis.pool_picker import (
+    POOL_SIZE,
     UserContext,
+    _highest_level_components,
     build_user_context,
     components_eaten_since,
     components_in_log,
     eligible_ingredients,
     has_celiac,
+    rank_pool,
 )
 from schemas.symptom_log import WashoutStatus
+from services.ingredient_pool_service import IngredientPoolService
 from services.taxonomy_service import TaxonomyService, get_taxonomy
 
 NOW = datetime(2026, 10, 25, 12, 0, tzinfo=timezone.utc)
@@ -205,3 +210,100 @@ def test_filters_hold_on_the_real_taxonomy():
     assert all(not levels(iid).keys() & taxonomy.allergen_components for iid in naive)
     assert "ghee" not in naive
     assert all(taxonomy.ingredients[iid]["elimination_base"] == "true" for iid in washout)
+
+
+def with_ingredients(taxonomy, **extra: dict[str, int]):
+    """Add ingredients to a catalog() copy, each as {component: level}."""
+    for iid, levels in extra.items():
+        taxonomy.ingredients[iid] = {"id": iid, "canonical_name": iid, "elimination_base": "false"}
+        taxonomy.pairs[iid] = [{"component": cid, "level": str(level)} for cid, level in levels.items()]
+    return taxonomy
+
+
+def top_component_counts(taxonomy, pool: list[str]) -> Counter:
+    return Counter(component for iid in pool for component in _highest_level_components(taxonomy, iid))
+
+
+class TestRankPool:
+    def test_component_eaten_daily_for_14_days_ranks_below_one_never_eaten(self):
+        # pasta (gluten) sorts before tomato (nightshade) on a tie, so only the count can move it down
+        assert rank_pool(["pasta", "tomato"], catalog(), {}) == ["pasta", "tomato"]
+
+        assert rank_pool(["pasta", "tomato"], catalog(), {"gluten": 14}) == ["tomato", "pasta"]
+
+    def test_14_daily_logs_count_14_times_and_rank_lower(self):
+        service = IngredientPoolService()
+        service.taxonomy = SimpleNamespace(lookup=lookup)
+        logs = [log(["bread"], days_ago=day) for day in range(14)]
+
+        counts = service._count_recent_components(logs, NOW)
+
+        assert counts["gluten"] == 14
+        assert rank_pool(["pasta", "tomato"], catalog(), counts) == ["tomato", "pasta"]
+
+    def test_lower_prior_tier_ranks_lower(self):
+        taxonomy = catalog()
+        taxonomy.components["gluten"]["prior_tier"] = "low"
+
+        assert rank_pool(["pasta", "tomato"], taxonomy, {}) == ["tomato", "pasta"]
+
+    def test_never_three_with_the_same_highest_level_component(self):
+        taxonomy = with_ingredients(catalog(), rye={"gluten": 3}, barley={"gluten": 3}, spelt={"gluten": 3})
+        gluten_heavy = ["barley", "pasta", "rye", "spelt", "wheat_bread"]
+
+        pool = rank_pool(gluten_heavy + ["tomato"], taxonomy, {}, size=10)
+
+        assert len([iid for iid in pool if iid in gluten_heavy]) == 2
+        assert "tomato" in pool
+
+    def test_tied_highest_components_count_toward_both(self):
+        taxonomy = with_ingredients(
+            catalog(),
+            gluten_milk={"gluten": 3, "milk_protein": 3},
+            rye={"gluten": 3},
+            cream={"milk_protein": 3},
+        )
+
+        pool = rank_pool(["gluten_milk", "rye", "pasta", "cream", "cheese"], taxonomy, {}, size=10)
+
+        assert top_component_counts(taxonomy, pool)["gluten"] == 2
+        assert top_component_counts(taxonomy, pool)["milk_protein"] == 2
+
+    def test_lower_level_components_do_not_hit_the_cap(self):
+        # gluten is not the highest level in custard, so it does not count toward gluten's limit
+        taxonomy = with_ingredients(catalog(), rye={"gluten": 3})
+
+        pool = rank_pool(["pasta", "rye", "custard"], taxonomy, {}, size=10)
+
+        assert sorted(pool) == ["custard", "pasta", "rye"]
+
+    def test_level_zero_components_do_not_score_or_count(self):
+        assert rank_pool(["trace_grain", "maple_syrup"], catalog(), {}) == ["maple_syrup", "trace_grain"]
+
+        taxonomy = with_ingredients(catalog(), rye={"gluten": 3})
+        assert "trace_grain" in rank_pool(["pasta", "rye", "trace_grain"], taxonomy, {}, size=10)
+
+    def test_ties_are_broken_by_ingredient_id(self):
+        assert rank_pool(["white_rice", "maple_syrup"], catalog(), {}) == ["maple_syrup", "white_rice"]
+
+    def test_respects_size(self):
+        eligible = sorted(INGREDIENTS)
+
+        assert rank_pool(eligible, catalog(), {}, size=0) == []
+        assert len(rank_pool(eligible, catalog(), {}, size=3)) == 3
+
+    def test_empty_eligible_list(self):
+        assert rank_pool([], catalog(), {}) == []
+
+
+def test_ranking_holds_on_the_real_taxonomy():
+    taxonomy = get_taxonomy()
+    eligible = eligible_ingredients(taxonomy, context(*taxonomy.components), INACTIVE)
+
+    default_pool = rank_pool(eligible, taxonomy, {})
+    full_pool = rank_pool(eligible, taxonomy, {}, size=len(eligible))
+
+    assert 0 < len(default_pool) <= POOL_SIZE
+    assert len(set(full_pool)) == len(full_pool)
+    assert set(full_pool) <= set(eligible)
+    assert max(top_component_counts(taxonomy, full_pool).values(), default=0) <= 2

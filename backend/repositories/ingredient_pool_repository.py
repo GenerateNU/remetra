@@ -1,3 +1,5 @@
+"""Database access for stored daily ingredient pools."""
+
 import logging
 from datetime import date
 
@@ -9,12 +11,15 @@ logger = logging.getLogger(__name__)
 
 
 class IngredientPoolRepository:
+    """Reads and writes ingredient_pools rows."""
+
     def get_by_user_and_date(
         self,
         db: Session,
         username: str,
         pool_date: date,
     ) -> IngredientPool | None:
+        """Return the pool for this user and date, or None if it has not been created."""
         return (
             db.query(IngredientPool)
             .filter(
@@ -32,6 +37,12 @@ class IngredientPoolRepository:
         ingredient_ids: list[str],
         washout: bool,
     ) -> IngredientPool:
+        """
+        Insert a new pool row.
+
+        Raises:
+            IntegrityError: If the user already has a pool for `pool_date`.
+        """
         ingredient_pool = IngredientPool(
             username=username,
             pool_date=pool_date,

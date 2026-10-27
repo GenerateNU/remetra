@@ -3,6 +3,7 @@
 lookup = taxonomy_service.lookup
 context = build_user_context(user.disease, food_logs, lookup, now)
 eligible = eligible_ingredients(taxonomy_service.data, context, washout)
+pool = rank_pool(eligible, taxonomy_service.data, recent_component_counts)
 """
 
 from collections.abc import Callable
@@ -19,6 +20,8 @@ ALLERGEN_HISTORY_DAYS = 30
 _CELIAC_TERMS = ("celiac", "coeliac")
 POOL_SIZE = 12
 _PRIOR_WEIGHTS = {"high": 3, "medium": 2, "low": 1}
+_MAX_SHARED_TOP_COMPONENT = 2
+
 
 @dataclass(frozen=True)
 class UserContext:
@@ -118,6 +121,9 @@ def rank_pool(
     recent_component_counts: dict[str, int],
     size=POOL_SIZE,
 ) -> list[str]:
+    """Order eligible ingredients by how much eating them would teach us,
+    then trim to `size`.
+    """
     if size <= 0:
         return []
 
@@ -136,8 +142,7 @@ def rank_pool(
 
         return score
 
-    ranked = sorted(eligible, key=lambda ingredient_id: 
-                    (-_ingredient_score(ingredient_id), ingredient_id))
+    ranked = sorted(eligible, key=lambda ingredient_id: (-_ingredient_score(ingredient_id), ingredient_id))
 
     pool: list[str] = []
     highest_component_counts: dict[str, int] = {}
@@ -147,21 +152,20 @@ def rank_pool(
             break
 
         highest_components = _highest_level_components(taxonomy, ingredient_id)
-        if any(highest_component_counts.get(component, 0) >= 2 for component in highest_components):
+        if any(
+            highest_component_counts.get(component, 0) >= _MAX_SHARED_TOP_COMPONENT for component in highest_components
+        ):
             continue
         pool.append(ingredient_id)
-        
+
         for component in highest_components:
             highest_component_counts[component] = highest_component_counts.get(component, 0) + 1
-    
+
     return pool
 
 
 def _highest_level_components(taxonomy: TaxonomyData, ingredient_id: str) -> list[str]:
-    levels = {
-        component: level
-        for component, level in _levels(taxonomy, ingredient_id).items()
-        if level > 0
-    }
+    """Components at the ingredient's top level; all of them if tied, none if every level is 0."""
+    levels = {component: level for component, level in _levels(taxonomy, ingredient_id).items() if level > 0}
     max_level = max(levels.values(), default=0)
     return [component for component, level in levels.items() if level == max_level]
