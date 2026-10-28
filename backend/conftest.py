@@ -113,6 +113,7 @@ def authenticated_user(db_session, sample_user_data):
     Protected routes resolve through get_current_user. Tests override that
     dependency so they do not call Clerk.
     """
+    from auth_context import current_username
     from main import app
     from repositories.user_repository import UserRepository
     from routers.auth import get_current_user
@@ -125,9 +126,16 @@ def authenticated_user(db_session, sample_user_data):
         clerk_user_id="user_testclerk",
     )
     profile = UserResponse.model_validate(user)
+    context_token = current_username.set(user.username)
 
-    def override_current_user():
-        return profile
+    async def override_current_user():
+        # Async so set/reset stay in one context. Sync generators run in a threadpool
+        # and cannot reset a ContextVar token.
+        token = current_username.set(user.username)
+        try:
+            yield profile
+        finally:
+            current_username.reset(token)
 
     app.dependency_overrides[get_current_user] = override_current_user
     try:
@@ -137,6 +145,7 @@ def authenticated_user(db_session, sample_user_data):
             "clerk_user_id": user.clerk_user_id,
         }
     finally:
+        current_username.reset(context_token)
         app.dependency_overrides.pop(get_current_user, None)
 
 

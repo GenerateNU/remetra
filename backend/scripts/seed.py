@@ -24,6 +24,7 @@ import models.symptom  # noqa: F401
 import models.symptom_log  # noqa: F401
 import models.tag  # noqa: F401
 import models.user  # noqa: F401
+from auth_context import system_access
 from database import Base, SessionLocal, engine
 from models.food import Food
 from models.food_log import FoodLog
@@ -264,28 +265,29 @@ def main() -> None:
 
     db = SessionLocal()
     try:
-        if args.clear:
-            clear_seed_data(db)
+        with system_access():
+            if args.clear:
+                clear_seed_data(db)
 
-        print("Seeding tags...")
-        tag_map = seed_tags(db)
+            print("Seeding tags...")
+            tag_map = seed_tags(db)
 
-        print("Seeding users...")
-        seed_users(db)
+            print("Seeding users...")
+            seed_users(db)
 
-        print("Seeding foods...")
-        food_map, _ = seed_foods(db, tag_map)
+            print("Seeding foods...")
+            food_map, _ = seed_foods(db, tag_map)
 
-        print("Seeding symptoms...")
-        symptom_map, _ = seed_symptoms(db)
+            print("Seeding symptoms...")
+            symptom_map, _ = seed_symptoms(db)
 
-        print("Seeding food logs...")
-        seed_food_logs(db, food_map)
+            print("Seeding food logs...")
+            seed_food_logs(db, food_map)
 
-        print("Seeding symptom logs...")
-        seed_symptom_logs(db, symptom_map)
+            print("Seeding symptom logs...")
+            seed_symptom_logs(db, symptom_map)
 
-        print("\nDone.")
+            print("\nDone.")
     finally:
         db.close()
 

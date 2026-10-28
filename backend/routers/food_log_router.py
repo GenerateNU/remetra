@@ -14,6 +14,7 @@ from services.food_log_service import FoodLogService
 router = APIRouter(
     prefix="/food-log",
     tags=["Food Logs"],
+    dependencies=[Depends(get_current_user)]
 )
 
 

@@ -18,6 +18,7 @@ from services.symptom_log_service import SymptomLogService
 router = APIRouter(
     prefix="/symptom-logs",
     tags=["Symptom Logs"],
+    dependencies=[Depends(get_current_user)]
 )
 
 
