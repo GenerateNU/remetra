@@ -117,14 +117,17 @@ export function HistoryScreen() {
 
   const changeMonth = useCallback(
     (next: string) => {
-      // The selected day stays put, so the list doesn't jump while paging through months
+      // Select a day in the new month, so the grid and the list always show the same month:
+      // today in the current month, otherwise the 1st
+      const day = next === monthOf(today) ? today : `${next}-01`;
       setMonth(next);
+      setSelectedDay(day);
       run(async () => {
-        await loadMonth(next);
+        await Promise.all([loadMonth(next), loadDay(day)]);
         prefetchAround(next);
       });
     },
-    [run, loadMonth, prefetchAround]
+    [run, loadMonth, loadDay, prefetchAround, today]
   );
 
   const selectDay = useCallback(
@@ -137,11 +140,10 @@ export function HistoryScreen() {
 
   const updateEntry = useCallback(
     (entry: TimelineEntry, patch: Partial<TimelineEntry>) => {
+      // Show the edit right away, then refetch so the grid and list match what was saved
+      // (a new time can move the log to another day)
       setEdits((prev) => ({ ...prev, [entry.id]: { ...prev[entry.id], ...patch } }));
-      // A new time can move the log to another day, which changes the counts on the grid
-      if (patch.timestamp && patch.timestamp.getTime() !== entry.timestamp.getTime()) {
-        run(() => refresh(month, selectedDay));
-      }
+      run(() => refresh(month, selectedDay));
     },
     [run, refresh, month, selectedDay]
   );

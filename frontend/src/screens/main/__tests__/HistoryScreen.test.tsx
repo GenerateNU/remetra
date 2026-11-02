@@ -15,6 +15,40 @@ jest.mock('../../../api/food_log_service', () => ({
 jest.mock('../../../api/symptom_log_service', () => ({
   symptomLogService: { getMySymptomLogs: jest.fn(), updateSymptomLog: jest.fn() },
 }));
+// A stand-in for the calendar endpoints, answering from the log mocks above, so each test only
+// has to say which logs exist. The real grouping and status rules are tested in the backend.
+jest.mock('../../../api/calendar_service', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports -- jest.mock factories can't use imports */
+  const { foodLogService: food } = require('../../../api/food_log_service');
+  const { symptomLogService: symptom } = require('../../../api/symptom_log_service');
+  const { monthRange } = require('../../../utils/calendarGrid');
+  const { addDays, toDayKey } = require('../../../utils/dayKey');
+  /* eslint-enable @typescript-eslint/no-require-imports */
+  const onDay = (day: string) => (log: { timestamp: string }) => toDayKey(new Date(log.timestamp)) === day;
+  const allLogs = () => Promise.all([food.getMyFoodLogs(), symptom.getMySymptomLogs()]);
+
+  return {
+    calendarService: {
+      async getMonth(month: string) {
+        const [foodLogs, symptomLogs] = await allLogs();
+        const { start, end } = monthRange(month);
+        const days = [];
+        for (let day = start; day <= end; day = addDays(day, 1)) {
+          const f = foodLogs.filter(onDay(day)).length;
+          const s = symptomLogs.filter(onDay(day)).length;
+          const status = f && s ? 'complete' : f ? 'food_only' : s ? 'symptoms_only' : 'empty';
+          days.push({ date: day, food_count: f, symptom_count: s, has_health_data: false, status });
+        }
+        const streak = foodLogs.length + symptomLogs.length > 0 ? 1 : 0;
+        return { month, days, current_streak: streak, longest_streak: streak };
+      },
+      async getDayLogs(day: string) {
+        const [foodLogs, symptomLogs] = await allLogs();
+        return { date: day, food_logs: foodLogs.filter(onDay(day)), symptom_logs: symptomLogs.filter(onDay(day)) };
+      },
+    },
+  };
+});
 
 const mockFoodLogs = foodLogService.getMyFoodLogs as jest.Mock;
 const mockSymptomLogs = symptomLogService.getMySymptomLogs as jest.Mock;
@@ -146,6 +180,34 @@ test('a day with nothing logged offers to log for that day', async () => {
   expect(await screen.findByText('Nothing logged on this day.')).toBeTruthy();
   fireEvent.press(screen.getByText('+ Log for Today'));
   expect(useUIStore.getState().showLogModal).toBe(true);
+});
+
+test('paging months selects a day in the new month, and today when coming back', async () => {
+  render(<HistoryScreen />);
+  await screen.findByText('Chicken');
+  const lastMonth = shiftMonth(monthOf(toDayKey(new Date())), -1);
+  const firstLabel = new Date(`${lastMonth}-01T12:00:00`).toLocaleDateString([], {
+    weekday: 'long', month: 'long', day: 'numeric',
+  });
+
+  fireEvent.press(screen.getByLabelText('Previous month'));
+  expect(await screen.findByText(firstLabel)).toBeTruthy();
+
+  fireEvent.press(screen.getByLabelText('Next month'));
+  expect(await screen.findByText('Today')).toBeTruthy();
+  expect(screen.getByText('Chicken')).toBeTruthy();
+});
+
+test('saving an edit refetches the calendar and the day', async () => {
+  (foodLogService.updateFoodLog as jest.Mock).mockResolvedValue({});
+  render(<HistoryScreen />);
+  fireEvent.press(await screen.findByText('Chicken'));
+  const callsBefore = mockFoodLogs.mock.calls.length;
+
+  fireEvent.press(await screen.findByText('Save Changes'));
+
+  // The stand-in endpoints read the log mocks, so new calls mean the month and day were refetched
+  await waitFor(() => expect(mockFoodLogs.mock.calls.length).toBeGreaterThanOrEqual(callsBefore + 2));
 });
 
 test('editing a card still saves', async () => {
