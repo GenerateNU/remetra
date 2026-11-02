@@ -12,11 +12,11 @@ def route_requires_auth(route):
 
 
 def test_all_auth_routes_except_health():
-    exempt_paths = {'/health', '/auth/signup', '/auth/login', '/scalar', '/'}
+    exempt_paths = {"/health", "/auth/signup", "/auth/login", "/scalar", "/"}
     unprotected = []
 
     for route in app.routes:
-        if not hasattr(route, 'dependant'):
+        if not hasattr(route, "dependant"):
             continue
         if route.path in exempt_paths:
             continue
