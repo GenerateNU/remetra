@@ -1,6 +1,4 @@
 # Mock user types. Each user gets one type: a single planted trigger component, or none.
-# component ids come from data/taxonomy/components.yaml; symptoms must use the app's
-# sensation/location options (frontend/src/types/symptomOptions.ts).
 
 background_symptoms_per_day: 0.15
 

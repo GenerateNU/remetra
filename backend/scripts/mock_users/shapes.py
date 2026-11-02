@@ -1,4 +1,5 @@
-"""Shape of the generated data, shared by the generator and the code that saves it.
+"""
+Shape of the generated data, shared by the generator and the code that saves it.
 """
 
 from dataclasses import dataclass, field
