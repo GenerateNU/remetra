@@ -10,9 +10,10 @@ interface LogEntryModalProps {
   visible: boolean;
   onClose: () => void;
   onLogEntry: (entry: LogEntry) => void;
-  initialStep?: ModalStep; 
+  initialStep?: ModalStep;
+  initialTimestamp?: Date;
 }
-const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep }) => {
+const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep, initialTimestamp }) => {
   const [step, setStep] = useState<ModalStep>(initialStep ?? "select_type");
 
   useEffect(() => {
@@ -83,12 +84,17 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
             {step === "food" && (
               <FoodLogForm 
               onSubmit={handleSubmit} 
-              onBack={() => setStep("select_type")} 
-              onCloseModal={handleClose} /> 
+              onBack={() => setStep("select_type")}
+              onCloseModal={handleClose}
+              initialTimestamp={initialTimestamp} />
             )}
 
             {step === "symptom" && (
-              <SymptomLogForm onSubmit={handleSubmit} onBack={() => setStep("select_type")} />
+              <SymptomLogForm
+                onSubmit={handleSubmit}
+                onBack={() => setStep("select_type")}
+                initialTimestamp={initialTimestamp}
+              />
             )}
           </ScrollView>
         </View>

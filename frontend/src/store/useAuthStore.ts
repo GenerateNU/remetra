@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService, MeResponse } from '../api/auth_service';
 import { clerkSignIn, clerkSignOut, clerkSignUp } from '../auth/clerkSession';
 import { useBankStore } from './bankStore';
+import { useCalendarStore } from './calendarStore';
 
 interface UserProfile {
   id: string | null;
@@ -113,11 +114,13 @@ export const useAuthStore = create<AuthStore>()(
 
       clearLocal: () => {
         useBankStore.getState().clearBank();
+        useCalendarStore.getState().clearCalendar();
         set(clearedSession);
       },
 
       logout: () => {
         useBankStore.getState().clearBank();
+        useCalendarStore.getState().clearCalendar();
         set(clearedSession);
         void clerkSignOut().catch(() => {});
       },
