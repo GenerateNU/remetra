@@ -35,7 +35,9 @@ class SymptomLogRepository:
         return log
 
     def delete(self, db: Session, log_id: UUID) -> bool:
-        query = sa.delete(SymptomLog).where(SymptomLog.id == log_id)
-        result = db.execute(query)
+        log = self.get_by_id(db, log_id)
+        if not log:
+            return False
+        db.delete(log)
         db.commit()
-        return result.rowcount > 0
+        return True

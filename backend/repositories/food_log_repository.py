@@ -15,7 +15,7 @@ class FoodLogRepository:
 
     def create_food_log(self, db: Session, food_log_data: FoodLogCreate) -> FoodLog:
         """Create a new food log entry."""
-        logger.info("Creating food log for user: %s", food_log_data.username)
+        logger.info("Creating food log for food: %s", food_log_data.food_id)
         try:
             food_log = FoodLog(**food_log_data.model_dump())
             db.add(food_log)

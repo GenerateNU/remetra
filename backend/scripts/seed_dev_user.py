@@ -1,15 +1,13 @@
-"""Seed a persistent dev user for deployment testing.
+"""Seed a persistent profile row for development data.
 
 Usage:
     python scripts/seed_dev_user.py           # create dev user (idempotent)
     python scripts/seed_dev_user.py --clear   # delete the dev user and re-create
 
-The dev user credentials are read from environment variables so they can be
-set per-environment (local, Railway, Supabase, etc.) without hardcoding them:
+   Credentials exist on Clerk, first authenticated request for a Clerk user creates its own profile row.
 
     DEV_USER_USERNAME   (default: devuser)
     DEV_USER_EMAIL      (default: dev@remetra.test)
-    DEV_USER_PASSWORD   (default: devpassword123)
 """
 
 import os
@@ -23,13 +21,11 @@ from sqlalchemy import delete, select
 
 from database import SessionLocal
 from models.user import User
-from services.auth_service import get_password_hash
 
 load_dotenv()
 
 DEV_USERNAME = os.getenv("DEV_USER_USERNAME", "devuser")
 DEV_EMAIL = os.getenv("DEV_USER_EMAIL", "dev@remetra.test")
-DEV_PASSWORD = os.getenv("DEV_USER_PASSWORD", "devpassword123")
 
 
 def seed_dev_user(db) -> None:
@@ -42,7 +38,6 @@ def seed_dev_user(db) -> None:
         User(
             username=DEV_USERNAME,
             email=DEV_EMAIL,
-            password_hash=get_password_hash(DEV_PASSWORD),
         )
     )
     db.commit()

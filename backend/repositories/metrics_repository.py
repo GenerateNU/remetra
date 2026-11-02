@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from auth_context import current_username
 from models.metrics import Metrics
 
 
@@ -31,6 +32,10 @@ class MetricsRepository:
         """
         if not metrics_by_ingredient:
             return
+
+        owner = current_username.get()
+        if owner is not None:
+            username = owner
 
         rows = [
             {

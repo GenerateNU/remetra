@@ -1,22 +1,28 @@
 import { useAuthStore } from "../useAuthStore";
 import { authService } from "../../api/auth_service";
+import { clerkSignIn, clerkSignOut, clerkSignUp } from "../../auth/clerkSession";
 
-// Mock the entire auth service module
 jest.mock("../../api/auth_service", () => ({
   ...jest.requireActual("../../api/auth_service"),
   authService: {
-    login: jest.fn(),
-    register: jest.fn(),
     getMe: jest.fn(),
+    updateProfile: jest.fn(),
   },
 }));
 
-const mockLogin = authService.login as jest.Mock;
-const mockRegister = authService.register as jest.Mock;
+jest.mock("../../auth/clerkSession", () => ({
+  clerkSignIn: jest.fn(),
+  clerkSignUp: jest.fn(),
+  clerkSignOut: jest.fn(),
+}));
+
 const mockGetMe = authService.getMe as jest.Mock;
+const mockClerkSignIn = clerkSignIn as jest.Mock;
+const mockClerkSignUp = clerkSignUp as jest.Mock;
+const mockClerkSignOut = clerkSignOut as jest.Mock;
 
 const resetStore = () => {
-  useAuthStore.getState().logout();
+  useAuthStore.getState().clearLocal();
   useAuthStore.setState({ hasCompletedOnboarding: false });
 };
 
@@ -31,22 +37,9 @@ describe("AuthStore navigation states", () => {
   beforeEach(() => {
     resetStore();
     jest.clearAllMocks();
-
-    // Default mock: successful login
-    mockLogin.mockResolvedValue({
-      access_token: "valid-token-123",
-      token_type: "bearer",
-      username: "testuser",
-    });
-
-    // Default mock: successful registration (now returns a token directly)
-    mockRegister.mockResolvedValue({
-      access_token: "valid-token-123",
-      token_type: "bearer",
-      username: "testuser",
-    });
-
-    // Default mock: successful getMe
+    mockClerkSignIn.mockResolvedValue(undefined);
+    mockClerkSignUp.mockResolvedValue(undefined);
+    mockClerkSignOut.mockResolvedValue(undefined);
     mockGetMe.mockResolvedValue({
       username: "testuser",
       email: "testuser@example.com",
@@ -54,31 +47,24 @@ describe("AuthStore navigation states", () => {
   });
 
   test("cold start with no stored state", () => {
-    const { isAuthenticated, accessToken, hasCompletedOnboarding } =
-      useAuthStore.getState();
+    const { isAuthenticated, hasCompletedOnboarding } = useAuthStore.getState();
 
     expect(isAuthenticated).toBe(false);
-    expect(accessToken).toBeNull();
     expect(hasCompletedOnboarding).toBe(false);
     expect(getInitialScreen()).toBe("auth");
   });
 
-  test("login sets auth state and fetches profile on success", async () => {
+  test("login signs in with Clerk and loads the profile", async () => {
     await useAuthStore.getState().login({
       username: "testuser",
       password: "password123",
     });
 
-    const { isAuthenticated, accessToken, hasCompletedOnboarding, user } =
-      useAuthStore.getState();
+    const { isAuthenticated, hasCompletedOnboarding, user } = useAuthStore.getState();
 
-    expect(mockLogin).toHaveBeenCalledWith({
-      username: "testuser",
-      password: "password123",
-    });
+    expect(mockClerkSignIn).toHaveBeenCalledWith("testuser", "password123");
     expect(mockGetMe).toHaveBeenCalledTimes(1);
     expect(isAuthenticated).toBe(true);
-    expect(accessToken).toBe("valid-token-123");
     expect(user.name).toBe("testuser");
     expect(user.email).toBe("testuser@example.com");
     expect(hasCompletedOnboarding).toBe(false);
@@ -86,47 +72,37 @@ describe("AuthStore navigation states", () => {
   });
 
   test("login failure does not update state", async () => {
-    mockLogin.mockRejectedValue(new Error("Invalid credentials"));
+    mockClerkSignIn.mockRejectedValue(new Error("Incorrect username or password"));
 
     await expect(
       useAuthStore.getState().login({
         username: "bad",
         password: "wrong",
       })
-    ).rejects.toThrow("Invalid credentials");
+    ).rejects.toThrow("Incorrect username or password");
 
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
-    expect(useAuthStore.getState().accessToken).toBeNull();
+    expect(mockGetMe).not.toHaveBeenCalled();
     expect(getInitialScreen()).toBe("auth");
   });
 
-  test("register issues token directly — no separate login call", async () => {
-    mockRegister.mockResolvedValue({
-      access_token: "reg-token-456",
-      token_type: "bearer",
-      username: "newuser",
-    });
-
+  test("register signs up with Clerk and loads the profile", async () => {
     await useAuthStore.getState().register({
       username: "newuser",
       email: "new@example.com",
       password: "password123",
     });
 
-    expect(mockRegister).toHaveBeenCalledWith({
-      username: "newuser",
-      email: "new@example.com",
-      password: "password123",
-    });
-    expect(mockLogin).not.toHaveBeenCalled();
-    expect(mockGetMe).not.toHaveBeenCalled();
+    expect(mockClerkSignUp).toHaveBeenCalledWith("newuser", "new@example.com", "password123");
+    expect(mockClerkSignIn).not.toHaveBeenCalled();
+    expect(mockGetMe).toHaveBeenCalledTimes(1);
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(useAuthStore.getState().accessToken).toBe("reg-token-456");
-    expect(useAuthStore.getState().user.email).toBe("new@example.com");
+    expect(useAuthStore.getState().user.email).toBe("testuser@example.com");
+    expect(useAuthStore.getState().user.name).toBe("testuser");
   });
 
   test("register failure does not update state", async () => {
-    mockRegister.mockRejectedValue(new Error("Email already exists"));
+    mockClerkSignUp.mockRejectedValue(new Error("Username already registered"));
 
     await expect(
       useAuthStore.getState().register({
@@ -134,22 +110,24 @@ describe("AuthStore navigation states", () => {
         email: "taken@example.com",
         password: "password123",
       })
-    ).rejects.toThrow("Email already exists");
+    ).rejects.toThrow("Username already registered");
 
-    expect(mockLogin).not.toHaveBeenCalled();
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 
-  test("full flow: login, complete onboarding, reach main", async () => {
+  test("logout clears the session and signs out of Clerk", async () => {
     await useAuthStore.getState().login({
       username: "testuser",
       password: "password123",
     });
     useAuthStore.getState().completeOnboarding();
 
-    expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(useAuthStore.getState().accessToken).toBe("valid-token-123");
-    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
-    expect(getInitialScreen()).toBe("main");
+    useAuthStore.getState().logout();
+
+    expect(mockClerkSignOut).toHaveBeenCalled();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(false);
+    expect(useAuthStore.getState().user.email).toBeNull();
+    expect(getInitialScreen()).toBe("auth");
   });
 });

@@ -18,7 +18,6 @@ export interface AlgorithmAssociationResponse {
 }
 
 export interface AlgorithmRunRequest {
-  user_id: string;
   symptom_ids?: string[];
   time_window_hours?: number;
 }
@@ -28,16 +27,15 @@ export interface AlgorithmRunResponse {
 }
 
 export const algorithmService = {
-  // GET /algorithm/user/{user_id}?symptom_id=...
+  // GET /algorithm/associations?symptom_id=...
   async getAssociations(
-    userId: string,
     symptomId?: string,
   ): Promise<AlgorithmAssociationResponse[]> {
     try {
       const params: Record<string, string | number> = {};
       if (symptomId) params.symptom_id = symptomId;
       const { data } = await apiClient.get<AlgorithmAssociationResponse[]>(
-        `/algorithm/user/${userId}`,
+        '/algorithm/associations',
         { params: Object.keys(params).length > 0 ? params : undefined }
       );
       return data;

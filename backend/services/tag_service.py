@@ -4,8 +4,10 @@ import logging
 from typing import Optional
 from uuid import UUID
 
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from repositories.food_repository import FoodRepository
 from repositories.tag_repository import TagRepository
 from schemas.tag import TagCreate, TagResponse
 
@@ -35,6 +37,7 @@ class TagService:
 
     def add_tags_to_food(self, db: Session, food_id: UUID, tag_ids: list[UUID]) -> list[TagResponse]:
         """Persist confirmed tags to a food, then return the full tag objects."""
+        self._require_owned_food(db, food_id)
         tag_repo = TagRepository()
         tag_repo.add_tags_to_food(db, food_id, tag_ids)
         tags = tag_repo.get_tags_by_food_id(db, food_id)
@@ -42,6 +45,20 @@ class TagService:
 
     def get_tags_by_food_id(self, db: Session, food_id: UUID) -> list[TagResponse]:
         """Return all confirmed tags for a food."""
+        self._require_owned_food(db, food_id)
         tag_repo = TagRepository()
         tags = tag_repo.get_tags_by_food_id(db, food_id)
         return [TagResponse.model_validate(t) for t in tags]
+
+    def _require_owned_food(self, db: Session, food_id: UUID) -> None:
+        """404 when the food is missing or belongs to someone else.
+
+        FoodRepository.get_food_by_id runs through the ownership filter, so another
+        user's food looks the same as a missing one.
+        """
+        food = FoodRepository().get_food_by_id(db, food_id)
+        if food is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"food with ID {food_id} not found",
+            )

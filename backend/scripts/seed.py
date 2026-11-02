@@ -24,6 +24,7 @@ import models.symptom  # noqa: F401
 import models.symptom_log  # noqa: F401
 import models.tag  # noqa: F401
 import models.user  # noqa: F401
+from auth_context import system_access
 from database import Base, SessionLocal, engine
 from models.food import Food
 from models.food_log import FoodLog
@@ -32,11 +33,9 @@ from models.symptom import Symptom
 from models.symptom_log import SymptomLog
 from models.tag import FoodTag, Tag
 from models.user import User
-from services.auth_service import get_password_hash
 
 SEED_DATA_DIR = Path("/seed_data")
 SEED_USERS = [f"user_{i:03d}" for i in range(1, 41)]
-SEED_PASSWORD = "testpassword"
 SEED_TAG_NAMES = ["gluten", "dairy", "legumes", "shellfish", "soy", "fish", "egg", "peanuts"]
 
 # Maps raw symptom labels from symptom_log.json to the (sensation, location)
@@ -78,8 +77,7 @@ def seed_tags(db) -> dict[str, Tag]:
 
 
 def seed_users(db) -> int:
-    """Create 40 test users; skip if username already exists."""
-    password_hash = get_password_hash(SEED_PASSWORD)
+    """Create 40 local profile rows. Sign-in is handled by Clerk, not these rows."""
     created = 0
     for username in SEED_USERS:
         exists = db.execute(select(User).where(User.username == username)).scalar_one_or_none()
@@ -88,7 +86,6 @@ def seed_users(db) -> int:
                 User(
                     username=username,
                     email=f"{username}@seed.remetra.test",
-                    password_hash=password_hash,
                 )
             )
             created += 1
@@ -268,28 +265,29 @@ def main() -> None:
 
     db = SessionLocal()
     try:
-        if args.clear:
-            clear_seed_data(db)
+        with system_access():
+            if args.clear:
+                clear_seed_data(db)
 
-        print("Seeding tags...")
-        tag_map = seed_tags(db)
+            print("Seeding tags...")
+            tag_map = seed_tags(db)
 
-        print("Seeding users...")
-        seed_users(db)
+            print("Seeding users...")
+            seed_users(db)
 
-        print("Seeding foods...")
-        food_map, _ = seed_foods(db, tag_map)
+            print("Seeding foods...")
+            food_map, _ = seed_foods(db, tag_map)
 
-        print("Seeding symptoms...")
-        symptom_map, _ = seed_symptoms(db)
+            print("Seeding symptoms...")
+            symptom_map, _ = seed_symptoms(db)
 
-        print("Seeding food logs...")
-        seed_food_logs(db, food_map)
+            print("Seeding food logs...")
+            seed_food_logs(db, food_map)
 
-        print("Seeding symptom logs...")
-        seed_symptom_logs(db, symptom_map)
+            print("Seeding symptom logs...")
+            seed_symptom_logs(db, symptom_map)
 
-        print("\nDone.")
+            print("\nDone.")
     finally:
         db.close()
 

@@ -11,22 +11,22 @@ VALID_CATEGORIES = {"symptom", "menstrual_flow"}
 
 class HealthDayEntry(BaseModel):
     date: date
-    sleep_total_min: Optional[int] = Field(None, ge=0, le=1440)
-    sleep_deep_min: Optional[int] = Field(None, ge=0, le=1440)
-    sleep_rem_min: Optional[int] = Field(None, ge=0, le=1440)
-    sleep_core_min: Optional[int] = Field(None, ge=0, le=1440)
-    sleep_awake_min: Optional[int] = Field(None, ge=0, le=1440)
-    hrv_avg_ms: Optional[float] = None
-    resting_hr_bpm: Optional[float] = None
+    sleep_total_min: Optional[int] = Field(None, ge=0, le=1440, description="Total sleep in minutes")
+    sleep_deep_min: Optional[int] = Field(None, ge=0, le=1440, description="Deep sleep in minutes")
+    sleep_rem_min: Optional[int] = Field(None, ge=0, le=1440, description="REM sleep in minutes")
+    sleep_core_min: Optional[int] = Field(None, ge=0, le=1440, description="Core sleep in minutes")
+    sleep_awake_min: Optional[int] = Field(None, ge=0, le=1440, description="Awake time in minutes")
+    hrv_avg_ms: Optional[float] = Field(None, description="Average heart rate variability in ms")
+    resting_hr_bpm: Optional[float] = Field(None, description="Resting heart rate in bpm")
 
 
 class HealthEventEntry(BaseModel):
-    hk_uuid: UUID
-    category: str
-    type: str
-    value: str
-    start_at: datetime
-    end_at: datetime
+    hk_uuid: UUID = Field(..., description="Apple Health unique event ID")
+    category: str = Field(..., description="Event category: symptom or menstrual_flow")
+    type: str = Field(..., description="Event type, e.g. headache, fatigue, bloating")
+    value: str = Field(..., description="Severity or flow level")
+    start_at: datetime = Field(..., description="Event start time")
+    end_at: datetime = Field(..., description="Event end time")
     date: date
 
     @model_validator(mode="after")
@@ -41,12 +41,12 @@ class HealthEventEntry(BaseModel):
 
 
 class HealthSyncRequest(BaseModel):
-    timezone: str
-    days: list[HealthDayEntry]
-    events: list[HealthEventEntry]
+    timezone: str = Field(..., description="Client timezone, e.g. America/New_York")
+    days: list[HealthDayEntry] = Field(..., description="Daily health metric entries")
+    events: list[HealthEventEntry] = Field(..., description="Discrete health events")
 
 
 class HealthSyncResponse(BaseModel):
-    days_saved: int
-    events_added: int
-    events_skipped: int
+    days_saved: int = Field(..., description="Number of days inserted or updated")
+    events_added: int = Field(..., description="Number of new events inserted")
+    events_skipped: int = Field(..., description="Number of duplicate events skipped")

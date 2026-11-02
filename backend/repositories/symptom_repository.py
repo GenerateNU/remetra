@@ -81,17 +81,19 @@ class SymptomRepository:
 
         logging.info(f"Updating symptom with ID {symptom_id}")
 
-        symptom = db.query(Symptom).filter(Symptom.id == symptom_id)
+        symptom = db.query(Symptom).filter(Symptom.id == symptom_id).first()
 
-        if not symptom.first():
+        if not symptom:
             logging.warning(f"Symptom with ID {symptom_id} not found for update")
             return None
 
-        symptom.update(symptom_data)
+        for field, value in symptom_data.items():
+            if field == "username":
+                continue
+            setattr(symptom, field, value)
         db.commit()
-
-        updated = db.query(Symptom).filter(Symptom.id == symptom_id).first()
-        return updated
+        db.refresh(symptom)
+        return symptom
 
     def delete_symptom_by_id(
         self,

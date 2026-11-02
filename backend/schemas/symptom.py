@@ -9,7 +9,6 @@ class SymptomBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     location: str = Field(..., min_length=1, max_length=255)
     sensation: str = Field(..., min_length=1, max_length=255)
-    username: Optional[str] = None
 
 
 class SymptomCreate(SymptomBase):
@@ -29,7 +28,6 @@ class SymptomUpdate(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=255)
     location: Optional[str] = Field(default=None, min_length=1, max_length=255)
     sensation: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    username: Optional[str] = None
 
 
 class SymptomResponse(SymptomBase):
@@ -38,6 +36,7 @@ class SymptomResponse(SymptomBase):
     """
 
     id: UUID
+    username: Optional[str] = None
     created_at: datetime
 
     class Config:

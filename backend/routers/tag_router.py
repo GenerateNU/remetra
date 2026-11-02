@@ -7,10 +7,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database import get_db
+from routers.auth import get_current_user
 from schemas.tag import TagCreate, TagResponse
 from services.tag_service import TagService
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 class AddTagsRequest(BaseModel):
@@ -48,6 +49,8 @@ async def add_tags_to_food(
     tag_service = TagService()
     try:
         return tag_service.add_tags_to_food(db, food_id, body.tag_ids)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from analysis.algorithm import get_analysis
 from analysis.models import FoodLogEntry, SymptomLogEntry
+from auth_context import current_username
 from models.food_log import FoodLog
 from models.metrics import Metrics
 from models.symptom_log import SymptomLog
@@ -22,9 +23,13 @@ class AlgorithmService:
         self.repo: MetricsRepository | None = None
 
     def run_algorithm(self, db: Session, payload: AlgorithmRunRequest) -> list[AlgorithmAssociationResponse]:
+        user_id = current_username.get()
+        if not user_id:
+            raise ValueError("Authenticated user is required")
+
         self.repo = MetricsRepository(db)
-        food_logs = self._get_food_logs_for_user(db, payload.user_id)
-        symptom_logs = self._get_symptom_logs_for_user(db, payload.user_id, payload.symptom_ids)
+        food_logs = self._get_food_logs_for_user(db, user_id)
+        symptom_logs = self._get_symptom_logs_for_user(db, user_id, payload.symptom_ids)
 
         metrics_by_symptom = self._build_metrics_by_symptom(
             food_logs=food_logs,
@@ -34,12 +39,12 @@ class AlgorithmService:
 
         for symptom_id_str, metrics_by_ingredient in metrics_by_symptom.items():
             self.repo.upsert_metrics(
-                username=payload.user_id,
+                username=user_id,
                 symptom_id=UUID(symptom_id_str),
                 metrics_by_ingredient=metrics_by_ingredient,
             )
 
-        return self.get_associations(db=db, user_id=payload.user_id, symptom_ids=payload.symptom_ids)
+        return self.get_associations(db=db, user_id=user_id, symptom_ids=payload.symptom_ids)
 
     def get_associations(
         self,

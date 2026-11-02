@@ -12,6 +12,7 @@ Requires the FastAPI backend to be running at http://localhost:8000.
 import argparse
 import ast
 import csv
+import os
 import sys
 from pathlib import Path
 
@@ -44,31 +45,13 @@ SYMPTOM_META = {
 }
 
 
-def signup_or_login(username: str) -> str:
-    """Register the user, or log in if they already exist. Returns the access token."""
-    resp = requests.post(f"{BASE_URL}/auth/signup", json={
-        "username": username,
-        "email": f"{username}@seed.example.com",
-        "password": "seedpassword123",
-    })
-    if resp.status_code == 201:
-        print(f"  Registered {username}")
-        return resp.json()["access_token"]
-
-    # 400 = username/email already exists → just log in
-    if resp.status_code == 400:
-        login = requests.post(f"{BASE_URL}/auth/login", json={
-            "username": username,
-            "password": "seedpassword123",
-        })
-        if login.status_code != 200:
-            print(f"  ERROR: could not log in as {username}: {login.text}")
-            sys.exit(1)
-        print(f"  Logged in as {username} (already exists)")
-        return login.json()["access_token"]
-
-    print(f"  ERROR during signup: {resp.status_code} {resp.text}")
-    sys.exit(1)
+def auth_token() -> str:
+    """Return a Clerk session token for protected endpoints."""
+    token = os.getenv("REMETRA_ACCESS_TOKEN")
+    if not token:
+        print("ERROR: set REMETRA_ACCESS_TOKEN to a Clerk session token.")
+        sys.exit(1)
+    return token
 
 
 def seed_foods(token: str, food_rows: list[dict]) -> dict[str, str]:
@@ -227,7 +210,7 @@ def seed_user(username: str):
 
     print(f"  Data: {len(meal_rows)} food logs, {len(symptom_rows)} symptom logs")
 
-    token = signup_or_login(username)
+    token = auth_token()
     food_map = seed_foods(token, meal_rows)
     symptom_names = {r["symptom"].strip() for r in symptom_rows}
     symptom_map = seed_symptoms(token, symptom_names)

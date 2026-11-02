@@ -24,10 +24,6 @@ class FoodBase(BaseModel):
         description="List of ingredients in the food list",
         max_length=500,
     )
-    username: Optional[str] = Field(
-        description="The username associated with a user-specific food",
-        default=None,
-    )
 
 
 class FoodCreate(FoodBase):
@@ -49,6 +45,10 @@ class FoodResponse(FoodBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(..., description="Unique ID for this food product")
+    username: Optional[str] = Field(
+        default=None,
+        description="The username associated with a user-specific food",
+    )
     tags: list[TagResponse] = Field(default=[], description="Confirmed trigger bucket tags for this food")
     suggested_ingredients: list[SuggestedIngredientResponse] = Field(
         default=[], description="LLM-suggested ingredients with their trigger buckets"

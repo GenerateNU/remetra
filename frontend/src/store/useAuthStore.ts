@@ -1,8 +1,8 @@
-
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService, LoginPayload, MeResponse, RegisterPayload } from '../api/auth_service';
+import { authService, MeResponse } from '../api/auth_service';
+import { clerkSignIn, clerkSignOut, clerkSignUp } from '../auth/clerkSession';
 import { useBankStore } from './bankStore';
 
 interface UserProfile {
@@ -17,9 +17,19 @@ interface UserProfile {
   medication: string[];
 }
 
+interface LoginPayload {
+  username: string;
+  password: string;
+}
+
+interface RegisterPayload {
+  username: string;
+  email: string;
+  password: string;
+}
+
 interface AuthState {
   isAuthenticated: boolean;
-  accessToken: string | null;
   hasCompletedOnboarding: boolean;
   user: UserProfile;
 }
@@ -27,6 +37,8 @@ interface AuthState {
 interface AuthActions {
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
+  setSignedIn: () => void;
+  clearLocal: () => void;
   logout: () => void;
   completeOnboarding: () => void;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
@@ -60,9 +72,14 @@ const mapMeToUser = (me: MeResponse): UserProfile => ({
   medication: me.medication ?? [],
 });
 
+const clearedSession = {
+  isAuthenticated: false,
+  hasCompletedOnboarding: false,
+  user: initialUserProfile,
+};
+
 const initialState: AuthState = {
   isAuthenticated: false,
-  accessToken: null,
   hasCompletedOnboarding: false,
   user: initialUserProfile,
 };
@@ -73,12 +90,7 @@ export const useAuthStore = create<AuthStore>()(
       ...initialState,
 
       login: async (payload) => {
-        const response = await authService.login(payload);
-        // Set token first so the getMe interceptor can attach it
-        set({
-          accessToken: response.access_token,
-          user: { ...initialUserProfile, name: response.username },
-        });
+        await clerkSignIn(payload.username, payload.password);
         const me = await authService.getMe();
         set({
           user: mapMeToUser(me),
@@ -88,22 +100,26 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       register: async (payload) => {
-        const response = await authService.register(payload);
+        await clerkSignUp(payload.username, payload.email, payload.password);
+        const me = await authService.getMe();
         set({
+          user: mapMeToUser(me),
           isAuthenticated: true,
-          accessToken: response.access_token,
-          user: { ...initialUserProfile, name: response.username, email: payload.email },
+          hasCompletedOnboarding: me.dob != null,
         });
+      },
+
+      setSignedIn: () => set({ isAuthenticated: true }),
+
+      clearLocal: () => {
+        useBankStore.getState().clearBank();
+        set(clearedSession);
       },
 
       logout: () => {
         useBankStore.getState().clearBank();
-        set({
-          isAuthenticated: false,
-          accessToken: null,
-          hasCompletedOnboarding: false,
-          user: initialUserProfile,
-        });
+        set(clearedSession);
+        void clerkSignOut().catch(() => {});
       },
 
       completeOnboarding: () =>
@@ -132,17 +148,9 @@ export const useAuthStore = create<AuthStore>()(
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        accessToken: state.accessToken,
         hasCompletedOnboarding: state.hasCompletedOnboarding,
         user: state.user,
       }),
     }
   )
 );
-
-// // Selector hooks
-// export const useIsAuthenticated = () => useAuthStore((s) => s.isAuthenticated);
-// export const useaccessToken = () => useAuthStore((s) => s.accessToken);
-// export const useHasCompletedOnboarding = () => useAuthStore((s) => s.hasCompletedOnboarding);
-// export const useUser = () => useAuthStore((s) => s.user);

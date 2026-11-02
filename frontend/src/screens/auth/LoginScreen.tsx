@@ -26,6 +26,7 @@ export function LoginScreen() {
   // checks if inputd are valid before calling API 
     const validate = (): boolean => {
       const newErrors: typeof errors = {};
+      const MIN_PASSWORD_LENGTH = 8;
 
       if (!username.trim()) {
         newErrors.username = 'Username is required';
@@ -37,8 +38,8 @@ export function LoginScreen() {
 
       if (!password) {
         newErrors.password = 'Password is required';
-      } else if (password.length < 6) {
-        newErrors.password = 'Password must be at least 6 characters';
+      } else if (password.length < MIN_PASSWORD_LENGTH) {
+        newErrors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
       }
 
       setErrors(newErrors);
