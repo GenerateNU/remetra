@@ -42,14 +42,10 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
    * the new data arrives, so the screen doesn't flash empty.
    */
   refresh: async (month, day) => {
-    calendarService.clearCache();
     const [monthData, dayData] = await Promise.all([calendarService.getMonth(month), calendarService.getDayLogs(day)]);
     set({ months: { [month]: monthData }, days: { [day]: dayData } });
     get().prefetchAround(month);
   },
 
-  clearCalendar: () => {
-    calendarService.clearCache();
-    set({ months: {}, days: {} });
-  },
+  clearCalendar: () => set({ months: {}, days: {} }),
 }));

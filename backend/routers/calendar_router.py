@@ -1,63 +1,49 @@
-import logging
+"""Logging calendar routes."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.exc import SQLAlchemyError
+from datetime import date
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from database import get_db
 from routers.auth import get_current_user
-from schemas.calendar import (
-    CalendarDayRequest,
-    CalendarDayResponse,
-    CalendarMonthRequest,
-    CalendarMonthResponse,
-)
+from schemas.calendar import CalendarMonthResponse, DayLogsResponse, MonthKey, TimezoneName
 from schemas.user import UserResponse
 from services.calendar_service import CalendarService
 
 router = APIRouter(
     prefix="/calendar",
     tags=["Calendar"],
+    dependencies=[Depends(get_current_user)],
 )
 
+Timezone = Annotated[TimezoneName, Query(alias="tz", description="IANA timezone of the device, e.g. America/New_York")]
 
-@router.post(
-    "/month",
-    response_model=CalendarMonthResponse,
-    status_code=status.HTTP_200_OK,
-)
+
+@router.get("/month", response_model=CalendarMonthResponse)
 async def get_calendar_month(
-    request: CalendarMonthRequest,
+    month: Annotated[MonthKey, Query(description="YYYY-MM")],
+    timezone: Timezone,
     db: Session = Depends(get_db),
     current_user: UserResponse = Depends(get_current_user),
 ) -> CalendarMonthResponse:
+    """
+    How completely each day of a month was logged, grouped by the user's local day, with streaks.
+    """
     service = CalendarService()
-    try:
-        return service.get_month(db, current_user.username, request)
-    except SQLAlchemyError as e:
-        logging.error(f"Error fetching calendar for user {current_user.username}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch calendar data",
-        ) from e
+    return service.get_month(db, current_user.username, month, timezone)
 
 
-@router.post(
-    "/day",
-    response_model=CalendarDayResponse,
-    status_code=status.HTTP_200_OK,
-)
+@router.get("/day", response_model=DayLogsResponse)
 async def get_calendar_day(
-    request: CalendarDayRequest,
+    day: Annotated[date, Query(alias="date", description="YYYY-MM-DD")],
+    timezone: Timezone,
     db: Session = Depends(get_db),
     current_user: UserResponse = Depends(get_current_user),
-) -> CalendarDayResponse:
+) -> DayLogsResponse:
+    """
+    Every food and symptom log on one local day, oldest first.
+    """
     service = CalendarService()
-    try:
-        return service.get_day(db, current_user.username, request)
-    except SQLAlchemyError as e:
-        logging.error(f"Error fetching day logs for user {current_user.username}: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to fetch day logs",
-        ) from e
+    return service.get_day_logs(db, current_user.username, day, timezone)
