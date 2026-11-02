@@ -2,7 +2,7 @@ import { SymptomLogEntry, SymptomItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
 import { symptomLogService } from "../api/symptom_log_service";
 import { useAuthStore } from "../store/useAuthStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
@@ -13,9 +13,10 @@ import { ComboBox } from "./ComboBox";
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
   onBack: () => void;
+  initialTimestamp?: Date;
 }
 
-export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack }) => {
+export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack, initialTimestamp }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { symptoms, addSymptom } = useBankStore();
 
@@ -28,7 +29,12 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [intensity, setIntensity] = useState(5);
-  const [timestamp, setTimestamp] = useState(new Date());
+  const [timestamp, setTimestamp] = useState(() => initialTimestamp ?? new Date());
+
+  // The form can stay mounted between opens (e.g. when the modal opens straight to symptom)
+  useEffect(() => {
+    if (initialTimestamp) setTimestamp(initialTimestamp);
+  }, [initialTimestamp]);
   const [showDuration, setShowDuration] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState("");
   const [notes, setNotes] = useState("");
