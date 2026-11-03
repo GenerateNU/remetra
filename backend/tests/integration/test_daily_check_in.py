@@ -62,7 +62,6 @@ class TestDailyCheckInRouter:
         assert response.status_code == 422
 
 
-
 class TestDailyCheckInRepository:
     """Integration tests for DailyCheckInRepository."""
 
