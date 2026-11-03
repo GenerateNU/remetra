@@ -8,6 +8,8 @@ from pathlib import Path
 
 import yaml
 
+from schemas.health import HealthDayEntry
+
 USER_TYPES_PATH = Path(__file__).resolve().parent / "user_types.yaml"
 USERNAME_PREFIX = "mock_"
 
@@ -61,6 +63,7 @@ class MockUserData:
     meals: list[MealLog] = field(default_factory=list)
     symptoms: list[SymptomEvent] = field(default_factory=list)
     skipped_days: list[date] = field(default_factory=list)
+    health_days: list[HealthDayEntry] = field(default_factory=list)
 
 
 def load_user_types(path: Path = USER_TYPES_PATH) -> tuple[dict[str, UserType], float]:

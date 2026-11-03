@@ -1,4 +1,4 @@
-"""Generates mock users with one seeded random generator, and writes the truth file.
+"""Generates mock users with one seeded random generator, saves them, and writes the truth file.
 
 Usage (from backend/):
     python -m scripts.mock_users.generate --count 20 --seed 42
@@ -11,7 +11,11 @@ from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 
+from database import SessionLocal
+from scripts.init_db import init_db
+from scripts.mock_users.health import build_health_days
 from scripts.mock_users.meals import DEFAULT_DAYS, DEFAULT_SKIP_RATE, build_meals, pick_regular_foods
+from scripts.mock_users.save import save_users
 from scripts.mock_users.shapes import USERNAME_PREFIX, MockUserData, UserType, load_user_types
 from scripts.mock_users.symptoms import build_symptoms, trigger_meals
 
@@ -41,6 +45,7 @@ def generate_users(
         foods = [food for slot_foods in regular.values() for food in slot_foods]
         meals, skipped = build_meals(rng, regular, end_date, days, skip_rate)
         symptoms = build_symptoms(rng, meals, foods, user_type.trigger, background_rate, end_date, days, skipped)
+        health = build_health_days(rng, symptoms, end_date, days)
         users.append(
             MockUserData(
                 username=f"{USERNAME_PREFIX}{i + 1:03d}",
@@ -49,6 +54,7 @@ def generate_users(
                 meals=meals,
                 symptoms=symptoms,
                 skipped_days=skipped,
+                health_days=health,
             )
         )
     return users
@@ -79,15 +85,21 @@ def write_truth_file(users: list[MockUserData], path: Path, seed: int, end_date:
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Generate mock users and write the truth file.")
+    parser = argparse.ArgumentParser(description="Generate mock users, save them, and write the truth file.")
     parser.add_argument("--count", type=int, default=20, help="number of mock users")
     parser.add_argument("--seed", type=int, default=42, help="same seed, same data")
     parser.add_argument("--days", type=int, default=DEFAULT_DAYS, help="days of history, ending today")
     parser.add_argument("--truth", type=Path, default=DEFAULT_TRUTH_PATH, help="where to write the truth file")
     args = parser.parse_args(argv)
 
+    init_db()
     end_date = date.today()
     users = generate_users(args.seed, args.count, end_date, args.days)
+    db = SessionLocal()
+    try:
+        save_users(db, users)
+    finally:
+        db.close()
     write_truth_file(users, args.truth, args.seed, end_date, args.days)
 
     for record in truth_records(users):

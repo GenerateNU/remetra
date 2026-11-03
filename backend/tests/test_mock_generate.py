@@ -2,6 +2,9 @@
 
 import json
 from datetime import date
+from unittest.mock import MagicMock
+
+import pytest
 
 from scripts.mock_users.generate import generate_users, main, truth_records, write_truth_file
 from scripts.mock_users.shapes import USERNAME_PREFIX, load_user_types
@@ -69,10 +72,36 @@ def test_write_truth_file(tmp_path):
     assert [r["username"] for r in truth["users"]] == [u.username for u in users]
 
 
-def test_main_writes_truth_file(tmp_path, capsys):
+def test_every_user_gets_health_days_with_some_missing():
+    users = generate_users(42, 4, END)
+
+    assert all(user.health_days for user in users)
+    assert sum(len(user.health_days) for user in users) < 4 * 60
+
+
+@pytest.fixture
+def no_db(monkeypatch):
+    monkeypatch.setattr("scripts.mock_users.generate.init_db", lambda: None)
+    monkeypatch.setattr("scripts.mock_users.generate.SessionLocal", MagicMock)
+
+
+def test_main_saves_then_writes_truth_file(tmp_path, capsys, monkeypatch, no_db):
+    save = MagicMock()
+    monkeypatch.setattr("scripts.mock_users.generate.save_users", save)
     path = tmp_path / "truth.json"
 
     main(["--count", "4", "--seed", "1", "--days", "10", "--truth", str(path)])
 
+    assert len(save.call_args.args[1]) == 4
     assert len(json.loads(path.read_text())["users"]) == 4
     assert "Wrote truth file for 4 users" in capsys.readouterr().out
+
+
+def test_main_does_not_write_truth_when_save_fails(tmp_path, monkeypatch, no_db):
+    monkeypatch.setattr("scripts.mock_users.generate.save_users", MagicMock(side_effect=RuntimeError("db down")))
+    path = tmp_path / "truth.json"
+
+    with pytest.raises(RuntimeError, match="db down"):
+        main(["--count", "1", "--seed", "1", "--days", "5", "--truth", str(path)])
+
+    assert not path.exists()
