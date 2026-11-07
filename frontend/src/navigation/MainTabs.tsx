@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TimelineScreen } from '../screens/main/TimelineScreen';
+import { HistoryScreen } from '../screens/main/HistoryScreen';
 import { AnalysisScreen } from '../screens/main/AnalysisScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
 import LogEntryModal from '../components/LogEntryModal';
@@ -28,7 +28,7 @@ function TabIcon({ Icon, focused }: { Icon: LucideIcon; focused: boolean }) {
 }
 
 export function MainTabs() {
-  const { showLogModal, closeLogModal, initialLogType } = useUIStore();
+  const { showLogModal, closeLogModal, initialLogType, initialLogTimestamp } = useUIStore();
 
   return (
     <>
@@ -37,6 +37,7 @@ export function MainTabs() {
         onClose={closeLogModal}
         onLogEntry={closeLogModal}
         initialStep={initialLogType ?? 'select_type'}
+        initialTimestamp={initialLogTimestamp}
       />
 
       <Tab.Navigator
@@ -55,7 +56,7 @@ export function MainTabs() {
       >
         <Tab.Screen
           name="History"
-          component={TimelineScreen}
+          component={HistoryScreen}
           options={{
             tabBarIcon: ({ focused }) => (
               <TabIcon Icon={ClipboardList} focused={focused} />
