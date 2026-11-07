@@ -95,7 +95,7 @@ class ChatService:
     def _call_model(self, summary: dict, question: str) -> ChatModelOutput:
         try:
             response = self.client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-3.5-flash",
                 contents=prompts.build_contents(summary, question),
                 config={
                     "system_instruction": prompts.SYSTEM_PROMPT,
