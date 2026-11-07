@@ -22,11 +22,14 @@ class UserIngredientService:
         )
 
     def replace_ingredients(self, db: Session, username: str, data: UserIngredientsUpdate) -> UserIngredientsResponse:
-        preferences = {
-             **{ingredient_id: IngredientPreference.AVOID for ingredient_id in data.avoid},
-            **{ingredient_id: IngredientPreference.SUSPECT for ingredient_id in data.suspect},
-            **{ingredient_id: IngredientPreference.SAFE for ingredient_id in data.safe},
-        }
+        preferences = {}
+        for ingredient_id in data.avoid:
+            preferences[ingredient_id] = IngredientPreference.AVOID
+        for ingredient_id in data.suspect:
+            preferences[ingredient_id] = IngredientPreference.SUSPECT
+        for ingredient_id in data.safe:
+            preferences[ingredient_id] = IngredientPreference.SAFE
+        
 
         missing = set(preferences) - self.repo.get_existing_ingredient_ids(db, set(preferences))
         if missing:
