@@ -37,3 +37,6 @@ from models import (
 from models import (
     user as user,
 )
+from models import (
+    user_component_state as user_component_state,
+)

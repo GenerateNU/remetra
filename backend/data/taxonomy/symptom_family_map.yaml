@@ -1,0 +1,13 @@
+# Maps symptom location (from the frontend) to a symptom family
+# used by the model spec (GI, SKIN, HEAD).
+# Locations not listed here are unmapped and ignored by the engine.
+
+location_to_family:
+  Abdomen: GI
+  Head: HEAD
+  Skin: SKIN
+  Jaw: HEAD
+  Eyes: HEAD
+  Throat: GI
+  Chest: GI
+  Neck: HEAD
