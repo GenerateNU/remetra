@@ -13,7 +13,3 @@ def get_components(ingredient: str) -> list[dict]:
             for row in csv.DictReader(f)
             if key in (row["ingredient_id"].lower(), row["canonical_name"].lower())
         ]
-
-
-if __name__ == "__main__":
-    print(get_components("wheat_bread"))
