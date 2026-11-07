@@ -11,14 +11,22 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+import auth_context as auth
 from services.food_log_service import FoodLogService
 from services.symptom_log_service import SymptomLogService
+from services.symptom_service import SymptomService
+
+# Only these fields are exposed to the LLM. Internal fields like the log id,
+# username and created_at are deliberately left out.
+FOOD_LOG_FIELDS = {"food_id", "quantity", "timestamp", "notes"}
+SYMPTOM_LOG_FIELDS = {"symptom_id", "intensity", "timestamp", "duration", "notes"}
 
 
 class ContextBuilder:
     def __init__(self):
         self.food_log_service = FoodLogService()
         self.symptom_log_service = SymptomLogService()
+        self.symptom_service = SymptomService()
 
     def get_revealed_insights(self, db: Session, user_id: UUID) -> list[dict]:
         """
@@ -27,11 +35,15 @@ class ContextBuilder:
         """
         raise NotImplementedError
 
-    def get_logs(self, db: Session, username: str, days: int = 30) -> dict:
+    def get_logs(self, db: Session, days: int = 30) -> dict:
         """
         Food logs, symptom logs and check-ins for a date range.
         """
         # TODO: check_ins
+        username = auth.current_username.get()
+        if username is None:
+            raise ValueError("Authenticated username is required")
+
         now = datetime.now(timezone.utc)
 
         food_logs = self.food_log_service.get_food_logs_by_username(db, username)
@@ -44,11 +56,11 @@ class ContextBuilder:
 
         for log in food_logs:
             if log.timestamp >= days_ago and log.timestamp <= now:
-                filtered_food_log.append(log)
+                filtered_food_log.append(log.model_dump(include=FOOD_LOG_FIELDS))
 
         for log in symptom_logs:
             if log.timestamp >= days_ago and log.timestamp <= now:
-                filtered_symptom_log.append(log)
+                filtered_symptom_log.append(log.model_dump(include=SYMPTOM_LOG_FIELDS))
 
         return {
             "food_logs": filtered_food_log,
@@ -56,29 +68,33 @@ class ContextBuilder:
             "check_ins": [],  # TODO: Here
         }
 
-    def get_trends(self, db: Session, user_id: str, days: int = 30) -> dict:
+    def get_trends(self, db: Session, days: int = 30) -> dict:
         """
         per symptom
         Pre-computed summaries for a date range: symptom frequency,
         intensity and logging consistency.
         """
-        logs = self.get_logs(db, user_id, days)
+        if days <= 0:
+            raise ValueError()
 
-        # symptom_id -> every intensity logged for it (count = len of the list)
-        intensities_by_symptom: dict[UUID, list[int]] = {}
+        logs = self.get_logs(db, days)
+
+        # symptom name -> every intensity logged for it (count = len of the list)
+        intensities_by_symptom: dict[str, list[int]] = {}
 
         for log in logs["symptom_logs"]:
-            intensities_by_symptom.setdefault(log.symptom_id, []).append(log.intensity)
+            symptom = self.symptom_service.get_symptom_by_id(db, log["symptom_id"])
+            intensities_by_symptom.setdefault(symptom.name, []).append(log["intensity"])
 
         trends = {
-            str(symptom_id): {
+            str(symptom_name): {
                 "count": len(values),
                 "avg_intensity": round(sum(values) / len(values), 1),
                 "max_intensity": max(values),
                 "min_intensity": min(values),
-                "logging_frequency": round(len(values) / days, 1),
+                "avg_logs_per_day": round(len(values) / days, 1),
             }
-            for symptom_id, values in intensities_by_symptom.items()
+            for symptom_name, values in intensities_by_symptom.items()
         }
 
         return trends
