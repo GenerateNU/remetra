@@ -1,5 +1,5 @@
 import { Modal, ScrollView, View, TouchableOpacity, Text } from "react-native";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Utensils, Stethoscope } from "lucide-react-native";
 
 import { LogEntry, ModalStep } from "../types/logs";
@@ -14,12 +14,14 @@ interface LogEntryModalProps {
 }
 const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep }) => {
   const [step, setStep] = useState<ModalStep>(initialStep ?? "select_type");
+  const [openSnapshot, setOpenSnapshot] = useState({ visible, initialStep });
 
-  useEffect(() => {
+  if (visible !== openSnapshot.visible || initialStep !== openSnapshot.initialStep) {
+    setOpenSnapshot({ visible, initialStep });
     if (visible) {
       setStep(initialStep ?? "select_type");
     }
-  }, [visible, initialStep]);
+  }
 
   const handleSubmit = (entry: LogEntry) => {
     onLogEntry(entry);
