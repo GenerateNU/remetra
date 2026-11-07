@@ -1,4 +1,7 @@
 from models import (
+    component as component,
+)
+from models import (
     daily_health_metrics as daily_health_metrics,
 )
 from models import (
@@ -9,6 +12,12 @@ from models import (
 )
 from models import (
     healthkit_event as healthkit_event,
+)
+from models import (
+    ingredient as ingredient,
+)
+from models import (
+    ingredient_component as ingredient_component,
 )
 from models import (
     knowledge_chunk as knowledge_chunk,

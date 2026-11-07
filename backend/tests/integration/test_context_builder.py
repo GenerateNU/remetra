@@ -161,6 +161,22 @@ class TestGetLogs:
         assert log["intensity"] == 7
         assert log["timestamp"] == when
 
+    def test_food_logs_name_the_food(self, db_session, builder, created_food, symptom):
+        log_food(db_session, created_food.id, FROZEN_NOW - timedelta(days=1))
+
+        (log,) = builder.get_logs(db_session)["food_logs"]
+
+        assert log["food"] == "test pizza"
+        assert log["food_id"] == created_food.id
+
+    def test_symptom_logs_name_the_symptom(self, db_session, builder, created_food, symptom):
+        log_symptom(db_session, symptom.id, FROZEN_NOW - timedelta(days=1))
+
+        (log,) = builder.get_logs(db_session)["symptom_logs"]
+
+        assert log["symptom"] == "headache"
+        assert log["symptom_id"] == symptom.id
+
     def test_excludes_logs_older_than_window(self, db_session, builder, created_food, symptom):
         log_food(db_session, created_food.id, FROZEN_NOW - timedelta(days=60))
         log_symptom(db_session, symptom.id, FROZEN_NOW - timedelta(days=60))
@@ -397,6 +413,23 @@ class TestGetTrends:
         assert result["headache"]["avg_intensity"] == 5.0
         assert result["bloating"]["count"] == 1
         assert result["bloating"]["avg_intensity"] == 8.0
+
+    def test_same_name_different_location_are_not_merged(self, db_session, builder, authenticated_user):
+        """Names are not unique: the table is unique on (username, location, sensation)."""
+        head = SymptomRepository().create_symptom(
+            db_session, SymptomCreate(name="pain", location="head", sensation="ache")
+        )
+        stomach = SymptomRepository().create_symptom(
+            db_session, SymptomCreate(name="pain", location="stomach", sensation="cramp")
+        )
+        log_symptom(db_session, head.id, FROZEN_NOW - timedelta(days=1), intensity=2)
+        log_symptom(db_session, stomach.id, FROZEN_NOW - timedelta(days=1), intensity=8)
+
+        result = builder.get_trends(db_session)
+
+        assert set(result) == {"pain (head)", "pain (stomach)"}
+        assert result["pain (head)"]["avg_intensity"] == 2.0
+        assert result["pain (stomach)"]["avg_intensity"] == 8.0
 
     def test_only_counts_logs_inside_window(self, db_session, builder, symptom):
         log_symptom(db_session, symptom.id, FROZEN_NOW - timedelta(days=1), intensity=2)
