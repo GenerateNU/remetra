@@ -15,11 +15,7 @@ from schemas.symptom_log import SymptomLogCreate, SymptomLogResponse, SymptomLog
 from schemas.user import UserResponse
 from services.symptom_log_service import SymptomLogService
 
-router = APIRouter(
-    prefix="/symptom-logs",
-    tags=["Symptom Logs"],
-    dependencies=[Depends(get_current_user)]
-)
+router = APIRouter(prefix="/symptom-logs", tags=["Symptom Logs"], dependencies=[Depends(get_current_user)])
 
 
 @router.post(

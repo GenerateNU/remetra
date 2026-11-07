@@ -1,15 +1,17 @@
-import csv
-from pathlib import Path
+from sqlalchemy.orm import Session
 
-CSV_PATH = Path(__file__).resolve().parent.parent / "data" / "taxonomy" / "ingredient_components.csv"
+from repositories.taxonomy_repository import TaxonomyRepository
 
 
-def get_components(ingredient: str) -> list[dict]:
-    """Return all components (with concentration) for an ingredient, matched by ingredient_id or canonical_name."""
-    key = ingredient.strip().lower()
-    with open(CSV_PATH, newline="") as f:
+class TaxonomyService:
+    """Business logic for the ingredient/component taxonomy."""
+
+    def __init__(self):
+        self.repo = TaxonomyRepository()
+
+    def get_components(self, db: Session, ingredient: str) -> list[dict]:
+        """Return all components (with concentration_level) for an ingredient, matched by slug or canonical_name."""
         return [
-            {"component": row["component"], "concentration_level": int(row["concentration_level"])}
-            for row in csv.DictReader(f)
-            if key in (row["ingredient_id"].lower(), row["canonical_name"].lower())
+            {"component": slug, "concentration_level": level}
+            for slug, level in self.repo.get_components_for_ingredient(db, ingredient)
         ]

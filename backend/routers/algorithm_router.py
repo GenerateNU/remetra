@@ -11,10 +11,7 @@ from schemas.algorithm import AlgorithmAssociationResponse, AlgorithmRunRequest,
 from schemas.user import UserResponse
 from services.algorithm_service import AlgorithmService
 
-router = APIRouter(prefix="/algorithm", 
-                   tags=["Algorithm"],
-                   dependencies=[Depends(get_current_user)]
-                )
+router = APIRouter(prefix="/algorithm", tags=["Algorithm"], dependencies=[Depends(get_current_user)])
 
 
 @router.post("/run", response_model=AlgorithmRunResponse)
