@@ -534,7 +534,6 @@ class TestGetTrends:
 @pytest.mark.parametrize(
     "call",
     [
-        pytest.param(lambda b, db: b.get_revealed_insights(db, uuid4()), id="get_revealed_insights"),
         pytest.param(lambda b, db: b.get_meal_ideas(db, uuid4(), FROZEN_NOW.date()), id="get_meal_ideas"),
         pytest.param(lambda b, db: b.adapt_recipe(db, uuid4(), {}, "make it dairy free"), id="adapt_recipe"),
         pytest.param(lambda b, db: b.get_profile_constraints(db, uuid4()), id="get_profile_constraints"),
@@ -548,3 +547,13 @@ class TestGetTrends:
 def test_unimplemented_tools_raise(db_session, builder, call):
     with pytest.raises(NotImplementedError):
         call(builder, db_session)
+
+
+def test_revealed_insights_empty_unless_demo_env_set(db_session, builder, monkeypatch):
+    monkeypatch.delenv("DEMO_REVEALED_TRIGGERS", raising=False)
+    assert builder.get_revealed_insights(db_session) == []
+
+
+def test_revealed_insights_from_demo_env(db_session, builder, monkeypatch):
+    monkeypatch.setenv("DEMO_REVEALED_TRIGGERS", " gluten, ,dairy ")
+    assert [i["label"] for i in builder.get_revealed_insights(db_session, uuid4())] == ["gluten", "dairy"]
