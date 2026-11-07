@@ -1,6 +1,7 @@
 """Integration tests for the taxonomy repository and service."""
 
 import pytest
+from sqlalchemy import delete
 
 from models.component import Component
 from models.ingredient import Ingredient
@@ -22,6 +23,9 @@ def _component(slug: str) -> Component:
 @pytest.fixture
 def wheat_bread(db_session):
     """wheat_bread -> gluten (3), fructans_grain (2); plain_rice has no components."""
+    # Start from empty taxonomy tables even if the DB was seeded; rolled back after the test.
+    for model in (IngredientComponent, Ingredient, Component):
+        db_session.execute(delete(model))
     gluten, fructans = _component("gluten"), _component("fructans_grain")
     bread = Ingredient(slug="wheat_bread", canonical_name="wheat bread")
     rice = Ingredient(slug="plain_rice", canonical_name="plain rice")

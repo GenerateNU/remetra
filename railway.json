@@ -4,8 +4,7 @@
     "dockerfilePath": "Dockerfile.backend"
   },
   "deploy": {
-    "preDeployCommand": "uv run python scripts/init_db.py && uv run python scripts/seed_taxonomy.py",
-    "startCommand": "sh -c 'uv run uvicorn main:app --host 0.0.0.0 --port $PORT'",
+    "startCommand": "sh scripts/start.sh",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300
   }
