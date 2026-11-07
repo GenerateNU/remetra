@@ -201,6 +201,27 @@ def test_get_washout_status_routes_signed_in_users_logs(db_session, authenticate
     assert status.ends_at == hours_ago(3) + timedelta(hours=48)
 
 
+def test_get_washout_status_family_span_starting_inside_window(db_session, authenticated_user):
+    # Arrange: GI at 71 h and SKIN at 47.5 h are within 24 h, so SKIN triggers and the washout ends in 30 min
+    username = authenticated_user["username"]
+    stomach = Symptom(username=username, name="cramps", location="Abdomen", sensation="Cramping")
+    skin = Symptom(username=username, name="rash", location="Skin", sensation="Itching")
+    db_session.add_all([stomach, skin])
+    db_session.flush()
+    db_session.add_all(
+        [
+            SymptomLog(username=username, symptom_id=stomach.id, intensity=3, timestamp=hours_ago(71)),
+            SymptomLog(username=username, symptom_id=skin.id, intensity=3, timestamp=hours_ago(47.5)),
+        ]
+    )
+    db_session.flush()
+    # Act
+    status = SymptomLogService().get_washout_status(db_session, NOW)
+    # Assert
+    assert status.active is True
+    assert status.ends_at == hours_ago(47.5) + timedelta(hours=48)
+
+
 def test_get_washout_status_without_logs_is_inactive(db_session, authenticated_user):
     # Act
     status = SymptomLogService().get_washout_status(db_session, NOW)

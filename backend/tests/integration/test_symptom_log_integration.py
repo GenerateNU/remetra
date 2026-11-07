@@ -61,6 +61,46 @@ class TestSymptomLogRepository:
         assert result.id == created.id
         assert result.intensity == sample_log_data.intensity
 
+    def test_reads_load_symptom_with_log(self, db_session, authenticated_user, sample_log_data, created_symptom):
+        """Test that get_by_id and get_by_username load each log's symptom in the same query."""
+        from sqlalchemy import inspect
+
+        repo = SymptomLogRepository()
+        created = repo.create(db_session, sample_log_data)
+        db_session.expire_all()
+
+        by_id = repo.get_by_id(db_session, created.id)
+        db_session.expire_all()
+        by_username = repo.get_by_username(db_session, authenticated_user["username"])
+
+        for log in [by_id, *by_username]:
+            assert "symptom" not in inspect(log).unloaded
+            assert log.symptom.id == created_symptom.id
+
+    def test_get_by_username_between_only_returns_window(self, db_session, authenticated_user, created_symptom):
+        """Test that only logs with start <= timestamp <= end come back, oldest first, with symptoms loaded."""
+        from datetime import timedelta, timezone
+
+        from sqlalchemy import inspect
+
+        repo = SymptomLogRepository()
+        now = datetime(2025, 1, 15, 12, 0, tzinfo=timezone.utc)
+        start = now - timedelta(hours=72)
+        hours = {"too_old": 73, "oldest_in": 71, "newest_in": 1, "future": -1}
+        ids = {}
+        for label, h in hours.items():
+            log = repo.create(
+                db_session,
+                SymptomLogCreate(symptom_id=created_symptom.id, intensity=3, timestamp=now - timedelta(hours=h)),
+            )
+            ids[label] = log.id
+        db_session.expire_all()
+
+        result = repo.get_by_username_between(db_session, authenticated_user["username"], start, now)
+
+        assert [log.id for log in result] == [ids["oldest_in"], ids["newest_in"]]
+        assert all("symptom" not in inspect(log).unloaded for log in result)
+
     def test_get_symptom_log_not_found(self, db_session):
         """Test that get_by_id returns None for a non-existent log."""
         from uuid import uuid4
@@ -105,6 +145,18 @@ class TestSymptomLogService:
         assert result.username == authenticated_user["username"]
         assert result.intensity == sample_log_data.intensity
         assert result.created_at is not None
+
+    def test_create_symptom_log_unknown_symptom(self, db_session, authenticated_user):
+        """Test that creating a log for a symptom that doesn't exist returns None and writes nothing."""
+        from uuid import uuid4
+
+        service = SymptomLogService()
+        data = SymptomLogCreate(symptom_id=uuid4(), intensity=5, timestamp=datetime(2025, 1, 15, 10, 30))
+
+        result = service.create_symptom_log(db_session, data)
+
+        assert result is None
+        assert service.get_symptom_logs_by_username(db_session, authenticated_user["username"]) == []
 
     def test_get_symptom_log(self, db_session, sample_log_data):
         """Test retrieving a symptom log via the service."""

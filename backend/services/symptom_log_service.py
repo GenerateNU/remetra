@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from auth_context import current_username
 from repositories.symptom_log_repository import SymptomLogRepository
+from repositories.symptom_repository import SymptomRepository
 from schemas.symptom_log import (
     SymptomFamily,
     SymptomLogCreate,
@@ -69,6 +70,7 @@ class SymptomLogService:
 
     def __init__(self):
         self.repo = SymptomLogRepository()
+        self.symptom_repo = SymptomRepository()
 
     def get_symptom_log(self, db: Session, log_id: UUID) -> Optional[SymptomLogResponse]:
         log = self.repo.get_by_id(db, log_id)
@@ -76,7 +78,11 @@ class SymptomLogService:
             return None
         return _to_response(log)
 
-    def create_symptom_log(self, db: Session, data: SymptomLogCreate) -> SymptomLogResponse:
+    def create_symptom_log(self, db: Session, data: SymptomLogCreate) -> Optional[SymptomLogResponse]:
+        """Create a symptom log, or return None if the symptom is missing or not the signed-in user's."""
+        # Reads are scoped to the signed-in user, so another user's symptom also comes back as None.
+        if not self.symptom_repo.get_symptom_by_id(db, data.symptom_id):
+            return None
         log = self.repo.create(db, data)
         return _to_response(log)
 
@@ -94,9 +100,13 @@ class SymptomLogService:
         return self.repo.delete(db, log_id)
 
     def get_washout_status(self, db: Session, now: datetime) -> WashoutStatus:
-        """Washout status for the signed-in user."""
+        """Washout status for the signed-in user.
+
+        Only an active trigger matters, which is within the last 48 h, and its family span looks
+        back 24 h more, so logs older than 72 h or after `now` can't change the result.
+        """
         since = now - WASHOUT_LENGTH - FAMILY_SPAN_WINDOW
-        logs = [log for log in self.repo.get_by_username(db, current_username.get()) if log.timestamp >= since]
+        logs = self.repo.get_by_username_between(db, current_username.get(), since, now)
         symptoms = [
             (route_symptom(log.symptom.sensation, log.symptom.location), log.intensity, log.timestamp) for log in logs
         ]
