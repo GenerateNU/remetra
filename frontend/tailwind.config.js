@@ -31,6 +31,15 @@ module.exports = {
         'remetra-text-primary':   '#3b2a24',
         'remetra-text-secondary': '#6e5a50',
         'remetra-ember':          '#c42f55',
+        'remetra-sheet':          '#faf8f6',
+        'remetra-dawn':           '#fdddcc',
+        'remetra-dawn-mid':       '#fef0e7',
+        'remetra-chip-line':      '#e8e2dc',
+        'remetra-chip-strong':    '#92472a',
+        'remetra-peach-line':     '#f2875a',
+        'remetra-text-tertiary':  '#7a7068',
+        'remetra-line-subtle':    '#f4f0ec',
+        'remetra-ember-end':      '#ffe09e',
       },
       fontSize: {
         // Brand wordmark used across onboarding screens
