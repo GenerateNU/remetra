@@ -111,6 +111,12 @@ def test_user_cannot_read_or_change_another_users_records(db_session, test_clien
         ]
         assert [response.status_code for response in bob_reads] == [404] * len(bob_reads)
 
+        log_on_alices_symptom = test_client.post(
+            "/symptom-logs/",
+            json={"symptom_id": symptom_id, "intensity": 3, "timestamp": "2024-01-01T11:00:00Z"},
+        )
+        assert log_on_alices_symptom.status_code == 404, log_on_alices_symptom.text
+
         assert all(row["id"] != food_id for row in test_client.get("/food/").json())
         assert all(row["id"] != symptom_id for row in test_client.get("/symptom/").json())
         assert all(row["id"] != food_log_id for row in test_client.get("/food-log/user/me").json())

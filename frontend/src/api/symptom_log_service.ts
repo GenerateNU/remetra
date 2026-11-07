@@ -25,6 +25,10 @@ export interface SymptomLogResponse {
   notes: string | null;
   username: string;
   created_at: string;
+  // Computed by the backend from the symptom's location + sensation; not stored
+  family: 'gi' | 'skin' | 'head' | 'other' | null;
+  route: 'red_flag' | 'allergy_like' | 'model';
+  safety_message: string | null;
 }
 
 export const symptomLogService = {

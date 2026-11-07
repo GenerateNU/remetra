@@ -31,9 +31,15 @@ async def create_symptom_log(log: SymptomLogCreate, db: Session = Depends(get_db
     """Create a new symptom log."""
     try:
         service = SymptomLogService()
-        return service.create_symptom_log(db, log)
+        created = service.create_symptom_log(db, log)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    if not created:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Symptom with ID {log.symptom_id} not found",
+        )
+    return created
 
 
 @router.get(
