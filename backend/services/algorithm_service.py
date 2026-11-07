@@ -14,6 +14,8 @@ from models.metrics import Metrics
 from models.symptom_log import SymptomLog
 from repositories.metrics_repository import MetricsRepository
 from schemas.algorithm import AlgorithmAssociationResponse, AlgorithmRunRequest
+from schemas.symptom_log import SymptomRouteType
+from services.symptom_routing import route_symptom
 
 
 class AlgorithmService:
@@ -29,7 +31,7 @@ class AlgorithmService:
 
         self.repo = MetricsRepository(db)
         food_logs = self._get_food_logs_for_user(db, user_id)
-        symptom_logs = self._get_symptom_logs_for_user(db, user_id, payload.symptom_ids)
+        symptom_logs = self._model_routed(self._get_symptom_logs_for_user(db, user_id, payload.symptom_ids))
 
         metrics_by_symptom = self._build_metrics_by_symptom(
             food_logs=food_logs,
@@ -78,12 +80,25 @@ class AlgorithmService:
         user_id: str,
         symptom_ids: Sequence[UUID] | None,
     ) -> list[SymptomLog]:
-        query = select(SymptomLog).where(SymptomLog.username == user_id).order_by(SymptomLog.timestamp.asc())
+        query = (
+            select(SymptomLog)
+            .options(joinedload(SymptomLog.symptom))
+            .where(SymptomLog.username == user_id)
+            .order_by(SymptomLog.timestamp.asc())
+        )
         if symptom_ids:
             query = query.where(SymptomLog.symptom_id.in_(symptom_ids))
 
         result = db.execute(query)
         return result.scalars().all()
+
+    def _model_routed(self, symptom_logs: list[SymptomLog]) -> list[SymptomLog]:
+        """v1: only model-routed symptoms feed the analysis; red flag and allergy-like logs are skipped."""
+        return [
+            log
+            for log in symptom_logs
+            if route_symptom(log.symptom.sensation, log.symptom.location).route == SymptomRouteType.MODEL
+        ]
 
     def _build_metrics_by_symptom(
         self,
