@@ -1,21 +1,24 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { UserGoalsScreen } from '../../screens/onboarding/UserGoalsScreen';
-import { SymptomFoodBankScreen } from '../../screens/onboarding/SymptomFoodBankScreen';
-import { UserProfileScreen } from '../../screens/onboarding/UserProfileScreen';
+import { ConditionsScreen } from '../../screens/onboarding/ConditionsScreen';
+import { ExclusionsScreen } from '../../screens/onboarding/ExclusionsScreen';
+import { SuspicionsScreen } from '../../screens/onboarding/SuspicionsScreen';
+import { RegularsScreen } from '../../screens/onboarding/RegularsScreen';
 
 export type OnboardingStackParamList = {
-  UserProfile: undefined;
-  UserGoals: undefined;
-  SymptomFoodBank: undefined;
+  Conditions: undefined;
+  Exclusions: undefined;
+  Suspicions: undefined;
+  Regulars: undefined;
 };
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 
 export const OnboardingStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }}>
-    <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-    <Stack.Screen name="UserGoals" component={UserGoalsScreen} />
-    <Stack.Screen name="SymptomFoodBank" component={SymptomFoodBankScreen} />
+    <Stack.Screen name="Conditions" component={ConditionsScreen} />
+    <Stack.Screen name="Exclusions" component={ExclusionsScreen} />
+    <Stack.Screen name="Suspicions" component={SuspicionsScreen} />
+    <Stack.Screen name="Regulars" component={RegularsScreen} />
   </Stack.Navigator>
 );
