@@ -25,14 +25,23 @@ module.exports = {
         'remetra-muted':          '#aaa',     // secondary / meta text
         'remetra-surface-accent': '#fff5f0',  // selected-item card background
         'remetra-text-holder':    '#676767',  // Placeholder text
+        // Welcome splash (Remetra v22)
+        'remetra-canvas':         '#fef4ee',
+        'remetra-primary':        '#b5582f',
+        'remetra-text-primary':   '#3b2a24',
+        'remetra-text-secondary': '#6e5a50',
+        'remetra-ember':          '#c42f55',
       },
       fontSize: {
         // Brand wordmark used across onboarding screens
         brand: '32px',
       },
       fontFamily: {
-        lora:    ['Lora_400Regular'],
-        ptserif: ['PTSerif_400Regular'],
+        lora:              ['Lora_400Regular'],
+        ptserif:           ['PTSerif_400Regular'],
+        prata:             ['Prata_400Regular'],
+        figtree:           ['Figtree_400Regular'],
+        'figtree-semibold': ['Figtree_600SemiBold'],
       },
     },
   },
