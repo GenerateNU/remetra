@@ -28,13 +28,14 @@ def system_access():
 
 
 def _owned_models() -> tuple[type, ...]:
+    from models.daily_check_in import DailyCheckIn
     from models.food import Food
     from models.food_log import FoodLog
     from models.metrics import Metrics
     from models.symptom import Symptom
     from models.symptom_log import SymptomLog
 
-    return (Food, FoodLog, Symptom, SymptomLog, Metrics)
+    return (Food, FoodLog, Symptom, SymptomLog, Metrics, DailyCheckIn)
 
 
 def _no_rows(_cls):
