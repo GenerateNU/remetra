@@ -83,7 +83,7 @@ class ContextBuilder:
             "check_ins": [],  # TODO: Here
         }
 
-    def get_trends(self, db: Session, days: int = 30) -> dict:
+    def get_trends(self, db: Session, days: int = 30, logs: dict | None = None) -> dict:
         """
         per symptom
         Pre-computed summaries for a date range: symptom frequency,
@@ -92,7 +92,9 @@ class ContextBuilder:
         if days <= 0:
             raise ValueError("days must be greater than 0")
 
-        logs = self.get_logs(db, days)
+        # `logs` must come from the same `days` window, since avg_logs_per_day divides by it.
+        if logs is None:
+            logs = self.get_logs(db, days)
 
         # symptom label -> all the intensities logged for it
         intensities_by_symptom: dict[str, list[int]] = {}

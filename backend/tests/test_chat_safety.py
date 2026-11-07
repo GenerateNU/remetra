@@ -114,6 +114,10 @@ class TestFindUnreportedClaims:
             "You seem sensitive to tomatoes.",
             "Your flares line up with coffee.",
             "Your logs look great. But eggs are the culprit here.",
+            # a hedge only excuses its own clause, not the claim after it
+            "Your logs don't show that yet, but gluten is clearly causing the bloating.",
+            "I can't say for sure, but you should probably avoid dairy.",
+            "Not enough data, though onion seems to be triggering your symptoms.",
         ],
     )
     def test_claim_in_text_is_caught(self, answer):

@@ -81,6 +81,9 @@ _CLAIM = re.compile(
 )
 
 # Wording the prompt asks for when logs don't support a claim ("your logs don't show that yet").
+# Splits a sentence into clauses so a hedge only excuses the clause it is in.
+_CONTRAST = re.compile(r"\b(but|though|although|however|that said|still)\b")
+
 _NO_CLAIM = re.compile(
     r"\b(dont|doesnt|do not|does not|didnt|did not) (yet )?show\b|\bnot (yet|enough)\b|\bno evidence\b|"
     r"\b(cant|cannot|can not) (say|tell)\b|\btoo (early|soon)\b|\bnot (flagged|in your report|one of your)\b"
@@ -106,11 +109,11 @@ def find_unreported_claims(answer: str, allowed: list[str], vocabulary: list[str
     found: list[str] = []
 
     for sentence in re.split(r"(?<=[.!?])\s+|\n+", answer):
-        normalized = _normalize(sentence)
-        if not _CLAIM.search(normalized) or _NO_CLAIM.search(normalized):
-            continue
-        for term in sorted(terms):
-            covered = any(_mentions(name, term) or _mentions(term, name) for name in allowed_norm)
-            if _mentions(normalized, term) and not covered and term not in found:
-                found.append(term)
+        for clause in _CONTRAST.split(_normalize(sentence)):
+            if not _CLAIM.search(clause) or _NO_CLAIM.search(clause):
+                continue
+            for term in sorted(terms):
+                covered = any(_mentions(name, term) or _mentions(term, name) for name in allowed_norm)
+                if _mentions(clause, term) and not covered and term not in found:
+                    found.append(term)
     return found

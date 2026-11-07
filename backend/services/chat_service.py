@@ -64,7 +64,7 @@ class ChatService:
         logs = self.context_builder.get_logs(db)
 
         return {
-            "trends": self.context_builder.get_trends(db),
+            "trends": self.context_builder.get_trends(db, logs=logs),
             "food_logs": [prompts.truncate_note(log) for log in logs["food_logs"]],
             "symptom_logs": [prompts.truncate_note(log) for log in logs["symptom_logs"]],
             "reported_triggers": self._get_reported_triggers(db),
