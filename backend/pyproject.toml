@@ -24,6 +24,7 @@ dependencies = [
     "pypdf>=6.9.2",
     "semantic-text-splitter>=0.29.0",
     "clerk-backend-api>=7.0.0",
+    "pyyaml>=6.0.3",
 ]
 
 [tool.uv.sources]
