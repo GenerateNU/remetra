@@ -95,6 +95,20 @@ class TestEmergency:
         assert result.kind == "emergency"
 
 
+class TestDemoTriggers:
+    def test_demo_trigger_can_be_named_and_others_still_refused(
+        self, db_session, authenticated_user, fake, monkeypatch
+    ):
+        monkeypatch.setenv("DEMO_REVEALED_TRIGGERS", "gluten")
+        fake.reply = {"answer": "Gluten is one of your reported triggers.", "triggers_mentioned": ["gluten"]}
+
+        assert ChatService().ask(db_session, "What are my triggers?").kind == "answer"
+        assert '"reported_triggers": ["gluten"]' in fake.last_contents
+
+        fake.reply = {"answer": "Dairy is causing it too.", "triggers_mentioned": ["dairy"]}
+        assert ChatService().ask(db_session, "Anything else?").kind == "refused"
+
+
 class TestHardPrompts:
     def test_injection_in_food_note_is_sent_only_as_data(
         self, db_session, authenticated_user, created_food, recent, fake
