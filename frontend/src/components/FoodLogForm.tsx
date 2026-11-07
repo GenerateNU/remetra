@@ -23,20 +23,19 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
-  const [isCustom, setIsCustom] = useState(false);
+  const [isCustom, setIsCustom] = useState(Boolean(useBankStore.getState().scannedFood));
 
-  const [customName, setCustomName] = useState("");
-  const [customIngredients, setCustomIngredients] = useState<string[]>([]);
   const { scannedFood, setScannedFood } = useBankStore();
+  const [customName, setCustomName] = useState(scannedFood?.name ?? "");
+  const [customIngredients, setCustomIngredients] = useState<string[]>(
+    scannedFood?.ingredients ?? []
+  );
 
   useEffect(() => {
     if (scannedFood) {
-      setCustomName(scannedFood.name);
-      setCustomIngredients(scannedFood.ingredients);
-      setIsCustom(true);
       setScannedFood(null);
     }
-  }, []);
+  }, [scannedFood, setScannedFood]);
 
   const [servings, setServings] = useState("1");
   const [timestamp, setTimestamp] = useState(new Date());

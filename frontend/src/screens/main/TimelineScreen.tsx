@@ -62,7 +62,6 @@ export function TimelineScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    setError(null);
     try {
       const fetchPromises: Promise<void>[] = [];
       if (foods.length === 0) fetchPromises.push(fetchFoods());
@@ -110,19 +109,36 @@ export function TimelineScreen() {
         (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
       );
       setEntries(all);
+      setError(null);
     } catch {
       setError('Failed to load logs. Pull down to retry.');
     }
   }, [foods, symptoms, fetchFoods, fetchSymptoms]);
 
   useEffect(() => {
-    setLoading(true);
-    load().finally(() => setLoading(false));
+    let active = true;
+    Promise.resolve().then(() => {
+      if (!active) return;
+      load().finally(() => {
+        if (active) setLoading(false);
+      });
+    });
+    return () => {
+      active = false;
+    };
+    // Initial fetch only. Later updates go through logVersion and pull-to-refresh.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (logVersion === 0) return;
-    load();
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) load();
+    });
+    return () => {
+      active = false;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logVersion]);
 
