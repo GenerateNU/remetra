@@ -1,0 +1,35 @@
+# Condition-to-component multipliers for onboarding.
+# When a user selects a condition, the listed components get their
+# starting confidence multiplied by the given factor.
+# Base confidence for all components is 0.04 (4%).
+# Suspected foods get a blanket 3x multiplier on their components.
+
+defaults:
+  base_confidence: 0.04
+  suspected_multiplier: 3.0
+
+conditions:
+  ibs:
+    multiplier: 2.0
+    components:
+      - fructans_grain
+      - fructans_allium
+      - fructans_other
+      - gos
+      - lactose
+      - excess_fructose
+      - sorbitol
+      - mannitol
+      - added_polyols
+
+  ibd:
+    multiplier: 1.5
+    components:
+      - fat_load
+      - insoluble_fiber_load
+      - lactose
+
+  celiac:
+    multiplier: 1.5
+    components:
+      - oats
