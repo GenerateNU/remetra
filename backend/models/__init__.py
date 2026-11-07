@@ -37,3 +37,6 @@ from models import (
 from models import (
     user as user,
 )
+from models import (
+    user_ingredient as user_ingredient,
+)
