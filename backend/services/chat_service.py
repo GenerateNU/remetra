@@ -7,9 +7,11 @@ import os
 from google import genai
 from sqlalchemy.orm import Session
 
+import auth_context as auth
 from chatbot import prompts, safety
 from chatbot.context_builder import ContextBuilder
 from schemas.chat import ChatModelOutput, ChatResponse
+from services.food_service import FoodService
 
 
 class ChatError(Exception):
@@ -22,6 +24,7 @@ class ChatService:
     def __init__(self):
         self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         self.context_builder = ContextBuilder()
+        self.food_service = FoodService()
 
     def ask(self, db: Session, question: str) -> ChatResponse:
         """
@@ -46,6 +49,12 @@ class ChatService:
 
         if not safety.check_triggers(output.triggers_mentioned, summary["reported_triggers"]):
             logging.warning(f"Chat answer named unreported triggers: {output.triggers_mentioned}")
+            return ChatResponse(answer=safety.REFUSED_REPLY, kind="refused")
+
+        # The model can name a trigger in its answer and still leave triggers_mentioned empty, so check the text too
+        in_text = safety.find_unreported_claims(output.answer, summary["reported_triggers"], self._food_vocabulary(db))
+        if in_text:
+            logging.warning(f"Chat answer text named unreported triggers: {in_text}")
             return ChatResponse(answer=safety.REFUSED_REPLY, kind="refused")
 
         return ChatResponse(answer=output.answer, kind="answer")
@@ -73,6 +82,15 @@ class ChatService:
         #   return [insight["label"] for insight in insights]
         # Until then the list stays empty, so every trigger claim is refused.
         return []
+
+    def _food_vocabulary(self, db: Session) -> list[str]:
+        """Names and ingredients of the signed-in user's foods, for the answer-text trigger check."""
+        username = auth.current_username.get()
+        words: list[str] = []
+        for food in self.food_service.get_all_foods(db, username):
+            words.append(food.name)
+            words.extend(food.ingredients or [])
+        return words
 
     def _call_model(self, summary: dict, question: str) -> ChatModelOutput:
         try:
