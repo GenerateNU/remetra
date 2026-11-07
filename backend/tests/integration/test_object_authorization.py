@@ -1,10 +1,15 @@
 """A signed-in user can only see and change their own rows."""
 
+from datetime import date
+
 from auth_context import current_username, system_access
 from main import app
+from models.daily_health_metrics import DailyHealthMetrics
 from models.food import Food
+from repositories.health_repository import HealthRepository
 from repositories.user_repository import UserRepository
 from routers.auth import get_current_user
+from schemas.health import HealthDayEntry
 from schemas.user import UserResponse
 
 
@@ -165,3 +170,27 @@ def test_query_with_no_user_returns_no_rows(db_session):
     with system_access():
         visible = db_session.query(Food).filter(Food.id == food_id).one()
         assert visible.name == "carol soup"
+
+
+def test_user_cannot_read_another_users_health_data(db_session):
+    """User B can never see user A's health days"""
+    repo = UserRepository()
+    repo.create(db=db_session, username="alice", email="alice@example.com", clerk_user_id="user_alice")
+    repo.create(db=db_session, username="bob", email="bob@example.com", clerk_user_id="user_bob")
+
+    HealthRepository().save_days(
+        db_session, "alice", "America/New_York", [HealthDayEntry(date=date(2026, 10, 20), sleep_total_min=420)]
+    )
+
+    token = current_username.set("bob")
+    try:
+        db_session.expire_all()
+        assert db_session.query(DailyHealthMetrics).all() == []
+    finally:
+        current_username.reset(token)
+
+    token = current_username.set("alice")
+    try:
+        assert len(db_session.query(DailyHealthMetrics).all()) == 1
+    finally:
+        current_username.reset(token)

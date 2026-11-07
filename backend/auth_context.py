@@ -28,13 +28,15 @@ def system_access():
 
 
 def _owned_models() -> tuple[type, ...]:
+    from models.daily_health_metrics import DailyHealthMetrics
     from models.food import Food
     from models.food_log import FoodLog
+    from models.healthkit_event import HealthKitEvent
     from models.metrics import Metrics
     from models.symptom import Symptom
     from models.symptom_log import SymptomLog
 
-    return (Food, FoodLog, Symptom, SymptomLog, Metrics)
+    return (Food, FoodLog, Symptom, SymptomLog, Metrics, DailyHealthMetrics, HealthKitEvent)
 
 
 def _no_rows(_cls):
