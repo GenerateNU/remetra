@@ -1,0 +1,416 @@
+# taxonomy/components.yaml
+# phi, prior_tier and flags copied from the design doc;
+# definition, inclusion_confidence, inclusion_rationale and sources added for ticket #127
+components:
+  - id: fructans_grain
+    display_name: "Wheat, rye & barley carbs"
+    category: fodmap
+    definition: "Fructan carbohydrates (fructose chains) from wheat, rye and barley, measured separately from gluten."
+    inclusion_confidence: high
+    inclusion_rationale: "Fructans are a major FODMAP source in grain foods, and in people with self-reported gluten sensitivity, fructans rather than gluten induced symptoms in a blinded challenge."
+    sources: ["https://doi.org/10.1111/j.1365-277X.2010.01139.x", "https://doi.org/10.1053/j.gastro.2017.10.040"]
+    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
+    prior_tier: high
+    flags: []
+  - id: fructans_allium
+    display_name: "Onion & garlic family"
+    category: fodmap
+    definition: "Fructan carbohydrates from Allium plants: onion, garlic, leek, shallot and scallion bulbs."
+    inclusion_confidence: high
+    inclusion_rationale: "Garlic, onion, shallot and leek have the highest measured fructan content of common vegetables."
+    sources: ["https://doi.org/10.1021/jf070623x", "https://monashfodmap.com/blog/fructans-fodmap-reintroduction/"]
+    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.10}
+    prior_tier: high
+    flags: []
+  - id: fructans_other
+    display_name: "Other fructan sources"
+    category: fodmap
+    definition: "Fructans from sources other than grains and alliums, mainly added inulin (chicory root fiber), artichoke and ripe banana."
+    inclusion_confidence: medium
+    inclusion_rationale: "Same fermentation mechanism as other fructans, and added inulin is a common processed-food source, but intake varies widely by product."
+    sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/", "https://doi.org/10.1021/jf070623x"]
+    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
+    prior_tier: medium
+    flags: []
+  - id: gos
+    display_name: "Beans & lentils carbs"
+    category: fodmap
+    definition: "Galacto-oligosaccharides, the fermentable carbohydrates in legumes and some nuts."
+    inclusion_confidence: high
+    inclusion_rationale: "GOS is one of the FODMAP subgroups clinicians test separately, and legumes are its main dietary source."
+    sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
+    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
+    prior_tier: high
+    flags: []
+  - id: lactose
+    display_name: "Milk sugar (lactose)"
+    category: fodmap
+    definition: "The milk sugar lactose, which causes symptoms when the lactase enzyme is low."
+    inclusion_confidence: high
+    inclusion_rationale: "Monash names lactose as the main FODMAP in dairy, and lactose malabsorption is a well-established cause of same-day gut symptoms."
+    sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
+    family_profile: {GI: 0.95, SKIN: 0.02, HEAD: 0.03}
+    prior_tier: high
+    flags: []
+  - id: excess_fructose
+    display_name: "Fruit sugar in excess"
+    category: fodmap
+    definition: "Free fructose in foods where fructose exceeds glucose, which the small intestine absorbs poorly."
+    inclusion_confidence: high
+    inclusion_rationale: "A FODMAP subgroup tested separately in clinical reintroduction, with sources (honey, mango) that separate it from sorbitol."
+    sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
+    family_profile: {GI: 0.90, SKIN: 0.03, HEAD: 0.07}
+    prior_tier: high
+    flags: []
+  - id: sorbitol
+    display_name: "Sorbitol"
+    category: fodmap
+    definition: "The naturally occurring polyol sorbitol, mainly in stone and pome fruits."
+    inclusion_confidence: medium
+    inclusion_rationale: "A polyol subgroup tested separately in clinical reintroduction; effects depend strongly on serving size."
+    sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
+    family_profile: {GI: 0.90, SKIN: 0.03, HEAD: 0.07}
+    prior_tier: medium
+    flags: []
+  - id: mannitol
+    display_name: "Mannitol"
+    category: fodmap
+    definition: "The naturally occurring polyol mannitol, mainly in mushrooms, cauliflower and celery."
+    inclusion_confidence: medium
+    inclusion_rationale: "A polyol subgroup tested separately in clinical reintroduction; effects depend strongly on serving size."
+    sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
+    family_profile: {GI: 0.90, SKIN: 0.03, HEAD: 0.07}
+    prior_tier: medium
+    flags: []
+  - id: added_polyols
+    display_name: "Sugar-free sweeteners (polyols)"
+    category: fodmap
+    definition: "Sugar alcohols added as sweeteners (xylitol, maltitol, isomalt, erythritol), separate from those occurring naturally in fruit."
+    inclusion_confidence: medium
+    inclusion_rationale: "Same mechanism as natural polyols but often eaten at large doses in sugar-free products; erythritol is mostly absorbed and causes fewer symptoms."
+    sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
+    family_profile: {GI: 0.90, SKIN: 0.02, HEAD: 0.08}
+    prior_tier: medium
+    flags: []
+  - id: gluten
+    display_name: "Gluten"
+    category: protein_allergen
+    definition: "The storage proteins in wheat, rye, barley and their hybrids."
+    inclusion_confidence: high
+    inclusion_rationale: "Gluten is the defining trigger in celiac disease, and FDA defines the gluten-containing grains for labeling."
+    sources: ["https://www.fda.gov/food/allergens/gluten-and-food-labeling"]
+    family_profile: {GI: 0.85, SKIN: 0.10, HEAD: 0.15}
+    prior_tier: high
+    flags: [allergen]
+  - id: oats
+    display_name: "Oats"
+    category: protein_allergen
+    definition: "Oats and oat products, kept separate from gluten."
+    inclusion_confidence: low
+    inclusion_rationale: "FDA does not count oats as a gluten-containing grain, but oats are often cross-contacted with wheat, and some people with celiac react to them."
+    sources: ["https://ofwlaw.com/gluten-free-now-has-an-official-fda-definition/"]
+    family_profile: {GI: 0.85, SKIN: 0.05, HEAD: 0.05}
+    prior_tier: low
+    flags: []
+  - id: milk_protein
+    display_name: "Milk protein"
+    category: protein_allergen
+    definition: "Casein and whey proteins from the milk of cows, goats, sheep and other ruminants."
+    inclusion_confidence: high
+    inclusion_rationale: "Milk is a FALCPA major allergen that reacts within hours, and it is separable from lactose through lactose-free milk and aged cheese."
+    sources: ["https://www.dailyintakeblog.com/2025/01/fda-issues-two-final-guidance-documents-on-allergens/", "https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
+    family_profile: {GI: 0.75, SKIN: 0.20, HEAD: 0.05}
+    prior_tier: medium
+    flags: [allergen]
+  - id: egg
+    display_name: "Egg"
+    category: protein_allergen
+    definition: "Proteins from the eggs of chickens, ducks, geese, quail and other fowl."
+    inclusion_confidence: high
+    inclusion_rationale: "Egg is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
+    sources: ["https://www.dailyintakeblog.com/2025/01/fda-issues-two-final-guidance-documents-on-allergens/", "https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
+    family_profile: {GI: 0.70, SKIN: 0.25, HEAD: 0.05}
+    prior_tier: medium
+    flags: [allergen]
+  - id: soy
+    display_name: "Soy"
+    category: protein_allergen
+    definition: "Proteins from soybeans and soy products."
+    inclusion_confidence: high
+    inclusion_rationale: "Soy is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
+    sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
+    family_profile: {GI: 0.75, SKIN: 0.20, HEAD: 0.05}
+    prior_tier: medium
+    flags: [allergen]
+  - id: peanut
+    display_name: "Peanut"
+    category: protein_allergen
+    definition: "Proteins from peanuts, a legume."
+    inclusion_confidence: high
+    inclusion_rationale: "Peanut is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
+    sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
+    family_profile: {GI: 0.50, SKIN: 0.45, HEAD: 0.05}
+    prior_tier: low
+    flags: [allergen]
+  - id: tree_nuts
+    display_name: "Tree nuts"
+    category: protein_allergen
+    definition: "Proteins from the 12 tree nuts FDA treats as major allergens (almond, cashew, walnut, pecan, pistachio and others); excludes coconut."
+    inclusion_confidence: high
+    inclusion_rationale: "Tree nuts are a FALCPA major allergen with reactions within hours; included mainly so the app can flag them and never introduce them."
+    sources: ["https://menutrinfo.com/blog/its-official-coconut-is-no-longer-a-tree-nut/", "https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
+    family_profile: {GI: 0.55, SKIN: 0.40, HEAD: 0.05}
+    prior_tier: low
+    flags: [allergen]
+  - id: sesame
+    display_name: "Sesame"
+    category: protein_allergen
+    definition: "Proteins from sesame seeds and sesame products."
+    inclusion_confidence: high
+    inclusion_rationale: "Sesame became the ninth US major food allergen under the FASTER Act; included mainly so the app can flag it and never introduce it."
+    sources: ["https://www.canr.msu.edu/news/the-faster-act-sesame-as-major-food-allergen"]
+    family_profile: {GI: 0.50, SKIN: 0.45, HEAD: 0.05}
+    prior_tier: low
+    flags: [allergen]
+  - id: fish
+    display_name: "Fish"
+    category: protein_allergen
+    definition: "Proteins from finfish."
+    inclusion_confidence: high
+    inclusion_rationale: "Fish is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
+    sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
+    family_profile: {GI: 0.55, SKIN: 0.40, HEAD: 0.05}
+    prior_tier: low
+    flags: [allergen]
+  - id: shellfish
+    display_name: "Shellfish"
+    category: protein_allergen
+    definition: "Proteins from crustaceans (shrimp, crab, lobster) and molluscs (clams, mussels, scallops)."
+    inclusion_confidence: high
+    inclusion_rationale: "Crustacean shellfish is a FALCPA major allergen and molluscs are an EU allergen; included mainly so the app can flag them and never introduce them."
+    sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents", "https://www.fsai.ie/enforcement-and-legislation/legislation/food-legislation/food-information-fic-(labelling)/list-of-14-allergens"]
+    family_profile: {GI: 0.55, SKIN: 0.40, HEAD: 0.05}
+    prior_tier: low
+    flags: [allergen]
+  - id: corn
+    display_name: "Corn"
+    category: protein_allergen
+    definition: "Corn and whole-corn products; refined corn starch and syrups count at low levels."
+    inclusion_confidence: low
+    inclusion_rationale: "Commonly suspected by users, but I found no clinical source showing a symptom mechanism; kept with a low prior because users will ask."
+    sources: []
+    family_profile: {GI: 0.85, SKIN: 0.10, HEAD: 0.05}
+    prior_tier: low
+    flags: [contested]
+  - id: mammalian_meat
+    display_name: "Red meat"
+    category: protein_allergen
+    definition: "Meat, organs, fats and gelatin from mammals, which carry the alpha-gal sugar."
+    inclusion_confidence: high
+    inclusion_rationale: "Alpha-gal syndrome is an established delayed allergy; symptoms appear 2 to 10 hours after eating meat or dairy, inside the 36-hour window."
+    sources: ["https://www.cdc.gov/alpha-gal-syndrome/data-research/products-containing-alpha-gal/", "https://www3.maine.gov/dhhs/mecdc/sites/maine.gov.dhhs.mecdc/files/epi/Alpha-Gal-FS.pdf"]
+    family_profile: {GI: 0.60, SKIN: 0.35, HEAD: 0.05}
+    prior_tier: low
+    flags: [clinician_if_skin]
+  - id: biogenic_amines
+    display_name: "Aged, cured & fermented foods"
+    category: food_chemical
+    definition: "Histamine and tyramine formed by bacteria in aged, cured and fermented foods, merged because they occur in the same foods."
+    inclusion_confidence: medium
+    inclusion_rationale: "Low-histamine diets have growing support, though some studies are limited by patient numbers or diet duration; fermented foods are the most consistent source."
+    sources: ["https://pmc.ncbi.nlm.nih.gov/articles/PMC8143338/"]
+    family_profile: {GI: 0.35, SKIN: 0.35, HEAD: 0.30}
+    prior_tier: medium
+    flags: []
+  - id: histamine_liberators
+    display_name: "Histamine-releasing foods"
+    category: food_chemical
+    definition: "Foods claimed to release the body's own histamine despite containing little themselves."
+    inclusion_confidence: low
+    inclusion_rationale: "Common in elimination diets, but no clinical studies in humans support the idea that foods release histamine."
+    sources: ["https://pmc.ncbi.nlm.nih.gov/articles/PMC8143338/"]
+    family_profile: {GI: 0.30, SKIN: 0.50, HEAD: 0.20}
+    prior_tier: low
+    flags: [contested]
+  - id: alcohol
+    display_name: "Alcohol"
+    category: food_chemical
+    definition: "Ethanol from alcoholic drinks, measured in grams per serving."
+    inclusion_confidence: high
+    inclusion_rationale: "Alcohol relaxes the esophageal sphincter and can damage the lining of the stomach and esophagus, a same-day effect."
+    sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://www.niaaa.nih.gov/alcohols-effects-health/overview-alcohol-consumption/what-standard-drink"]
+    family_profile: {GI: 0.45, SKIN: 0.25, HEAD: 0.30}
+    prior_tier: medium
+    flags: []
+  - id: caffeine
+    display_name: "Caffeine"
+    category: food_chemical
+    definition: "Caffeine from coffee, tea, cola, energy drinks, guarana and chocolate, measured in milligrams per serving."
+    inclusion_confidence: medium
+    inclusion_rationale: "Caffeine relaxes the esophageal sphincter, which can increase reflux, but study results on coffee and reflux are mixed."
+    sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much"]
+    family_profile: {GI: 0.50, SKIN: 0.05, HEAD: 0.45}
+    prior_tier: medium
+    flags: []
+  - id: cocoa
+    display_name: "Chocolate & cocoa"
+    category: food_chemical
+    definition: "Cocoa solids from cacao products, separate from their caffeine."
+    inclusion_confidence: medium
+    inclusion_rationale: "Chocolate can worsen reflux by relaxing the esophageal sphincter; it is on most clinical reflux lists."
+    sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://med.virginia.edu/ginutrition/wp-content/uploads/sites/199/2025/10/GERD-2023.pdf", "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-B/part-163"]
+    family_profile: {GI: 0.60, SKIN: 0.10, HEAD: 0.30}
+    prior_tier: low
+    flags: []
+  - id: sulfites
+    display_name: "Sulfites"
+    category: food_chemical
+    definition: "Sulfiting agents added as preservatives or formed in fermentation (sulfur dioxide and sulfite, bisulfite and metabisulfite salts)."
+    inclusion_confidence: medium
+    inclusion_rationale: "Reactions come within 15 to 30 minutes of eating but are uncommon, and reactions in people without asthma are extremely rare."
+    sources: ["https://ask.ifas.ufl.edu/publication/FY731"]
+    family_profile: {GI: 0.30, SKIN: 0.40, HEAD: 0.30}
+    prior_tier: low
+    flags: []
+  - id: added_glutamate
+    display_name: "Added MSG & yeast extract"
+    category: food_chemical
+    definition: "Free glutamate added as MSG or through yeast extract and hydrolyzed protein; natural glutamate in tomato and cheese is not counted."
+    inclusion_confidence: low
+    inclusion_rationale: "FDA has received reports of headache and nausea after foods with MSG; kept mainly because users ask about it."
+    sources: ["https://www.fda.gov/food/food-additives-petitions/questions-and-answers-monosodium-glutamate-msg"]
+    family_profile: {GI: 0.30, SKIN: 0.20, HEAD: 0.50}
+    prior_tier: low
+    flags: [contested]
+  - id: nitrites
+    display_name: "Cured-meat preservatives"
+    category: food_chemical
+    definition: "Nitrite and nitrate curing agents, including natural sources like celery powder."
+    inclusion_confidence: low
+    inclusion_rationale: "Commonly blamed for headaches, but I found no clinical source; kept so cured meats can be separated from aged foods."
+    sources: ["https://www.fsis.usda.gov/sites/default/files/media_file/2021-03/FPLIC_4b_Sausage_Operations.pdf"]
+    family_profile: {GI: 0.30, SKIN: 0.10, HEAD: 0.60}
+    prior_tier: low
+    flags: []
+  - id: salicylates
+    display_name: "Salicylates"
+    category: food_chemical
+    definition: "Natural salicylic acid compounds in plants, highest in dried herbs, spices and many fruits."
+    inclusion_confidence: low
+    inclusion_rationale: "Salicylate sensitivity can cause stomach pain, nausea, diarrhoea and headaches, but food content data is inconsistent across studies."
+    sources: ["https://bda.uk.com/static/5284c6c5-ee49-43f5-a50cede11ba44e85/Salicylate-Sensitivity-2022.pdf"]
+    family_profile: {GI: 0.40, SKIN: 0.40, HEAD: 0.20}
+    prior_tier: low
+    flags: [contested]
+  - id: artificial_sweeteners
+    display_name: "Non-sugar sweeteners"
+    category: food_chemical
+    definition: "High-intensity sweeteners: the six FDA-approved additives plus stevia and monk fruit extracts."
+    inclusion_confidence: low
+    inclusion_rationale: "Studies report effects on gut microbiome composition and function, but I found no source showing symptoms within 36 hours."
+    sources: ["https://www.fda.gov/food/food-additives-petitions/high-intensity-sweeteners"]
+    family_profile: {GI: 0.60, SKIN: 0.05, HEAD: 0.35}
+    prior_tier: low
+    flags: [contested]
+  - id: emulsifiers_gums
+    display_name: "Emulsifiers & gums"
+    category: food_chemical
+    definition: "Food additives that bind oil and water or thicken foods, such as carboxymethylcellulose, polysorbate 80, carrageenan and xanthan gum."
+    inclusion_confidence: low
+    inclusion_rationale: "Evidence is mostly from animal and lab studies of long-term inflammation, which may not meet the 36-hour mechanism rule."
+    sources: ["https://pmc.ncbi.nlm.nih.gov/articles/PMC7986288"]
+    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
+    prior_tier: low
+    flags: [contested]
+  - id: colors_preservatives
+    display_name: "Artificial colors & benzoates"
+    category: food_chemical
+    definition: "Certified synthetic food dyes and added benzoate preservatives."
+    inclusion_confidence: low
+    inclusion_rationale: "It is unclear whether benzoates and artificial colorings act like salicylates, and evidence is mostly from behavior studies in children."
+    sources: ["https://bda.uk.com/static/5284c6c5-ee49-43f5-a50cede11ba44e85/Salicylate-Sensitivity-2022.pdf", "https://www.fda.gov/industry/color-additives/fdc-red-no-3"]
+    family_profile: {GI: 0.20, SKIN: 0.60, HEAD: 0.20}
+    prior_tier: low
+    flags: [contested]
+  - id: capsaicin
+    display_name: "Chili heat"
+    category: meal_property
+    definition: "Capsaicinoids, the compounds that make chilies hot; bell pepper has none."
+    inclusion_confidence: medium
+    inclusion_rationale: "Spicy foods are on every clinical reflux list found and act within hours."
+    sources: ["https://med.virginia.edu/ginutrition/wp-content/uploads/sites/199/2025/10/GERD-2023.pdf", "https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn"]
+    family_profile: {GI: 0.80, SKIN: 0.15, HEAD: 0.05}
+    prior_tier: medium
+    flags: []
+  - id: fat_load
+    display_name: "High-fat meals"
+    category: meal_property
+    definition: "Total fat in a meal, computed from FoodData Central nutrients rather than mapped from ingredients."
+    inclusion_confidence: high
+    inclusion_rationale: "Fatty foods can relax the lower esophageal sphincter and delay stomach emptying, a direct same-meal effect."
+    sources: ["https://cancerreferraltest.ohiohealth.com/siteassets/find-a-location/hospitals/mansfield-hospital/services/heartburn-clinic/medical-management-of-gerd.pdf", "https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://fdc.nal.usda.gov/download-datasets"]
+    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
+    prior_tier: medium
+    flags: [meal_level]
+  - id: insoluble_fiber_load
+    display_name: "High-roughage meals"
+    category: meal_property
+    definition: "Fiber in a meal, computed from FoodData Central total dietary fiber as a proxy for insoluble fiber."
+    inclusion_confidence: medium
+    inclusion_rationale: "Large fiber loads plausibly change stool and bloating within a day, but I found no source for this one."
+    sources: ["https://fdc.nal.usda.gov/download-datasets"]
+    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
+    prior_tier: medium
+    flags: [meal_level]
+  - id: carbonation
+    display_name: "Fizzy drinks"
+    category: meal_property
+    definition: "Dissolved carbon dioxide in drinks."
+    inclusion_confidence: medium
+    inclusion_rationale: "Carbonated drinks are a listed reflux trigger, though associations are heterogeneous across studies."
+    sources: ["https://pubmed.ncbi.nlm.nih.gov/41132014/", "https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn"]
+    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
+    prior_tier: medium
+    flags: []
+  - id: acidic
+    display_name: "Acidic foods"
+    category: meal_property
+    definition: "Foods with low pH, mainly citrus, tomato and vinegar."
+    inclusion_confidence: medium
+    inclusion_rationale: "Citrus fruits and tomatoes increase stomach acidity, but study associations are mixed."
+    sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://www.clemson.edu/extension/food/_files/ph-of-common-foods-table.pdf"]
+    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
+    prior_tier: medium
+    flags: []
+  - id: mint
+    display_name: "Mint"
+    category: meal_property
+    definition: "Peppermint, spearmint and menthol."
+    inclusion_confidence: medium
+    inclusion_rationale: "Peppermint relaxes the esophageal sphincter and can make reflux worse, even though people use it to settle the stomach."
+    sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://med.virginia.edu/ginutrition/wp-content/uploads/sites/199/2025/10/GERD-2023.pdf"]
+    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
+    prior_tier: low
+    flags: []
+  - id: nightshades
+    display_name: "Nightshades"
+    category: meal_property
+    definition: "Foods from plants in the Solanaceae family: tomato, potato, eggplant, peppers and related fruits."
+    inclusion_confidence: low
+    inclusion_rationale: "Often removed on autoimmune elimination diets, but I found no source showing a symptom mechanism; kept because users will ask."
+    sources: ["https://journals.indianapolis.iu.edu/index.php/ias/article/download/8321/8298/14470", "https://www.helpfightra.org/should-i-eat-nightshade-vegetables/"]
+    family_profile: {GI: 0.50, SKIN: 0.30, HEAD: 0.20}
+    prior_tier: low
+    flags: [contested]
+merge_groups:
+  - {id: wheat, members: [gluten, fructans_grain], display_name: "Wheat, rye & barley (gluten or wheat carbs)"}
+  - {id: dairy, members: [lactose, milk_protein], display_name: "Dairy (lactose or milk protein)"}
+  - {id: cured_aged, members: [biogenic_amines, nitrites], display_name: "Cured & aged foods"}
+  - {id: wine, members: [alcohol, sulfites, biogenic_amines], display_name: "Wine"}
+  - {id: apples_pears, members: [excess_fructose, sorbitol], display_name: "Apples, pears & similar fruit"}
+  - {id: chocolate_caffeine, members: [caffeine, cocoa], display_name: "Chocolate & caffeine"}
+  - {id: tomatoes, members: [acidic, histamine_liberators, nightshades], display_name: "Tomatoes & similar"}
+  - {id: chili, members: [capsaicin, nightshades], display_name: "Chili peppers"}
+meal_level_thresholds:
+  fat_load: [15, 30, 45]
+  insoluble_fiber_load: [4, 8, 12]
