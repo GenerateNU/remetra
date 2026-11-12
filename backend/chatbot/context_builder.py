@@ -6,6 +6,7 @@ chatbot needs for the current user. The DB session is passed per call and
 never stored on the class.
 """
 
+import os
 from collections import Counter
 from datetime import date, datetime, timedelta, timezone
 from uuid import UUID
@@ -28,6 +29,10 @@ SYMPTOM_LOG_FIELDS = SYMPTOM_LOG_DUMP_FIELDS | {"symptom"}
 
 UNKNOWN = "unknown"
 
+# DEMO ONLY: comma-separated trigger names to fake revealed insights, e.g. DEMO_REVEALED_TRIGGERS=gluten.
+# Unset (the default) means nothing is revealed. Remove once get_revealed_insights reads real results.
+DEMO_TRIGGERS_ENV = "DEMO_REVEALED_TRIGGERS"
+
 
 class ContextBuilder:
     def __init__(self):
@@ -36,12 +41,16 @@ class ContextBuilder:
         self.food_service = FoodService()
         self.symptom_service = SymptomService()
 
-    def get_revealed_insights(self, db: Session, user_id: UUID) -> list[dict]:
+    def get_revealed_insights(self, db: Session, user_id: UUID | None = None) -> list[dict]:
         """
         Labels and explanations for revealed food groups only.
         The reveal policy is applied here on the server, never by the LLM.
+
+        DEMO STUB: returns the names in DEMO_REVEALED_TRIGGERS for every user, or [] when it's unset.
+        TODO: replace with the algorithm's revealed results for user_id.
         """
-        raise NotImplementedError
+        names = [name.strip() for name in os.getenv(DEMO_TRIGGERS_ENV, "").split(",") if name.strip()]
+        return [{"label": name, "explanation": "Demo placeholder, not from the analysis."} for name in names]
 
     def get_logs(self, db: Session, days: int = 30) -> dict:
         """
@@ -83,7 +92,7 @@ class ContextBuilder:
             "check_ins": [],  # TODO: Here
         }
 
-    def get_trends(self, db: Session, days: int = 30) -> dict:
+    def get_trends(self, db: Session, days: int = 30, logs: dict | None = None) -> dict:
         """
         per symptom
         Pre-computed summaries for a date range: symptom frequency,
@@ -92,7 +101,9 @@ class ContextBuilder:
         if days <= 0:
             raise ValueError("days must be greater than 0")
 
-        logs = self.get_logs(db, days)
+        # `logs` must come from the same `days` window, since avg_logs_per_day divides by it.
+        if logs is None:
+            logs = self.get_logs(db, days)
 
         # symptom label -> all the intensities logged for it
         intensities_by_symptom: dict[str, list[int]] = {}
