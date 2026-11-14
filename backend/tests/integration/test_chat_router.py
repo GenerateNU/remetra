@@ -1,10 +1,14 @@
 """HTTP tests for POST /chat against a fake Gemini client."""
 
+import threading
 from datetime import datetime, timedelta, timezone
 
 import pytest
 
+import auth_context as auth
 from chatbot import safety
+from schemas.chat import ChatResponse
+from services.chat_service import ChatService
 from tests.fake_gemini import FakeGeminiClient, gullible_model
 
 
@@ -77,6 +81,26 @@ class TestChatRouter:
         assert response.status_code == 200
         assert response.json() == {"answer": safety.REFUSED_REPLY, "kind": "refused"}
         assert "Ignore your instructions" in fake.last_contents
+
+    def test_ask_runs_off_the_event_loop_as_the_signed_in_user(
+        self, test_client, authenticated_user, fake, monkeypatch
+    ):
+        """ask() runs in a worker thread, and the signed-in username still reaches it there."""
+        seen = {}
+
+        def spy_ask(self, db, question):
+            seen["thread"] = threading.current_thread()
+            seen["username"] = auth.current_username.get()
+            return ChatResponse(answer="ok")
+
+        monkeypatch.setattr(ChatService, "ask", spy_ask)
+
+        response = test_client.post("/chat", json={"question": "hi"})
+
+        assert response.status_code == 200
+        assert seen["thread"] is not threading.main_thread()
+        assert seen["thread"].name.startswith("AnyIO worker thread")
+        assert seen["username"] == authenticated_user["username"]
 
     def test_model_failure_returns_502(self, test_client, authenticated_user, fake):
         fake.error = RuntimeError("boom")

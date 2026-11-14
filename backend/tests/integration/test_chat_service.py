@@ -9,7 +9,7 @@ from chatbot import prompts, safety
 from schemas.food_log import FoodLogCreate
 from schemas.symptom import SymptomCreate
 from schemas.symptom_log import SymptomLogCreate
-from services.chat_service import MAX_OUTPUT_TOKENS, ChatError, ChatService
+from services.chat_service import GEMINI_TIMEOUT_MS, MAX_OUTPUT_TOKENS, ChatError, ChatService
 from services.food_log_service import FoodLogService
 from services.symptom_log_service import SymptomLogService
 from services.symptom_service import SymptomService
@@ -56,6 +56,19 @@ class TestAnswers:
         assert fake.last_system_prompt == prompts.SYSTEM_PROMPT
         assert fake.calls[-1]["config"]["response_mime_type"] == "application/json"
         assert fake.last_contents.endswith("Question: How was my week?")
+
+    def test_client_is_built_with_a_timeout(self, monkeypatch):
+        seen = {}
+        monkeypatch.setattr("services.chat_service.genai.Client", lambda **kwargs: seen.update(kwargs))
+
+        ChatService()
+
+        assert seen["http_options"].timeout == GEMINI_TIMEOUT_MS
+
+    def test_timeout_becomes_chat_error(self, db_session, authenticated_user, fake):
+        fake.error = TimeoutError("read timed out")
+        with pytest.raises(ChatError, match="unavailable"):
+            ChatService().ask(db_session, "How was my week?")
 
     def test_output_tokens_are_capped(self, db_session, authenticated_user, fake):
         ChatService().ask(db_session, "How was my week?")

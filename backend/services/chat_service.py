@@ -5,6 +5,7 @@ import logging
 import os
 
 from google import genai
+from google.genai import types
 from sqlalchemy.orm import Session
 
 import auth_context as auth
@@ -17,6 +18,10 @@ from services.food_service import FoodService
 # reply cut off mid-JSON fails to parse. Tighten once the usage logs show what replies really use.
 MAX_OUTPUT_TOKENS = 1024
 
+# How long to wait for Gemini before giving up, in milliseconds. A timeout raises, which becomes a ChatError (502),
+# so a hung call fails fast instead of holding the request open.
+GEMINI_TIMEOUT_MS = 30_000
+
 
 class ChatError(Exception):
     """Raises when Gemini fails, or returns a response that's unusable."""
@@ -26,7 +31,10 @@ class ChatService:
     """Service that sends the user's summary and question to Gemini and enforces the chat rules."""
 
     def __init__(self):
-        self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+        self.client = genai.Client(
+            api_key=os.getenv("GEMINI_API_KEY"),
+            http_options=types.HttpOptions(timeout=GEMINI_TIMEOUT_MS),
+        )
         self.context_builder = ContextBuilder()
         self.food_service = FoodService()
 
