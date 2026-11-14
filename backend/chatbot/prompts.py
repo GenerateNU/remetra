@@ -3,7 +3,10 @@
 import json
 import secrets
 
-MAX_NOTE_CHARS = 500
+# Caps on what each request sends, so input tokens (and cost) don't grow with how much a user logs.
+# trends still covers the full window, so the model sees the big picture even when older logs are cut.
+MAX_NOTE_CHARS = 200
+MAX_LOGS_PER_TYPE = 50
 
 SYSTEM_PROMPT = """You are Remetra's assistant. You help a person living with an autoimmune condition
 understand their own food and symptom logs.
@@ -56,6 +59,11 @@ def truncate_note(log: dict) -> dict:
     if not notes or len(notes) <= MAX_NOTE_CHARS:
         return log
     return {**log, "notes": notes[:MAX_NOTE_CHARS]}
+
+
+def most_recent(logs: list[dict], limit: int = MAX_LOGS_PER_TYPE) -> list[dict]:
+    """The newest `limit` logs by timestamp, newest first."""
+    return sorted(logs, key=lambda log: log["timestamp"], reverse=True)[:limit]
 
 
 def build_contents(summary: dict, question: str) -> str:

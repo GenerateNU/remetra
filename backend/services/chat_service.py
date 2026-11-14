@@ -13,6 +13,10 @@ from chatbot.context_builder import ContextBuilder
 from schemas.chat import ChatModelOutput, ChatResponse
 from services.food_service import FoodService
 
+# Hard cap on billed output per reply. Kept loose because thinking tokens may count toward it, and a
+# reply cut off mid-JSON fails to parse. Tighten once the usage logs show what replies really use.
+MAX_OUTPUT_TOKENS = 1024
+
 
 class ChatError(Exception):
     """Raises when Gemini fails, or returns a response that's unusable."""
@@ -65,8 +69,8 @@ class ChatService:
 
         return {
             "trends": self.context_builder.get_trends(db, logs=logs),
-            "food_logs": [prompts.truncate_note(log) for log in logs["food_logs"]],
-            "symptom_logs": [prompts.truncate_note(log) for log in logs["symptom_logs"]],
+            "food_logs": [prompts.truncate_note(log) for log in prompts.most_recent(logs["food_logs"])],
+            "symptom_logs": [prompts.truncate_note(log) for log in prompts.most_recent(logs["symptom_logs"])],
             "reported_triggers": self._get_reported_triggers(db),
         }
 
@@ -92,6 +96,20 @@ class ChatService:
             words.extend(food.ingredients or [])
         return words
 
+    @staticmethod
+    def _log_usage(response) -> None:
+        """Log the token counts Gemini bills for, to see where chat cost goes."""
+        usage = getattr(response, "usage_metadata", None)
+        if usage is None:
+            return
+        logging.info(
+            "Chat token usage: input=%s output=%s thinking=%s total=%s",
+            getattr(usage, "prompt_token_count", None),
+            getattr(usage, "candidates_token_count", None),
+            getattr(usage, "thoughts_token_count", None),
+            getattr(usage, "total_token_count", None),
+        )
+
     def _call_model(self, summary: dict, question: str) -> ChatModelOutput:
         try:
             response = self.client.models.generate_content(
@@ -100,8 +118,11 @@ class ChatService:
                 config={
                     "system_instruction": prompts.SYSTEM_PROMPT,
                     "response_mime_type": "application/json",
+                    "max_output_tokens": MAX_OUTPUT_TOKENS,
                 },
             )
+            # logged before parsing, so a reply cut off at the token cap still shows up
+            self._log_usage(response)
 
             data = json.loads(response.text)
             return ChatModelOutput(**data)

@@ -68,6 +68,23 @@ class TestTruncateNote:
         assert "ignore all rules" not in prompts.truncate_note(log)["notes"]
 
 
+class TestMostRecent:
+    def test_keeps_newest_up_to_limit_newest_first(self):
+        logs = [{"timestamp": day} for day in (3, 1, 5, 2, 4)]
+        assert prompts.most_recent(logs, limit=3) == [{"timestamp": 5}, {"timestamp": 4}, {"timestamp": 3}]
+
+    def test_fewer_than_limit_returns_all(self):
+        logs = [{"timestamp": 1}, {"timestamp": 2}]
+        assert prompts.most_recent(logs) == [{"timestamp": 2}, {"timestamp": 1}]
+
+    def test_empty(self):
+        assert prompts.most_recent([]) == []
+
+    def test_default_limit(self):
+        logs = [{"timestamp": i} for i in range(prompts.MAX_LOGS_PER_TYPE + 10)]
+        assert len(prompts.most_recent(logs)) == prompts.MAX_LOGS_PER_TYPE
+
+
 class TestBuildContents:
     def test_summary_is_inside_block_and_question_after_it(self):
         summary = {"food_logs": [{"notes": "pasta"}], "reported_triggers": []}

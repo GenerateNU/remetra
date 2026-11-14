@@ -25,6 +25,10 @@ class FakeGeminiClient:
             reply if reply is not None else {"answer": "You logged 2 meals this week.", "triggers_mentioned": []}
         )
         self.error = error
+        # token counts attached to each response; set to None to simulate a response without usage data
+        self.usage = SimpleNamespace(
+            prompt_token_count=100, candidates_token_count=20, thoughts_token_count=5, total_token_count=125
+        )
         self.calls: list[dict] = []
         self.models = self
 
@@ -33,7 +37,7 @@ class FakeGeminiClient:
         if self.error:
             raise self.error
         reply = self.reply(kwargs["contents"]) if callable(self.reply) else self.reply
-        return SimpleNamespace(text=reply if isinstance(reply, str) else json.dumps(reply))
+        return SimpleNamespace(text=reply if isinstance(reply, str) else json.dumps(reply), usage_metadata=self.usage)
 
     @property
     def last_contents(self) -> str:

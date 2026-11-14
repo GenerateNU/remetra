@@ -1,5 +1,6 @@
 """Tests for ChatService against a fake Gemini client, including prompt injection hidden in the user's own notes."""
 
+import logging
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -8,7 +9,7 @@ from chatbot import prompts, safety
 from schemas.food_log import FoodLogCreate
 from schemas.symptom import SymptomCreate
 from schemas.symptom_log import SymptomLogCreate
-from services.chat_service import ChatError, ChatService
+from services.chat_service import MAX_OUTPUT_TOKENS, ChatError, ChatService
 from services.food_log_service import FoodLogService
 from services.symptom_log_service import SymptomLogService
 from services.symptom_service import SymptomService
@@ -55,6 +56,27 @@ class TestAnswers:
         assert fake.last_system_prompt == prompts.SYSTEM_PROMPT
         assert fake.calls[-1]["config"]["response_mime_type"] == "application/json"
         assert fake.last_contents.endswith("Question: How was my week?")
+
+    def test_output_tokens_are_capped(self, db_session, authenticated_user, fake):
+        ChatService().ask(db_session, "How was my week?")
+        assert fake.calls[-1]["config"]["max_output_tokens"] == MAX_OUTPUT_TOKENS
+
+    def test_token_usage_is_logged(self, db_session, authenticated_user, fake, caplog):
+        with caplog.at_level(logging.INFO):
+            ChatService().ask(db_session, "How was my week?")
+        assert "Chat token usage: input=100 output=20 thinking=5 total=125" in caplog.text
+
+    def test_usage_logged_even_when_reply_is_unparseable(self, db_session, authenticated_user, fake, caplog):
+        fake.reply = '{"answer": "cut off mid'
+        with caplog.at_level(logging.INFO), pytest.raises(ChatError):
+            ChatService().ask(db_session, "How was my week?")
+        assert "Chat token usage" in caplog.text
+
+    def test_missing_usage_data_does_not_break_the_answer(self, db_session, authenticated_user, fake, caplog):
+        fake.usage = None
+        with caplog.at_level(logging.INFO):
+            assert ChatService().ask(db_session, "How was my week?").kind == "answer"
+        assert "Chat token usage" not in caplog.text
 
     def test_summary_contains_users_logs_and_trends(self, db_session, authenticated_user, created_food, recent, fake):
         _log_food(db_session, created_food.id, recent, notes="ate at noon")
