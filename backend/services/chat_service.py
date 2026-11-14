@@ -76,7 +76,12 @@ class ChatService:
 
         An empty list means the bot never calls anything a trigger.
         """
-        return [insight["label"] for insight in self.context_builder.get_revealed_insights(db)]
+        # TODO: blocked on ContextBuilder.get_revealed_insights (still NotImplementedError).
+        # Once it lands, return the revealed food/ingredient names from it here, e.g.
+        #   insights = self.context_builder.get_revealed_insights(db, ...)
+        #   return [insight["label"] for insight in insights]
+        # Until then the list stays empty, so every trigger claim is refused.
+        return []
 
     def _food_vocabulary(self, db: Session) -> list[str]:
         """Names and ingredients of the signed-in user's foods, for the answer-text trigger check."""
