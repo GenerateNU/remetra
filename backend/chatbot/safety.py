@@ -80,10 +80,12 @@ _CLAIM = re.compile(
     r"avoid\w*|cut \w+( \w+)? out|cut out|eliminat\w*|stop eating|flare\w*)\b"
 )
 
-# Wording the prompt asks for when logs don't support a claim ("your logs don't show that yet").
 # Splits a sentence into clauses so a hedge only excuses the clause it is in.
-_CONTRAST = re.compile(r"\b(but|though|although|however|that said|still)\b")
+# Non-capturing group on purpose: with a capturing group, re.split would also return the
+# contrast words themselves ("but", "though") as extra list items.
+_CONTRAST = re.compile(r"\b(?:but|though|although|however|that said|still)\b")
 
+# Wording the prompt asks for when logs don't support a claim ("your logs don't show that yet").
 _NO_CLAIM = re.compile(
     r"\b(dont|doesnt|do not|does not|didnt|did not) (yet )?show\b|\bnot (yet|enough)\b|\bno evidence\b|"
     r"\b(cant|cannot|can not) (say|tell)\b|\btoo (early|soon)\b|\bnot (flagged|in your report|one of your)\b"
