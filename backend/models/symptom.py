@@ -8,9 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from database import Base
-from models.symptom_family import SymptomFamily
-
-FAMILY_VALUES = ", ".join(f"'{family}'" for family in SymptomFamily)  # 'GI', 'SKIN', 'HEAD'
+from models.symptom_family import FAMILY_VALUES
 
 
 class Symptom(Base):

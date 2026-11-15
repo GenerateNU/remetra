@@ -9,3 +9,7 @@ class SymptomFamily(enum.StrEnum):
     GI = "GI"
     SKIN = "SKIN"
     HEAD = "HEAD"
+
+
+# SQL literal list for CHECK constraints on family columns
+FAMILY_VALUES = ", ".join(f"'{family}'" for family in SymptomFamily)  # 'GI', 'SKIN', 'HEAD'
