@@ -2,12 +2,15 @@
 
 import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, UniqueConstraint
+from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from database import Base
+from models.symptom_family import SymptomFamily
+
+FAMILY_VALUES = ", ".join(f"'{family}'" for family in SymptomFamily)  # 'GI', 'SKIN', 'HEAD'
 
 
 class Symptom(Base):
@@ -20,6 +23,7 @@ class Symptom(Base):
     name = Column(String, nullable=False)
     location = Column(String, nullable=False)
     sensation = Column(String, nullable=False)
+    family = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     symptom_logs = relationship("SymptomLog", back_populates="symptom")
@@ -31,4 +35,5 @@ class Symptom(Base):
             "sensation",
             name="uq_symptoms_username_location_sensation",
         ),
+        CheckConstraint(f"family IN ({FAMILY_VALUES})", name="ck_symptoms_family"),
     )
