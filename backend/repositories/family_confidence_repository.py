@@ -1,16 +1,14 @@
-import math
+from uuid import UUID
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, contains_eager
 
+from analysis.model_constants import INITIAL_LOG_ODDS
 from models.component import Component
 from models.symptom_family import SymptomFamily
 from models.user_background_total import UserBackgroundTotal
 from models.user_family_confidence import UserFamilyConfidence
-
-INITIAL_CONFIDENCE = 0.04
-INITIAL_LOG_ODDS = math.log(INITIAL_CONFIDENCE / (1 - INITIAL_CONFIDENCE))
 
 
 class FamilyConfidenceRepository:
@@ -66,3 +64,19 @@ class FamilyConfidenceRepository:
         )
         total = db.execute(query).scalar_one_or_none()
         return total if total is not None else 0.0
+
+    def get_confidences(
+            self,
+            db: Session,
+            username: str,
+            family: SymptomFamily,
+            component_ids: list[UUID] | None = None,
+    ) -> list[UserFamilyConfidence]:
+        """Return the user's confidence rows for one family, optionally limited to the given components."""
+        query = sa.select(UserFamilyConfidence).where(
+            UserFamilyConfidence.username == username,
+            UserFamilyConfidence.family == family.value,
+        )
+        if component_ids is not None:
+            query = query.where(UserFamilyConfidence.component_id.in_(component_ids))
+        return list(db.execute(query).scalars().all())
