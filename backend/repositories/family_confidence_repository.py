@@ -96,3 +96,21 @@ class FamilyConfidenceRepository:
         except Exception:
             db.rollback()
             raise
+
+    def add_expected_reactions(
+            self, db: Session, username: str, family: SymptomFamily, amounts: dict[UUID, float]
+            ) -> None:
+        """Add each amount to the matching component's expected_reactions for this family, in one transaction."""
+        try:
+            for component_id, amount in amounts.items():
+                db.execute(
+                    sa.update(UserFamilyConfidence).where(
+                        UserFamilyConfidence.username == username,
+                        UserFamilyConfidence.family == family.value,
+                        UserFamilyConfidence.component_id == component_id,
+                    ).values(expected_reactions=UserFamilyConfidence.expected_reactions + amount)
+                )
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
