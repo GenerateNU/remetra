@@ -80,3 +80,19 @@ class FamilyConfidenceRepository:
         if component_ids is not None:
             query = query.where(UserFamilyConfidence.component_id.in_(component_ids))
         return list(db.execute(query).scalars().all())
+
+    def update_log_odds(self, db: Session, username: str, family: SymptomFamily, deltas: dict[UUID, float]) -> None:
+        """Add each delta to the matching component's log_odds for this family, in one transactiom."""
+        try:
+            for component_id, delta in deltas.items():
+                db.execute(
+                    sa.update(UserFamilyConfidence).where(
+                        UserFamilyConfidence.username == username,
+                        UserFamilyConfidence.family == family.value,
+                        UserFamilyConfidence.component_id == component_id,
+                    ).values(log_odds=UserFamilyConfidence.log_odds + delta)
+                )
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
