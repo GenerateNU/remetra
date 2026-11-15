@@ -114,3 +114,17 @@ class FamilyConfidenceRepository:
         except Exception:
             db.rollback()
             raise
+
+    def add_background_total(self, db: Session, username: str, family: SymptomFamily, amount:float) -> None:
+        """Add an amount to the user's background total for a family."""
+        try:
+            db.execute(
+                sa.update(UserBackgroundTotal).where(
+                    UserBackgroundTotal.username == username,
+                    UserBackgroundTotal.family == family.value,
+                ).values(background_total=UserBackgroundTotal.background_total + amount)
+            )
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
