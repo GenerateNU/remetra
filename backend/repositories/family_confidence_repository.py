@@ -66,11 +66,11 @@ class FamilyConfidenceRepository:
         return total if total is not None else 0.0
 
     def get_confidences(
-            self,
-            db: Session,
-            username: str,
-            family: SymptomFamily,
-            component_ids: list[UUID] | None = None,
+        self,
+        db: Session,
+        username: str,
+        family: SymptomFamily,
+        component_ids: list[UUID] | None = None,
     ) -> list[UserFamilyConfidence]:
         """Return the user's confidence rows for one family, optionally limited to the given components."""
         query = sa.select(UserFamilyConfidence).where(
@@ -82,15 +82,17 @@ class FamilyConfidenceRepository:
         return list(db.execute(query).scalars().all())
 
     def update_log_odds(self, db: Session, username: str, family: SymptomFamily, deltas: dict[UUID, float]) -> None:
-        """Add each delta to the matching component's log_odds for this family, in one transactiom."""
+        """Add each delta to the matching component's log_odds for this family, in one transaction."""
         try:
             for component_id, delta in deltas.items():
                 db.execute(
-                    sa.update(UserFamilyConfidence).where(
+                    sa.update(UserFamilyConfidence)
+                    .where(
                         UserFamilyConfidence.username == username,
                         UserFamilyConfidence.family == family.value,
                         UserFamilyConfidence.component_id == component_id,
-                    ).values(log_odds=UserFamilyConfidence.log_odds + delta)
+                    )
+                    .values(log_odds=UserFamilyConfidence.log_odds + delta)
                 )
             db.commit()
         except Exception:
@@ -98,31 +100,35 @@ class FamilyConfidenceRepository:
             raise
 
     def add_expected_reactions(
-            self, db: Session, username: str, family: SymptomFamily, amounts: dict[UUID, float]
-            ) -> None:
+        self, db: Session, username: str, family: SymptomFamily, amounts: dict[UUID, float]
+    ) -> None:
         """Add each amount to the matching component's expected_reactions for this family, in one transaction."""
         try:
             for component_id, amount in amounts.items():
                 db.execute(
-                    sa.update(UserFamilyConfidence).where(
+                    sa.update(UserFamilyConfidence)
+                    .where(
                         UserFamilyConfidence.username == username,
                         UserFamilyConfidence.family == family.value,
                         UserFamilyConfidence.component_id == component_id,
-                    ).values(expected_reactions=UserFamilyConfidence.expected_reactions + amount)
+                    )
+                    .values(expected_reactions=UserFamilyConfidence.expected_reactions + amount)
                 )
             db.commit()
         except Exception:
             db.rollback()
             raise
 
-    def add_background_total(self, db: Session, username: str, family: SymptomFamily, amount:float) -> None:
+    def add_background_total(self, db: Session, username: str, family: SymptomFamily, amount: float) -> None:
         """Add an amount to the user's background total for a family."""
         try:
             db.execute(
-                sa.update(UserBackgroundTotal).where(
+                sa.update(UserBackgroundTotal)
+                .where(
                     UserBackgroundTotal.username == username,
                     UserBackgroundTotal.family == family.value,
-                ).values(background_total=UserBackgroundTotal.background_total + amount)
+                )
+                .values(background_total=UserBackgroundTotal.background_total + amount)
             )
             db.commit()
         except Exception:
