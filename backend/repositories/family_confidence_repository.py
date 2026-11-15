@@ -1,0 +1,68 @@
+import math
+
+import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.orm import Session, contains_eager
+
+from models.component import Component
+from models.symptom_family import SymptomFamily
+from models.user_background_total import UserBackgroundTotal
+from models.user_family_confidence import UserFamilyConfidence
+
+INITIAL_CONFIDENCE = 0.04
+INITIAL_LOG_ODDS = math.log(INITIAL_CONFIDENCE / (1 - INITIAL_CONFIDENCE))
+
+
+class FamilyConfidenceRepository:
+    """Access to a user's per-family component confidences and background totals."""
+
+    def initialize_for_user(self, db: Session, username: str) -> None:
+        """Insert a confidence row for every component and family, and a background total for every family.
+
+        Idempotent: rows that already exist are left alone, so calling this twice changes nothing.
+        """
+        try:
+            component_ids = db.execute(sa.select(Component.id)).scalars().all()
+            confidence_rows = [
+                {
+                    "username": username,
+                    "component_id": component_id,
+                    "family": family.value,
+                    "log_odds": INITIAL_LOG_ODDS,
+                }
+                for component_id in component_ids
+                for family in SymptomFamily
+            ]
+            if confidence_rows:
+                db.execute(insert(UserFamilyConfidence).values(confidence_rows).on_conflict_do_nothing())
+            background_rows = [{"username": username, "family": family.value} for family in SymptomFamily]
+            db.execute(insert(UserBackgroundTotal).values(background_rows).on_conflict_do_nothing())
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+
+    def has_confidences(self, db: Session, username: str) -> bool:
+        """Return whether the user has any confidence rows yet."""
+        query = sa.select(sa.exists().where(UserFamilyConfidence.username == username))
+        return db.execute(query).scalar()
+
+    def get_all_confidences(self, db: Session, username: str) -> list[UserFamilyConfidence]:
+        """Return every confidence row for the user, with its component loaded, ordered by family then slug."""
+        query = (
+            sa.select(UserFamilyConfidence)
+            .join(UserFamilyConfidence.component)
+            .options(contains_eager(UserFamilyConfidence.component))
+            .where(UserFamilyConfidence.username == username)
+            .order_by(UserFamilyConfidence.family, Component.slug)
+        )
+        return list(db.execute(query).scalars().all())
+
+    def get_background_total(self, db: Session, username: str, family: SymptomFamily) -> float:
+        """Return the user's background total for a family, or 0.0 if they have no row for it."""
+        query = sa.select(UserBackgroundTotal.background_total).where(
+            UserBackgroundTotal.username == username,
+            UserBackgroundTotal.family == family.value,
+        )
+        total = db.execute(query).scalar_one_or_none()
+        return total if total is not None else 0.0
