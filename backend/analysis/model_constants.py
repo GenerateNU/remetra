@@ -19,7 +19,7 @@ BACKGROUND_PRIOR_HOURS = 168
 
 def initial_background_rate(family: SymptomFamily) -> float:
     """Hourly background rate implied by the daily chance of the family's symptoms."""
-    return -math.long(1 - DAILY_BACKGROUND[family]) / 24
+    return -math.log(1 - DAILY_BACKGROUND[family]) / 24
 
 
 def background_rate(family: SymptomFamily, background_total: float, hours_observed: float) -> float:
