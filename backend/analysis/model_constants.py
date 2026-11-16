@@ -24,6 +24,25 @@ REACTION_CHANCE = {
 }
 
 
+# T_f: meal lookback window per family (hours)
+LOOKBACK_HOURS = {
+    SymptomFamily.GI: 36,
+    SymptomFamily.HEAD: 36,
+    SymptomFamily.SKIN: 48,
+}
+
+# Timing curve parameters: (median_hours, spread)
+# GI and HEAD use a single log-normal; SKIN mixes an early and a late curve
+TIMING_PARAMS = {
+    SymptomFamily.GI: [(4, 0.8)],
+    SymptomFamily.HEAD: [(8, 0.8)],
+    SymptomFamily.SKIN: [(1, 0.7), (24, 0.5)],
+}
+
+# SKIN mixing weight: 50% early, 50% late
+SKIN_EARLY_WEIGHT = 0.5
+
+
 def initial_background_rate(family: SymptomFamily) -> float:
     """Hourly background rate implied by the daily chance of the family's symptoms."""
     return -math.log(1 - DAILY_BACKGROUND[family]) / 24
