@@ -6,8 +6,9 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from analysis.model_constants import LOOKBACK_HOURS
 from analysis.model_constants import background_rate as compute_background_rate
-from analysis.timing import meal_strength
+from analysis.timing import expected_reaction_penalty, meal_strength, timing_share
 from models.symptom_family import SymptomFamily
 from repositories.family_confidence_repository import FamilyConfidenceRepository
 from repositories.taxonomy_repository import TaxonomyRepository
@@ -74,9 +75,7 @@ class FamilyConfidenceService:
             for slug, product in by_component.items()
         ]
 
-    def get_background_rate(
-        self, db: Session, username: str, family: SymptomFamily, since: datetime
-    ) -> float:
+    def get_background_rate(self, db: Session, username: str, family: SymptomFamily, since: datetime) -> float:
         """Return the hourly background rate for a family, mixing prior with observed data."""
         user = self.user_repo.get_by_username(db, username)
         if user is None:
@@ -90,3 +89,57 @@ class FamilyConfidenceService:
         hours_observed = (now - since).total_seconds() / 3600
         background_total = self.repo.get_background_total(db, username, family)
         return compute_background_rate(family, background_total, hours_observed)
+
+    def apply_expected_reactions(
+        self,
+        db: Session,
+        username: str,
+        ingredient_id: UUID,
+        family: SymptomFamily,
+        start_hours: float,
+        end_hours: float,
+    ) -> list[FamilyConfidenceResponse]:
+        """Lower confidences for the ingredient's component for the part of its timing window
+        between 'start_hours' and 'end_hours' after eating.
+
+        Returns the updated confidences for the components that changed.
+        """
+        if start_hours > end_hours:
+            raise ValueError(f"start_hours ({start_hours}) cannot be after end_hours ({end_hours})")
+        span_start = max(0.0, start_hours)
+        span_end = min(LOOKBACK_HOURS[family], end_hours)
+        if span_start >= span_end:
+            return []
+
+        self.ensure_initialized(db, username)
+        strengths = self._meal_strengths(family, self._component_exposures(db, ingredient_id))
+        if not strengths:
+            return []
+
+        share = timing_share(family, span_start, span_end)
+        penalties = expected_reaction_penalty(strengths, share)
+        expected = {component_id: -penalty for component_id, penalty in penalties.items()}
+
+        try:
+            self.repo.update_log_odds(db, username, family, penalties, commit=False)
+            self.repo.add_expected_reactions(db, username, family, expected, commit=False)
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+
+        return self._confidence_responses(db, username, family, list(penalties))
+
+    def _confidence_responses(
+        self, db: Session, username: str, family: SymptomFamily, component_ids: list[UUID]
+    ) -> list[FamilyConfidenceResponse]:
+        """Return the current confidences for the given components, with q = 1 / (1 + e^{-log_odds})."""
+        rows = self.repo.get_confidences(db, username, family, component_ids)
+        return [
+            FamilyConfidenceResponse(
+                component_slug=row.component.slug,
+                family=row.family,
+                confidence=1 / (1 + math.exp(-row.log_odds)),
+            )
+            for row in rows
+        ]
