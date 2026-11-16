@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
@@ -25,4 +26,20 @@ class TaxonomyRepository:
             .where(sa.or_(sa.func.lower(Ingredient.slug) == key, sa.func.lower(Ingredient.canonical_name) == key))
             .order_by(Component.slug)
         )
-        return [(slug, level) for slug, level in db.execute(query).all()]
+        return [(slug, concentration_level) for slug, concentration_level in db.execute(query).all()]
+
+    def get_components_for_ingredient_id(self, db: Session, ingredient_id: UUID) -> list[tuple[UUID, int]] | None:
+        """Return (component_id, concentration_level) pairs for an ingredient, ordered by component_id.
+
+        Returns None if the ingredient doesn't exist, and [] if it exists but has no components.
+        Level-0 components are included; callers decide whether to skip them.
+        """
+        logging.info(f"Retrieving components for ingredient id {ingredient_id} from database")
+        if db.get(Ingredient, ingredient_id) is None:
+            return None
+        query = (
+            sa.select(IngredientComponent.component_id, IngredientComponent.concentration_level)
+            .where(IngredientComponent.ingredient_id == ingredient_id)
+            .order_by(IngredientComponent.component_id)
+        )
+        return [(component_id, concentration_level) for component_id, concentration_level in db.execute(query).all()]

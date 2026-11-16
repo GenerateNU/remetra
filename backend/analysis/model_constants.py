@@ -16,6 +16,13 @@ INITIAL_LOG_ODDS = math.log(P0 / (1 - P0))
 
 BACKGROUND_PRIOR_HOURS = 168
 
+# s_f: chance a real trigger causes a reaction in the family from one full serving
+REACTION_CHANCE = {
+    SymptomFamily.GI: 0.40,
+    SymptomFamily.SKIN: 0.30,
+    SymptomFamily.HEAD: 0.25,
+}
+
 
 def initial_background_rate(family: SymptomFamily) -> float:
     """Hourly background rate implied by the daily chance of the family's symptoms."""
