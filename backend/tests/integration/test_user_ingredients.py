@@ -3,8 +3,11 @@
 from uuid import uuid4
 
 import pytest
+from sqlalchemy import delete
 
+from models.component import Component
 from models.ingredient import Ingredient
+from models.ingredient_component import IngredientComponent
 from models.user import User
 from models.user_ingredient import UserIngredient
 
@@ -123,3 +126,119 @@ class TestUserIngredientCascade:
 
         remaining = db_session.query(UserIngredient).filter(UserIngredient.username == authenticated_user["username"])
         assert remaining.all() == []
+
+
+def _component(slug: str) -> Component:
+    return Component(
+        slug=slug,
+        display_name=slug,
+        category="fodmap",
+        inclusion_confidence="high",
+        prior_tier="high",
+    )
+
+
+def _link(db_session, ingredient: Ingredient, component: Component) -> None:
+    db_session.add(
+        IngredientComponent(
+            ingredient_id=ingredient.id,
+            component_id=component.id,
+            concentration_level=3,
+            confidence="high",
+        )
+    )
+
+
+@pytest.fixture
+def onboarding_taxonomy(db_session):
+    """A few taxonomy rows the onboarding labels resolve through."""
+    for model in (IngredientComponent, Ingredient, Component):
+        db_session.execute(delete(model))
+    lactose, gluten, meat = _component("lactose"), _component("gluten"), _component("mammalian_meat")
+    milk = Ingredient(slug="milk", canonical_name="milk")
+    bread = Ingredient(slug="wheat_bread", canonical_name="wheat bread")
+    pork = Ingredient(slug="pork", canonical_name="pork")
+    beef = Ingredient(slug="beef", canonical_name="beef")
+    coffee = Ingredient(slug="coffee", canonical_name="coffee")
+    db_session.add_all([lactose, gluten, meat, milk, bread, pork, beef, coffee])
+    db_session.flush()
+    _link(db_session, milk, lactose)
+    _link(db_session, bread, gluten)
+    _link(db_session, pork, meat)
+    _link(db_session, beef, meat)
+    db_session.flush()
+
+
+def _put_labels(test_client, avoid=(), suspect=(), safe=()):
+    return test_client.put(
+        "/users/me/ingredients/labels",
+        json={"avoid": list(avoid), "suspect": list(suspect), "safe": list(safe)},
+    )
+
+
+class TestOnboardingLabels:
+    """Onboarding chips are stored as ingredient preferences."""
+
+    def test_labels_resolve_to_ingredient_lists(self, test_client, authenticated_user, onboarding_taxonomy):
+        """Dairy, gluten, and coffee labels come back as the ingredients in those groups."""
+        response = _put_labels(test_client, avoid=["Dairy"], suspect=["Gluten"], safe=["Coffee"])
+
+        assert response.status_code == 200, response.text
+        body = test_client.get("/users/me/ingredients").json()
+        assert _names(body["avoid"]) == ["milk"]
+        assert _names(body["suspect"]) == ["wheat bread"]
+        assert _names(body["safe"]) == ["coffee"]
+
+    def test_empty_labels_clear_saved_preferences(self, test_client, authenticated_user, onboarding_taxonomy):
+        """Skipping every food screen stores empty lists."""
+        _put_labels(test_client, avoid=["Dairy"])
+
+        response = _put_labels(test_client)
+
+        assert response.status_code == 200, response.text
+        assert response.json() == {"avoid": [], "suspect": [], "safe": []}
+
+    def test_unknown_label_returns_422_and_writes_nothing(self, test_client, authenticated_user, onboarding_taxonomy):
+        """An unknown chip is rejected and the previous save stays in place."""
+        _put_labels(test_client, avoid=["Dairy"])
+
+        response = _put_labels(test_client, avoid=["Not a food"])
+
+        assert response.status_code == 422
+        body = test_client.get("/users/me/ingredients").json()
+        assert _names(body["avoid"]) == ["milk"]
+
+    def test_avoid_wins_when_a_food_is_also_marked_safe(self, test_client, authenticated_user, onboarding_taxonomy):
+        """Pork stays avoided when red meat, which also contains pork, is marked safe."""
+        response = _put_labels(test_client, avoid=["Pork"], suspect=["Coffee"], safe=["Red meat", "Coffee"])
+
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert _names(body["avoid"]) == ["pork"]
+        assert _names(body["suspect"]) == ["coffee"]
+        assert _names(body["safe"]) == ["beef"]
+
+    def test_a_label_with_no_matching_ingredients_saves_the_rest(
+        self, test_client, authenticated_user, onboarding_taxonomy
+    ):
+        """A known group that is absent from the taxonomy does not block the other groups."""
+        response = _put_labels(test_client, avoid=["Mushrooms", "Dairy"])
+
+        assert response.status_code == 200, response.text
+        assert _names(response.json()["avoid"]) == ["milk"]
+
+
+class TestOnboardingDisease:
+    """Finishing onboarding writes disease, including an empty list."""
+
+    def test_new_user_disease_is_null_and_empty_list_is_stored(self, test_client, authenticated_user, db_session):
+        """Null means onboarding has not been saved. [] means it was saved with nothing selected."""
+        user = db_session.get(User, authenticated_user["username"])
+        assert user.disease is None
+
+        response = test_client.put("/auth/me", json={"disease": []})
+
+        assert response.status_code == 200, response.text
+        assert response.json()["disease"] == []
+        db_session.expire_all()
+        assert db_session.get(User, authenticated_user["username"]).disease == []

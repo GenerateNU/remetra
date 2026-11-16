@@ -1,34 +1,48 @@
-import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { ScrollView, Text, View } from 'react-native';
 import { ChoiceChip, OnboardingChrome } from './OnboardingChrome';
-import { NONE_CONDITION, REGULAR_OPTIONS, useOnboardingStore } from '../../store/onboardingStore';
+import { onboardingAnswers } from './onboardingAnswers';
+import { REGULAR_OPTIONS, useOnboardingStore } from '../../store/onboardingStore';
 import { useAuthStore } from '../../store/useAuthStore';
+import { ApiError } from '../../api/client';
 import { authService } from '../../api/auth_service';
+import { ingredientService } from '../../api/ingredient_service';
 import { useAppNavigation } from '../../navigation/hooks';
 
 export function RegularsScreen() {
   const navigation = useAppNavigation();
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const savingRef = useRef(false);
   const regulars = useOnboardingStore((state) => state.regulars);
   const toggleRegular = useOnboardingStore((state) => state.toggleRegular);
   const completeOnboarding = useAuthStore((state) => state.completeOnboarding);
   const updateUserProfile = useAuthStore((state) => state.updateUserProfile);
 
   const finish = async () => {
-    if (saving) return;
+    if (savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
-    const conditions = useOnboardingStore
-      .getState()
-      .conditions.filter((condition) => condition !== NONE_CONDITION);
+    setError(null);
+    const answers = onboardingAnswers(useOnboardingStore.getState());
     try {
-      if (conditions.length > 0) {
-        const me = await authService.updateProfile({ disease: conditions });
-        updateUserProfile({ disease: me.disease ?? conditions });
+      await ingredientService.replaceLabels({
+        avoid: answers.avoid,
+        suspect: answers.suspect,
+        safe: answers.safe,
+      });
+      const me = await authService.updateProfile({ disease: answers.disease });
+      if (me.disease == null) {
+        throw new ApiError('Could not save your answers. Please try again.');
       }
-    } catch {
-      // The local flag still lets them into the app if the profile save fails.
+      updateUserProfile({ disease: me.disease });
+      completeOnboarding();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not save your answers. Please try again.');
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
     }
-    completeOnboarding();
   };
 
   return (
@@ -43,6 +57,9 @@ export function RegularsScreen() {
       onSkip={finish}
     >
       <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="pb-6">
+        {error ? (
+          <Text className="mb-4 font-figtree text-[14px] leading-5 text-red-400">{error}</Text>
+        ) : null}
         <View className="flex-row flex-wrap gap-3">
           {REGULAR_OPTIONS.map((option) => (
             <ChoiceChip
