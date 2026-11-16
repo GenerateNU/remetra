@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 import pytest
 from sqlalchemy import delete
 
-from analysis.model_constants import BACKGROUND_PRIOR_HOURS, INITIAL_LOG_ODDS, P0
+from analysis.model_constants import INITIAL_LOG_ODDS, P0
 from models.component import Component
 from models.symptom_family import SymptomFamily
 from models.user import User
@@ -258,11 +258,13 @@ class TestFamilyConfidenceService:
         repo = FamilyConfidenceRepository()
         repo.initialize_for_user(db_session, user.username)
 
-        before = [r for r in service.get_component_confidences(db_session, user.username) if r.component_slug == "gluten"][0]
+        results = service.get_component_confidences(db_session, user.username)
+        before = [r for r in results if r.component_slug == "gluten"][0]
 
         repo.update_log_odds(db_session, user.username, SymptomFamily.GI, {gluten.id: 3.0})
 
-        after = [r for r in service.get_component_confidences(db_session, user.username) if r.component_slug == "gluten"][0]
+        results = service.get_component_confidences(db_session, user.username)
+        after = [r for r in results if r.component_slug == "gluten"][0]
         assert after.confidence > before.confidence
 
     def test_get_background_rate_raises_if_before_creation(self, db_session, setup_user_and_components):
