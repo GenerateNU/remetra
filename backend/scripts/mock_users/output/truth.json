@@ -1,0 +1,287 @@
+{
+  "seed": 42,
+  "end_date": "2026-11-02",
+  "days": 60,
+  "users": [
+    {
+      "username": "mock_001",
+      "user_type": "onion_garlic",
+      "trigger": {
+        "component": "fructans_allium",
+        "delay_min_hours": 2.0,
+        "delay_max_hours": 12.0,
+        "symptom": {
+          "sensation": "Bloating",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 28,
+      "planted_reactions": 28,
+      "background_symptoms": 10
+    },
+    {
+      "username": "mock_002",
+      "user_type": "lactose",
+      "trigger": {
+        "component": "lactose",
+        "delay_min_hours": 1.0,
+        "delay_max_hours": 6.0,
+        "symptom": {
+          "sensation": "Cramping",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 61,
+      "planted_reactions": 59,
+      "background_symptoms": 8
+    },
+    {
+      "username": "mock_003",
+      "user_type": "alcohol",
+      "trigger": {
+        "component": "alcohol",
+        "delay_min_hours": 6.0,
+        "delay_max_hours": 14.0,
+        "symptom": {
+          "sensation": "Throbbing",
+          "location": "Head"
+        }
+      },
+      "trigger_meals": 9,
+      "planted_reactions": 8,
+      "background_symptoms": 6
+    },
+    {
+      "username": "mock_004",
+      "user_type": "no_trigger",
+      "trigger": null,
+      "trigger_meals": 0,
+      "planted_reactions": 0,
+      "background_symptoms": 7
+    },
+    {
+      "username": "mock_005",
+      "user_type": "onion_garlic",
+      "trigger": {
+        "component": "fructans_allium",
+        "delay_min_hours": 2.0,
+        "delay_max_hours": 12.0,
+        "symptom": {
+          "sensation": "Bloating",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 26,
+      "planted_reactions": 22,
+      "background_symptoms": 7
+    },
+    {
+      "username": "mock_006",
+      "user_type": "lactose",
+      "trigger": {
+        "component": "lactose",
+        "delay_min_hours": 1.0,
+        "delay_max_hours": 6.0,
+        "symptom": {
+          "sensation": "Cramping",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 41,
+      "planted_reactions": 41,
+      "background_symptoms": 8
+    },
+    {
+      "username": "mock_007",
+      "user_type": "alcohol",
+      "trigger": {
+        "component": "alcohol",
+        "delay_min_hours": 6.0,
+        "delay_max_hours": 14.0,
+        "symptom": {
+          "sensation": "Throbbing",
+          "location": "Head"
+        }
+      },
+      "trigger_meals": 13,
+      "planted_reactions": 13,
+      "background_symptoms": 15
+    },
+    {
+      "username": "mock_008",
+      "user_type": "no_trigger",
+      "trigger": null,
+      "trigger_meals": 0,
+      "planted_reactions": 0,
+      "background_symptoms": 10
+    },
+    {
+      "username": "mock_009",
+      "user_type": "onion_garlic",
+      "trigger": {
+        "component": "fructans_allium",
+        "delay_min_hours": 2.0,
+        "delay_max_hours": 12.0,
+        "symptom": {
+          "sensation": "Bloating",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 39,
+      "planted_reactions": 39,
+      "background_symptoms": 9
+    },
+    {
+      "username": "mock_010",
+      "user_type": "lactose",
+      "trigger": {
+        "component": "lactose",
+        "delay_min_hours": 1.0,
+        "delay_max_hours": 6.0,
+        "symptom": {
+          "sensation": "Cramping",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 50,
+      "planted_reactions": 50,
+      "background_symptoms": 5
+    },
+    {
+      "username": "mock_011",
+      "user_type": "alcohol",
+      "trigger": {
+        "component": "alcohol",
+        "delay_min_hours": 6.0,
+        "delay_max_hours": 14.0,
+        "symptom": {
+          "sensation": "Throbbing",
+          "location": "Head"
+        }
+      },
+      "trigger_meals": 17,
+      "planted_reactions": 14,
+      "background_symptoms": 5
+    },
+    {
+      "username": "mock_012",
+      "user_type": "no_trigger",
+      "trigger": null,
+      "trigger_meals": 0,
+      "planted_reactions": 0,
+      "background_symptoms": 12
+    },
+    {
+      "username": "mock_013",
+      "user_type": "onion_garlic",
+      "trigger": {
+        "component": "fructans_allium",
+        "delay_min_hours": 2.0,
+        "delay_max_hours": 12.0,
+        "symptom": {
+          "sensation": "Bloating",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 62,
+      "planted_reactions": 60,
+      "background_symptoms": 8
+    },
+    {
+      "username": "mock_014",
+      "user_type": "lactose",
+      "trigger": {
+        "component": "lactose",
+        "delay_min_hours": 1.0,
+        "delay_max_hours": 6.0,
+        "symptom": {
+          "sensation": "Cramping",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 84,
+      "planted_reactions": 84,
+      "background_symptoms": 8
+    },
+    {
+      "username": "mock_015",
+      "user_type": "alcohol",
+      "trigger": {
+        "component": "alcohol",
+        "delay_min_hours": 6.0,
+        "delay_max_hours": 14.0,
+        "symptom": {
+          "sensation": "Throbbing",
+          "location": "Head"
+        }
+      },
+      "trigger_meals": 2,
+      "planted_reactions": 2,
+      "background_symptoms": 7
+    },
+    {
+      "username": "mock_016",
+      "user_type": "no_trigger",
+      "trigger": null,
+      "trigger_meals": 0,
+      "planted_reactions": 0,
+      "background_symptoms": 7
+    },
+    {
+      "username": "mock_017",
+      "user_type": "onion_garlic",
+      "trigger": {
+        "component": "fructans_allium",
+        "delay_min_hours": 2.0,
+        "delay_max_hours": 12.0,
+        "symptom": {
+          "sensation": "Bloating",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 36,
+      "planted_reactions": 35,
+      "background_symptoms": 2
+    },
+    {
+      "username": "mock_018",
+      "user_type": "lactose",
+      "trigger": {
+        "component": "lactose",
+        "delay_min_hours": 1.0,
+        "delay_max_hours": 6.0,
+        "symptom": {
+          "sensation": "Cramping",
+          "location": "Abdomen"
+        }
+      },
+      "trigger_meals": 74,
+      "planted_reactions": 74,
+      "background_symptoms": 16
+    },
+    {
+      "username": "mock_019",
+      "user_type": "alcohol",
+      "trigger": {
+        "component": "alcohol",
+        "delay_min_hours": 6.0,
+        "delay_max_hours": 14.0,
+        "symptom": {
+          "sensation": "Throbbing",
+          "location": "Head"
+        }
+      },
+      "trigger_meals": 5,
+      "planted_reactions": 4,
+      "background_symptoms": 6
+    },
+    {
+      "username": "mock_020",
+      "user_type": "no_trigger",
+      "trigger": null,
+      "trigger_meals": 0,
+      "planted_reactions": 0,
+      "background_symptoms": 8
+    }
+  ]
+}

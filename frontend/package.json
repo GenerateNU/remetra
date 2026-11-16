@@ -33,10 +33,13 @@
     "expo-auth-session": "~58.0.17",
     "expo-blur": "~58.0.5",
     "expo-camera": "~58.0.14",
+    "expo-clipboard": "~58.0.4",
     "expo-crypto": "~58.0.7",
     "expo-font": "~58.0.11",
     "expo-linear-gradient": "~58.0.3",
+    "expo-print": "~58.0.8",
     "expo-secure-store": "~58.0.2",
+    "expo-sharing": "~58.0.22",
     "expo-splash-screen": "~58.0.13",
     "expo-status-bar": "~58.0.4",
     "expo-web-browser": "~58.0.7",
@@ -68,6 +71,7 @@
     "jest": "~30.5.2",
     "jest-expo": "~58.0.14",
     "react-native-dotenv": "^3.4.11",
+    "react-native-svg-transformer": "^1.5.3",
     "react-test-renderer": "19.3.0",
     "tailwindcss": "^3.4.19",
     "typescript": "~6.0.3"
@@ -79,7 +83,10 @@
     ],
     "setupFiles": [
       "<rootDir>/jest.setup.js"
-    ]
+    ],
+    "moduleNameMapper": {
+      "\\.svg$": "<rootDir>/__mocks__/svgMock.js"
+    }
   },
   "private": true
 }

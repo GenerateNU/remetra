@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle id="Avatar" cx="28" cy="28" r="28" fill="url(#paint0_radial_0_37)"/>
+<defs>
+<radialGradient id="paint0_radial_0_37" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(28 28) scale(28)">
+<stop stop-color="#F26A5B"/>
+<stop offset="0.35" stop-color="#F7A35C"/>
+<stop offset="0.68" stop-color="#FFE3A6" stop-opacity="0.85"/>
+<stop offset="1" stop-color="#FFE3A6" stop-opacity="0"/>
+</radialGradient>
+</defs>
+</svg>

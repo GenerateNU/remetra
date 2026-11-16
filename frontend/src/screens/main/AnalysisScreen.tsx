@@ -8,6 +8,7 @@ import { useBankStore } from '../../store/bankStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
 import { useAppNavigation } from '../../navigation/hooks';
+import { AskEntryCard } from '../../components/ask/AskEntryCard';
 import { ChevronRight } from 'lucide-react-native';
 
 const MIN_LOGS_FOR_ANALYSIS = 30;
@@ -22,6 +23,7 @@ interface SymptomCount {
 }
 
 export function AnalysisScreen() {
+  const navigation = useAppNavigation();
   const { symptoms, fetchSymptoms } = useBankStore();
   const username = useAuthStore((s) => s.user.name);
   const { runAlgorithm } = useAlgorithmStore();
@@ -100,6 +102,14 @@ export function AnalysisScreen() {
         <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[1px] text-center mb-8">
           YOUR ANALYSIS
         </Text>
+
+        <View className="mb-6">
+          <AskEntryCard
+            title="Ask about your results"
+            subtitle="Get answers from your own logs"
+            onPress={() => navigation.navigate('AskRemetra', { entry: 'insights' })}
+          />
+        </View>
 
         <SectionDivider label="Symptoms by Occurrences"/>
 

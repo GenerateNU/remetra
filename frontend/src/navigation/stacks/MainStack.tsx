@@ -7,11 +7,14 @@ import { AboutScreen } from '../../screens/main/AboutScreen';
 import { EditWeightScreen } from '../../screens/main/EditWeightScreen';
 import { EditConditionsScreen } from '../../screens/main/EditConditionsScreen';
 import { EditMedicationsScreen } from '../../screens/main/EditMedicationsScreen';
+import { AskRemetraScreen } from '../../screens/main/AskRemetraScreen';
+import type { AskEntry } from '../../types/chat';
 
 export type MainStackParamList = {
   Tabs: undefined;
   BarcodeScanner: { onScanned?: (food: { name: string; ingredients: string[] }) => void };
   Correlations: { initialSymptomId?: string } | undefined;
+  AskRemetra: { entry?: AskEntry } | undefined;
   About: undefined;
   EditWeight: undefined;
   EditConditions: undefined;
@@ -25,6 +28,7 @@ export const MainStack = () => (
     <Stack.Screen name="Tabs" component={MainTabs} />
     <Stack.Screen name="BarcodeScanner" component={BarcodeScannerScreen} />
     <Stack.Screen name="Correlations" component={CorrelationsScreen} />
+    <Stack.Screen name="AskRemetra" component={AskRemetraScreen} options={{ gestureEnabled: true }} />
     <Stack.Screen
       name="About"
       component={AboutScreen}

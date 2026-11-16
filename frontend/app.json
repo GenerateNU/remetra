@@ -38,7 +38,8 @@
       "@react-native-community/datetimepicker",
       "@clerk/expo",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-sharing"
     ],
     "extra": {
       "eas": {
