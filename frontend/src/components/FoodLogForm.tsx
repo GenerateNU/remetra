@@ -10,25 +10,32 @@ import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { ArrowLeft, Camera } from "lucide-react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 
+export interface FoodPrefill {
+  name: string;
+  ingredients: string[];
+  timestamp?: Date;
+}
+
 interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
   onBack: () => void;
   onCloseModal: () => void;
+  prefill?: FoodPrefill;
 }
 
-export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCloseModal }) => {
+export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCloseModal, prefill }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
   const navigation = useNavigation<any>();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
-  const [isCustom, setIsCustom] = useState(Boolean(useBankStore.getState().scannedFood));
+  const [isCustom, setIsCustom] = useState(Boolean(prefill ?? useBankStore.getState().scannedFood));
 
   const { scannedFood, setScannedFood } = useBankStore();
-  const [customName, setCustomName] = useState(scannedFood?.name ?? "");
+  const [customName, setCustomName] = useState(prefill?.name ?? scannedFood?.name ?? "");
   const [customIngredients, setCustomIngredients] = useState<string[]>(
-    scannedFood?.ingredients ?? []
+    prefill?.ingredients ?? scannedFood?.ingredients ?? []
   );
 
   useEffect(() => {
@@ -38,7 +45,7 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
   }, [scannedFood, setScannedFood]);
 
   const [servings, setServings] = useState("1");
-  const [timestamp, setTimestamp] = useState(new Date());
+  const [timestamp, setTimestamp] = useState(prefill?.timestamp ?? new Date());
   const [notes, setNotes] = useState("");
 
   const filtered = foods.filter((f) =>

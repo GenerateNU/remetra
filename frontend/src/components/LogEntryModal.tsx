@@ -3,7 +3,7 @@ import { useState } from "react";
 import { X, Utensils, Stethoscope } from "lucide-react-native";
 
 import { LogEntry, ModalStep } from "../types/logs";
-import { FoodLogForm } from "./FoodLogForm";
+import { FoodLogForm, FoodPrefill } from "./FoodLogForm";
 import { SymptomLogForm } from "./SymptomLogForm";
 
 interface LogEntryModalProps {
@@ -11,8 +11,9 @@ interface LogEntryModalProps {
   onClose: () => void;
   onLogEntry: (entry: LogEntry) => void;
   initialStep?: ModalStep; 
+  foodPrefill?: FoodPrefill;
 }
-const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep }) => {
+const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep, foodPrefill }) => {
   const [step, setStep] = useState<ModalStep>(initialStep ?? "select_type");
   const [openSnapshot, setOpenSnapshot] = useState({ visible, initialStep });
 
@@ -84,6 +85,7 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
 
             {step === "food" && (
               <FoodLogForm 
+              prefill={foodPrefill}
               onSubmit={handleSubmit} 
               onBack={() => setStep("select_type")} 
               onCloseModal={handleClose} /> 

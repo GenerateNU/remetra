@@ -40,6 +40,22 @@ module.exports = {
         'remetra-text-tertiary':  '#7a7068',
         'remetra-line-subtle':    '#f4f0ec',
         'remetra-ember-end':      '#ffe09e',
+        // Insight states (Ask Remetra, Insights)
+        'remetra-trigger-bg':     '#fffbeb',
+        'remetra-trigger-line':   '#f59e0b',
+        'remetra-trigger-text':   '#78350f',
+        'remetra-fine-bg':        '#f0fdf4',
+        'remetra-fine-line':      '#247f48',
+        'remetra-fine-text':      '#065f46',
+        // Symptom calendar + intensity
+        'remetra-day-symptoms':   '#c9a3c9',
+        'remetra-day-clear':      '#fbd7bf',
+        'remetra-day-unlogged':   '#f1ebe6',
+        'remetra-day-unlogged-line': '#cdbfb5',
+        'remetra-intensity-off':  '#eadfd7',
+        // Safety banner
+        'remetra-emergency':      '#2a1f1a',
+        'remetra-emergency-label': '#3b2230',
       },
       fontSize: {
         // Brand wordmark used across onboarding screens
@@ -51,6 +67,7 @@ module.exports = {
         prata:             ['Prata_400Regular'],
         figtree:           ['Figtree_400Regular'],
         'figtree-semibold': ['Figtree_600SemiBold'],
+        'figtree-bold':     ['Figtree_700Bold'],
       },
     },
   },

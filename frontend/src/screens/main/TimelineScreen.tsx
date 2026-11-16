@@ -15,6 +15,9 @@ import { foodLogService, FoodLogResponse } from '../../api/food_log_service';
 import { symptomLogService, SymptomLogResponse } from '../../api/symptom_log_service';
 import { useBankStore } from '../../store/bankStore';
 import { useUIStore } from '../../store/uiStore';
+import { useAppNavigation } from '../../navigation/hooks';
+import { AskEntryCard } from '../../components/ask/AskEntryCard';
+import { CHAT_USES_MOCK } from '../../api/chat_service';
 import { TimelineEntry, FoodTimelineEntry, SymptomTimelineEntry } from '../../types/timeline';
 
 // ─── screen-local helpers ─────────────────────────────────────────────────────
@@ -46,6 +49,7 @@ function groupByDate(entries: TimelineEntry[]): { dateKey: string; label: string
 // ─── screen ───────────────────────────────────────────────────────────────────
 
 export function TimelineScreen() {
+  const navigation = useAppNavigation();
   const { foods, symptoms, fetchFoods, fetchSymptoms, scannedFood } = useBankStore();
   const openLogModal = useUIStore((s) => s.openLogModal);
   const logVersion = useUIStore((s) => s.logVersion);
@@ -183,6 +187,14 @@ export function TimelineScreen() {
             <Text className="text-white text-base font-semibold">+</Text>
             <Text className="text-white text-[13px] font-medium">Add Log</Text>
           </TouchableOpacity>
+        </View>
+
+        <View className="px-5 mb-4">
+          <AskEntryCard
+            title={CHAT_USES_MOCK ? 'Log by chatting' : 'Ask about your logs'}
+            subtitle={CHAT_USES_MOCK ? 'Tell me what you ate or how you feel' : 'Get answers from your food and symptom logs'}
+            onPress={() => navigation.navigate('AskRemetra', { entry: 'log' })}
+          />
         </View>
 
         {/* Legend */}

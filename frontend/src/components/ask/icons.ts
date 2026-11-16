@@ -1,0 +1,17 @@
+export { default as Avatar28 } from '../../assets/ask/avatar-28.svg';
+export { default as Avatar56 } from '../../assets/ask/avatar-56.svg';
+export { default as CaretLeftIcon } from '../../assets/ask/caret-left.svg';
+export { default as CaretRightIcon } from '../../assets/ask/caret-right.svg';
+export { default as CheckSuccessIcon } from '../../assets/ask/check-success.svg';
+export { default as CheckWhiteIcon } from '../../assets/ask/check-white.svg';
+export { default as ClockStarterIcon } from '../../assets/ask/clock-starter.svg';
+export { default as ClockTagIcon } from '../../assets/ask/clock-tag.svg';
+export { default as ForkKnifeIcon } from '../../assets/ask/fork-knife.svg';
+export { default as NotebookIcon } from '../../assets/ask/notebook.svg';
+export { default as SparkleChipIcon } from '../../assets/ask/sparkle-chip.svg';
+export { default as SparkleEntryIcon } from '../../assets/ask/sparkle-entry.svg';
+export { default as SparkleInsightIcon } from '../../assets/ask/sparkle-insight.svg';
+export { default as SparkleSendIcon } from '../../assets/ask/sparkle-send.svg';
+export { default as SparkleStarterIcon } from '../../assets/ask/sparkle-starter.svg';
+export { default as SparkleTagIcon } from '../../assets/ask/sparkle-tag.svg';
+export { default as WarningIcon } from '../../assets/ask/warning.svg';
