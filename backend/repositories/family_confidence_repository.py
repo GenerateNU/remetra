@@ -81,7 +81,14 @@ class FamilyConfidenceRepository:
             query = query.where(UserFamilyConfidence.component_id.in_(component_ids))
         return list(db.execute(query).scalars().all())
 
-    def update_log_odds(self, db: Session, username: str, family: SymptomFamily, deltas: dict[UUID, float]) -> None:
+    def update_log_odds(
+        self,
+        db: Session,
+        username: str,
+        family: SymptomFamily,
+        deltas: dict[UUID, float],
+        commit: bool = True,
+    ) -> None:
         """Add each delta to the matching component's log_odds for this family, in one transaction."""
         try:
             for component_id, delta in deltas.items():
@@ -94,13 +101,19 @@ class FamilyConfidenceRepository:
                     )
                     .values(log_odds=UserFamilyConfidence.log_odds + delta)
                 )
-            db.commit()
+            if commit:
+                db.commit()
         except Exception:
             db.rollback()
             raise
 
     def add_expected_reactions(
-        self, db: Session, username: str, family: SymptomFamily, amounts: dict[UUID, float]
+        self,
+        db: Session,
+        username: str,
+        family: SymptomFamily,
+        amounts: dict[UUID, float],
+        commit: bool = True,
     ) -> None:
         """Add each amount to the matching component's expected_reactions for this family, in one transaction."""
         try:
@@ -114,7 +127,8 @@ class FamilyConfidenceRepository:
                     )
                     .values(expected_reactions=UserFamilyConfidence.expected_reactions + amount)
                 )
-            db.commit()
+            if commit:
+                db.commit()
         except Exception:
             db.rollback()
             raise
