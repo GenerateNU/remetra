@@ -1,4 +1,4 @@
-"""Fixed values for model v2, from docs/model-vs-draft.md (Starting values)."""
+"""Fixed values for model v2, from docs/model-v2-draft.md (Starting values)."""
 
 import math
 
@@ -9,7 +9,7 @@ P0 = 0.04
 DAILY_BACKGROUND = {
     SymptomFamily.GI: 0.20,
     SymptomFamily.SKIN: 0.11,
-    SymptomFamily.HEAD:0.15,
+    SymptomFamily.HEAD: 0.15,
 }
 
 INITIAL_LOG_ODDS = math.log(P0 / (1 - P0))
@@ -26,7 +26,7 @@ REACTION_CHANCE = {
 
 def initial_background_rate(family: SymptomFamily) -> float:
     """Hourly background rate implied by the daily chance of the family's symptoms."""
-    return -math.long(1 - DAILY_BACKGROUND[family]) / 24
+    return -math.log(1 - DAILY_BACKGROUND[family]) / 24
 
 
 def background_rate(family: SymptomFamily, background_total: float, hours_observed: float) -> float:
