@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import math
 from pathlib import Path
 
@@ -6,6 +7,9 @@ from sqlalchemy.orm import Session
 
 from models.user_component_state import UserComponentState
 from repositories.user_component_state_repository import UserComponentStateRepository
+from repositories.food_log_repository import FoodLogRepository
+from repositories.symptom_log_repository import SymptomLogRepository
+from analysis.nightly_refresh import nightly_refresh
 
 CONDITION_FILE = Path(__file__).resolve().parent.parent / "data" / "taxonomy" / "condition_multipliers.yaml"
 FAMILIES = ["GI", "SKIN", "HEAD"]
@@ -18,6 +22,7 @@ def _load_condition_multipliers() -> dict:
 
 
 def _compute_multiplier(user_diseases: list[str], component_slug: str, config: dict) -> float:
+    # TODO: 3x multiplier for suspected foods when that is added to user table?
     multiplier = 1.0
     for disease in user_diseases:
         condition = config["conditions"].get(disease.lower())
@@ -30,6 +35,8 @@ class OnboardingService:
 
     def __init__(self):
         self.repo = UserComponentStateRepository()
+        self.food_repo = FoodLogRepository()
+        self.symptom_repo = SymptomLogRepository()
 
     def initialize_user_state(self, db: Session, username: str) -> int:
         """Create 120 rows (40 components x 3 families) for a new user. Returns row count, 0 if already seeded."""
@@ -67,3 +74,29 @@ class OnboardingService:
 
         self.repo.bulk_insert(db, rows)
         return len(rows)
+
+    def run_user_night(self, db: Session, username: str, as_of: datetime) -> None:
+        states = self.repo.get_states_for_user(db, username)
+        if not states:
+            self.initialize_user_state(db, username)
+            states = self.repo.get_states_for_user(db, username)
+
+        last_update = states[0].last_update
+        if as_of <= last_update:
+            return
+
+        start = last_update - timedelta(hours=72)
+        new_meals = []
+        new_symptoms = []
+        meals = self.food_repo.get_food_logs_by_username(db, username)
+        for meal in meals:
+            if meal.timestamp >= start:
+                new_meals.append(meal)
+        symptoms = self.symptom_repo.get_by_username(db, username)
+        for symptom in symptoms:
+            if symptom.timestamp >= start:
+                new_symptoms.append(symptom)
+        new_states = nightly_refresh(new_meals, new_symptoms, as_of, last_update, states)
+        for s in new_states:
+            s.last_update = as_of
+        self.repo.update_states(db, new_states)
