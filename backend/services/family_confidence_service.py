@@ -27,12 +27,12 @@ class FamilyConfidenceService:
         self.symptom_repo = SymptomRepository()
 
     def ensure_initialized(self, db: Session, username: str) -> None:
-        """Create the user's starting confidence and background rows if they have none yet."""
+        """Create the user's starting confidences (4%) and background rows if they have none yet."""
         if not self.repo.has_confidences(db, username):
             self.repo.initialize_for_user(db, username)
 
     def _component_exposures(self, db: Session, ingredient_id: UUID) -> dict[UUID, float]:
-        """Return each of the ingredient's components mapped to its exposure e_c for one standard serving.
+        """Return each of the ingredient's components mapped to its exposure level e_c for one standard serving.
 
         e_c = min(1, concentration_level / 3). Level-0 components are left out, since they can't contribute.
         Raises ValueError if the ingredient doesn't exist.
@@ -41,14 +41,17 @@ class FamilyConfidenceService:
         if components is None:
             raise ValueError(f"Unknown ingredient {ingredient_id}")
         return {
-            component_id: min(1.0, concentration_level / MAX_CONCENTRATION_LEVEL)
+            component_id: min(1.0, concentration_level / MAX_CONCENTRATION_LEVEL) # e.g. (UUID('0b6f2c1e-8a4d-4e7b-9c3f-2d5a1e8b7c40'): 1.0)
             for component_id, concentration_level in components
-            if concentration_level > 0
+            if concentration_level > 0 
         }
 
     def _meal_strengths(self, family: SymptomFamily, exposures: dict[UUID, float]) -> dict[UUID, float]:
-        """Return each component mapped to its meal strength a_{c,f}: expected family reactions if it's a trigger."""
-        return {component_id: meal_strength(family, exposure) for component_id, exposure in exposures.items()}
+        """Return each component mapped to its meal strength a_{c,f}: expected number of family reactions if it's a trigger."""
+        return {
+            component_id: meal_strength(family, exposure)  # e.g. (UUID('0b6f2c1e-8a4d-4e7b-9c3f-2d5a1e8b7c40'): 0.5108256237659907)
+            for component_id, exposure in exposures.items()
+        }
 
     def apply_symptom_evidence(
         self,
@@ -78,16 +81,18 @@ class FamilyConfidenceService:
         if hours_elapsed <= 0 or hours_elapsed > TIMING_WINDOW_HOURS[family]:
             return []
 
-        self.ensure_initialized(db, username)
+        self.ensure_initialized(db, username) # initiliaze database rows
         exposures = self._component_exposures(db, ingredient_id)
         if not exposures:
             return []
         strengths = self._meal_strengths(family, exposures)
 
-        density = timing_density(family, hours_elapsed)
-        pulls = {component_id: strength * density for component_id, strength in strengths.items()}
+        # if this food causes a reaction, how likely is it to start at exactly this hour after eating?
+        density = timing_density(family, hours_elapsed) 
+        # if this component is a trigger, how many reactions per hour would it cause right now, at the hour the symptom started?
+        pulls = {component_id: strength * density for component_id, strength in strengths.items()} 
 
-        rows = self.repo.get_confidences(db, username, family, component_ids=list(pulls))
+        rows = self.repo.get_confidences(db, username, family, component_ids=list(pulls)) # only for components in this ingredient
         confidences = {row.component_id: _to_probability(row.log_odds) for row in rows}
         background_rate = self.get_background_rate(db, username, family, as_of=datetime.now(timezone.utc))
 
