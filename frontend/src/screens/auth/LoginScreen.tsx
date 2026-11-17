@@ -1,10 +1,11 @@
-import { View, Text, Pressable, TextInput, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, Pressable, TextInput, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
 import { useFonts } from 'expo-font';
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { PasswordInput } from '../../components/PasswordInput';
+import { KeyboardAwareScrollView } from '../../components/KeyboardAvoider';
 import { ApiError } from '../../api/client';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -71,9 +72,9 @@ export function LoginScreen() {
   if (!fontsLoaded) return null;
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View className="flex-1">
       <BackgroundGradient />
+      <KeyboardAwareScrollView>
 
       <View className="flex-1 justify-start items-center px-6 pt-[15%]">
 
@@ -153,7 +154,7 @@ export function LoginScreen() {
           </Pressable>
         </View>
       </View>
+      </KeyboardAwareScrollView>
     </View>
-    </TouchableWithoutFeedback>
   );
 }
