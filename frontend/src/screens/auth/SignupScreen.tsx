@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+import { PasswordInput } from '../../components/PasswordInput';
 import { ApiError } from '../../api/client';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -138,17 +139,15 @@ export function SignupScreen() {
 
           {/* password field */}
 
-          <TextInput
+          <PasswordInput
             placeholder="Password"
             placeholderTextColor='#B8624F' /* remetra-burgundy */
-            secureTextEntry
             value={password}
             onChangeText={(text) => {
               setPassword(text);
               if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
             }}
-            autoCapitalize="none"
-            className="border border-remetra-burgundy text-remetra-burgundy py-3 pl-2 mb-2"
+            className="border border-remetra-burgundy text-remetra-burgundy py-3 pl-2"
           />
           {errors.password && (
             <Text className="text-red-400 mb-2">{errors.password}</Text>
