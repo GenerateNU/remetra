@@ -39,6 +39,42 @@ reset-db:
 seed-rag:
     curl -X POST http://localhost:8000/ingest/folder
 
+# --- Taxonomy (ingredients / components / mappings) ---------------------------
+
+psql := "docker compose exec -T test-db psql -U test_user -d test_remetra -P pager=off"
+
+# Seed taxonomy tables from backend/data/taxonomy/ (replaces all rows; safe to re-run)
+seed-taxonomy:
+    docker compose run --rm backend sh -c "python scripts/init_db.py && python scripts/seed_taxonomy.py"
+
+# Drop + recreate only the taxonomy tables, then seed (use after changing their models)
+seed-taxonomy-recreate:
+    docker compose run --rm backend python scripts/seed_taxonomy.py --recreate
+
+# Row counts for the three taxonomy tables
+taxonomy-counts:
+    @{{psql}} -c "SELECT 'ingredients' AS table_name, count(*) FROM ingredients UNION ALL SELECT 'components', count(*) FROM components UNION ALL SELECT 'ingredient_components', count(*) FROM ingredient_components"
+
+# List components (e.g. gluten, lactose)
+taxonomy-components:
+    @{{psql}} -c "SELECT slug, display_name, category, prior_tier, inclusion_confidence, flags FROM components ORDER BY category, slug"
+
+# List ingredients; optional case-insensitive filter on slug/name/aliases, e.g. `just taxonomy-ingredients bread`
+taxonomy-ingredients filter="":
+    @{{psql}} -c "SELECT slug, canonical_name, aliases, std_serving_g, elimination_base AS elim, mapping_confidence AS conf FROM ingredients WHERE '{{filter}}' = '' OR slug ILIKE '%{{filter}}%' OR canonical_name ILIKE '%{{filter}}%' OR aliases::text ILIKE '%{{filter}}%' ORDER BY slug"
+
+# Ingredient -> component mappings; optional ingredient filter, e.g. `just taxonomy-mappings wheat_bread`
+taxonomy-mappings ingredient="":
+    @{{psql}} -c "SELECT i.slug AS ingredient, c.slug AS component, ic.concentration_level AS level, ic.confidence, ic.concentration_basis AS basis FROM ingredient_components ic JOIN ingredients i ON i.id = ic.ingredient_id JOIN components c ON c.id = ic.component_id WHERE '{{ingredient}}' = '' OR i.slug ILIKE '%{{ingredient}}%' OR i.canonical_name ILIKE '%{{ingredient}}%' ORDER BY i.slug, c.slug"
+
+# Which ingredients contain a component, strongest first, e.g. `just taxonomy-component gluten`
+taxonomy-component component:
+    @{{psql}} -c "SELECT i.slug AS ingredient, ic.concentration_level AS level, ic.confidence, left(ic.rationale, 80) AS rationale FROM ingredient_components ic JOIN ingredients i ON i.id = ic.ingredient_id JOIN components c ON c.id = ic.component_id WHERE c.slug = '{{component}}' ORDER BY ic.concentration_level DESC, i.slug"
+
+# Interactive psql shell on the local database (\dt, \d ingredients, ...)
+db-psql:
+    docker compose exec test-db psql -U test_user -d test_remetra
+
 test:
     docker compose up -d test-db
     sleep 3

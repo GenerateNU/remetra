@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  type TextInputInstance,
 } from 'react-native';
 
 interface ComboBoxProps {
@@ -25,13 +26,12 @@ export function ComboBox({
 }: ComboBoxProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<TextInputInstance>(null);
 
-  useEffect(() => {
-    if (open) {
-      setQuery(value || '');
-    }
-  }, [open, value]);
+  const openMenu = () => {
+    setQuery(value || '');
+    setOpen(true);
+  };
 
   const trimmed = query.trim();
   const filtered = options.filter((item) =>
@@ -58,7 +58,7 @@ export function ComboBox({
   return (
     <>
       <TouchableOpacity
-        onPress={() => setOpen(true)}
+        onPress={openMenu}
         className="border border-remetra-border rounded-lg p-3 bg-remetra-surface"
         activeOpacity={0.7}
       >
