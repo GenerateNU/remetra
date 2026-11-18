@@ -25,6 +25,7 @@ router = APIRouter(
 
 MAX_TREND_DAYS = 90
 
+
 @router.post(
     "/sync",
     response_model=HealthSyncResponse,
@@ -45,6 +46,7 @@ async def sync_health_data(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to sync health data",
         ) from e
+
 
 @router.get(
     "/trends",

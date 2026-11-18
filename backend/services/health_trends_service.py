@@ -25,7 +25,9 @@ class HealthTrendsService:
 
         health_by_date = {row.date: row for row in health_rows}
 
-        # collects all symptom logs using one timezone
+        # Bucket every symptom log by local date using a single timezone (the most recently synced
+        # one). A user who changed timezones mid-range could see a log land on an adjacent day, but
+        # that edge case isn't worth per-row timezone resolution here.
         tz = self._pick_timezone(health_rows)
         intensities_by_date: dict[date, list[int]] = defaultdict(list)
         for log in symptom_logs:
@@ -58,5 +60,3 @@ class HealthTrendsService:
             if row.timezone:
                 return ZoneInfo(row.timezone)
         return UTC
-
-    

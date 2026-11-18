@@ -119,8 +119,9 @@ class HealthRepository:
     def get_symptom_logs_in_range(self, db: Session, username: str, start: date, end: date) -> list[SymptomLog]:
         """
         Fetch a user's symptom logs that could fall on a local date between start and end.
-        Made sure window is padded by a day on each side because a log's local date can differ from its UTC date. The
-        service filters each log down to its exact local date.
+        The UTC window is padded (one day before start, two days after end) because a log's local
+        date can differ from its UTC date by up to a full day in either direction. The service then
+        filters each log down to its exact local date.
         """
         window_start = datetime.combine(start - timedelta(days=1), time.min, tzinfo=UTC)
         window_end = datetime.combine(end + timedelta(days=2), time.min, tzinfo=UTC)

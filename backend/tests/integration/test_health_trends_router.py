@@ -30,9 +30,7 @@ def _seed_health_day(db_session, username, day):
 
 
 def _seed_symptom_log(db_session, username, symptom_id, timestamp, intensity):
-    db_session.add(
-        SymptomLog(username=username, symptom_id=symptom_id, intensity=intensity, timestamp=timestamp)
-    )
+    db_session.add(SymptomLog(username=username, symptom_id=symptom_id, intensity=intensity, timestamp=timestamp))
     db_session.commit()
 
 
