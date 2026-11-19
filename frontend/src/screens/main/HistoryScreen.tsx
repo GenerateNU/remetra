@@ -69,18 +69,22 @@ export function HistoryScreen() {
     );
   }, [dayData, foods, symptoms, edits]);
 
-  useEffect(() => {
+  // Drop the optimistic edits once the day's logs are refetched
+  const [editsFor, setEditsFor] = useState(dayData);
+  if (dayData !== editsFor) {
+    setEditsFor(dayData);
     setEdits({});
-  }, [dayData]);
+  }
 
-  const run = useCallback(async (work: () => Promise<void>) => {
-    setError(null);
-    try {
-      await work();
-    } catch {
-      setError('Failed to load logs. Pull down to retry.');
-    }
-  }, []);
+  // State is only set once the work settles, so effects can call this without a synchronous setState
+  const run = useCallback(
+    (work: () => Promise<void>) =>
+      work().then(
+        () => setError(null),
+        () => setError('Failed to load logs. Pull down to retry.')
+      ),
+    []
+  );
 
   const loadVisible = useCallback(
     () =>
@@ -95,7 +99,6 @@ export function HistoryScreen() {
   );
 
   useEffect(() => {
-    setLoading(true);
     loadVisible().finally(() => setLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

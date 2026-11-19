@@ -42,9 +42,11 @@ export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCl
   const [timestamp, setTimestamp] = useState(() => initialTimestamp ?? new Date());
 
   // The form can stay mounted between opens (e.g. when the modal opens straight to food)
-  useEffect(() => {
+  const [prevInitialTimestamp, setPrevInitialTimestamp] = useState(initialTimestamp);
+  if (initialTimestamp !== prevInitialTimestamp) {
+    setPrevInitialTimestamp(initialTimestamp);
     if (initialTimestamp) setTimestamp(initialTimestamp);
-  }, [initialTimestamp]);
+  }
   const [notes, setNotes] = useState("");
 
   const filtered = foods.filter((f) =>

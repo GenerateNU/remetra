@@ -2,7 +2,7 @@ import { SymptomLogEntry, SymptomItem } from "../types/logs";
 import { useBankStore } from "../store/bankStore";
 import { symptomLogService } from "../api/symptom_log_service";
 import { useAuthStore } from "../store/useAuthStore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
@@ -32,9 +32,11 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const [timestamp, setTimestamp] = useState(() => initialTimestamp ?? new Date());
 
   // The form can stay mounted between opens (e.g. when the modal opens straight to symptom)
-  useEffect(() => {
+  const [prevInitialTimestamp, setPrevInitialTimestamp] = useState(initialTimestamp);
+  if (initialTimestamp !== prevInitialTimestamp) {
+    setPrevInitialTimestamp(initialTimestamp);
     if (initialTimestamp) setTimestamp(initialTimestamp);
-  }, [initialTimestamp]);
+  }
   const [showDuration, setShowDuration] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState("");
   const [notes, setNotes] = useState("");
