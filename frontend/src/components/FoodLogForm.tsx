@@ -14,32 +14,39 @@ interface FoodLogFormProps {
   onSubmit: (entry: FoodLogEntry) => void;
   onBack: () => void;
   onCloseModal: () => void;
+  initialTimestamp?: Date;
 }
 
-export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCloseModal }) => {
+export const FoodLogForm: React.FC<FoodLogFormProps> = ({ onSubmit, onBack, onCloseModal, initialTimestamp }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { foods, addFood } = useBankStore();
   const navigation = useNavigation<any>();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
-  const [isCustom, setIsCustom] = useState(false);
+  const [isCustom, setIsCustom] = useState(Boolean(useBankStore.getState().scannedFood));
 
-  const [customName, setCustomName] = useState("");
-  const [customIngredients, setCustomIngredients] = useState<string[]>([]);
   const { scannedFood, setScannedFood } = useBankStore();
+  const [customName, setCustomName] = useState(scannedFood?.name ?? "");
+  const [customIngredients, setCustomIngredients] = useState<string[]>(
+    scannedFood?.ingredients ?? []
+  );
 
   useEffect(() => {
     if (scannedFood) {
-      setCustomName(scannedFood.name);
-      setCustomIngredients(scannedFood.ingredients);
-      setIsCustom(true);
       setScannedFood(null);
     }
-  }, []);
+  }, [scannedFood, setScannedFood]);
 
   const [servings, setServings] = useState("1");
-  const [timestamp, setTimestamp] = useState(new Date());
+  const [timestamp, setTimestamp] = useState(() => initialTimestamp ?? new Date());
+
+  // The form can stay mounted between opens (e.g. when the modal opens straight to food)
+  const [prevInitialTimestamp, setPrevInitialTimestamp] = useState(initialTimestamp);
+  if (initialTimestamp !== prevInitialTimestamp) {
+    setPrevInitialTimestamp(initialTimestamp);
+    if (initialTimestamp) setTimestamp(initialTimestamp);
+  }
   const [notes, setNotes] = useState("");
 
   const filtered = foods.filter((f) =>

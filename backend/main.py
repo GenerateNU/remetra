@@ -17,6 +17,7 @@ from database import Base, engine
 from middleware.logging_middleware import LoggingMiddleware
 from routers.algorithm_router import router as algorithm_router
 from routers.auth import router as auth_router
+from routers.calendar_router import router as calendar_router
 from routers.food_log_router import router as food_log_router
 from routers.food_router import router as food_router
 from routers.health_router import router as health_router
@@ -25,6 +26,7 @@ from routers.meal_follow_up_router import router as meal_follow_up_router
 from routers.symptom_log_router import router as symptom_log_router
 from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
+from routers.user_ingredient_router import router as user_ingredient_router
 from routers.voice_router import router as voice_router
 
 logger = logging.getLogger(__name__)
@@ -120,6 +122,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(algorithm_router)
+app.include_router(calendar_router)
 app.include_router(symptom_log_router)
 app.include_router(symptom_router)
 app.include_router(food_router)
@@ -127,6 +130,7 @@ app.include_router(ingest_router)
 app.include_router(food_log_router)
 app.include_router(tag_router)
 app.include_router(health_router)
+app.include_router(user_ingredient_router)
 app.include_router(meal_follow_up_router)
 app.include_router(voice_router)
 

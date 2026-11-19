@@ -13,9 +13,10 @@ import { ComboBox } from "./ComboBox";
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
   onBack: () => void;
+  initialTimestamp?: Date;
 }
 
-export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack }) => {
+export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack, initialTimestamp }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { symptoms, addSymptom } = useBankStore();
 
@@ -28,7 +29,14 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [intensity, setIntensity] = useState(5);
-  const [timestamp, setTimestamp] = useState(new Date());
+  const [timestamp, setTimestamp] = useState(() => initialTimestamp ?? new Date());
+
+  // The form can stay mounted between opens (e.g. when the modal opens straight to symptom)
+  const [prevInitialTimestamp, setPrevInitialTimestamp] = useState(initialTimestamp);
+  if (initialTimestamp !== prevInitialTimestamp) {
+    setPrevInitialTimestamp(initialTimestamp);
+    if (initialTimestamp) setTimestamp(initialTimestamp);
+  }
   const [showDuration, setShowDuration] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState("");
   const [notes, setNotes] = useState("");
