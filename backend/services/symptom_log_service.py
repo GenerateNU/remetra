@@ -56,7 +56,7 @@ def washout_window(symptoms: list[tuple[SymptomRoute, int, datetime]], now: date
     return WashoutStatus(active=False, ends_at=None)
 
 
-def _to_response(log) -> SymptomLogResponse:
+def to_symptom_log_response(log) -> SymptomLogResponse:
     """Build the response with the route computed from the log's symptom."""
     route = route_symptom(log.symptom.sensation, log.symptom.location)
     stored = {
@@ -76,7 +76,7 @@ class SymptomLogService:
         log = self.repo.get_by_id(db, log_id)
         if not log:
             return None
-        return _to_response(log)
+        return to_symptom_log_response(log)
 
     def create_symptom_log(self, db: Session, data: SymptomLogCreate) -> Optional[SymptomLogResponse]:
         """Create a symptom log, or return None if the symptom is missing or not the signed-in user's."""
@@ -84,17 +84,17 @@ class SymptomLogService:
         if not self.symptom_repo.get_symptom_by_id(db, data.symptom_id):
             return None
         log = self.repo.create(db, data)
-        return _to_response(log)
+        return to_symptom_log_response(log)
 
     def get_symptom_logs_by_username(self, db: Session, username: str) -> list[SymptomLogResponse]:
         logs = self.repo.get_by_username(db, username)
-        return [_to_response(log) for log in logs]
+        return [to_symptom_log_response(log) for log in logs]
 
     def update_symptom_log(self, db: Session, log_id: UUID, data: SymptomLogUpdate) -> Optional[SymptomLogResponse]:
         updated = self.repo.update(db, log_id, data)
         if not updated:
             return None
-        return _to_response(updated)
+        return to_symptom_log_response(updated)
 
     def delete_symptom_log(self, db: Session, log_id: UUID) -> bool:
         return self.repo.delete(db, log_id)

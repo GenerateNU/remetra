@@ -1,7 +1,7 @@
 from datetime import date, datetime, time, timedelta
 
 from sqlalchemy import func, literal, select, union_all
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from local_day import local_date_column, parse_timezone
 from models.daily_health_metrics import DailyHealthMetrics
@@ -57,10 +57,11 @@ class CalendarRepository:
         start, end = _local_day_bounds(day, tz)
         stmt = (
             select(SymptomLog)
+            .options(joinedload(SymptomLog.symptom))  # the response routes each log by its symptom
             .where(SymptomLog.username == username, SymptomLog.timestamp >= start, SymptomLog.timestamp < end)
             .order_by(SymptomLog.timestamp)
         )
-        return list(db.execute(stmt).scalars().all())
+        return list(db.execute(stmt).unique().scalars().all())
 
 
 def _local_day_bounds(day: date, tz: str) -> tuple[datetime, datetime]:
