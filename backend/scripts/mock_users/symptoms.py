@@ -1,12 +1,14 @@
 """Builds a user's symptoms: planted reactions after trigger meals, plus background symptoms."""
 
+import csv
 import math
 import random
 from datetime import date, datetime, time, timedelta, timezone
+from functools import lru_cache
 
 from scripts.mock_users.meals import LOCAL_TZ
 from scripts.mock_users.shapes import MealLog, MockFood, SymptomEvent, SymptomKind, Trigger
-from services.taxonomy_service import TaxonomyService
+from scripts.seed_taxonomy import INGREDIENT_COMPONENTS_CSV
 
 # Symptoms anyone might log on a random day, unrelated to food. Includes the trigger symptoms,
 # so a planted reaction's symptom type alone doesn't give the trigger away.
@@ -27,11 +29,26 @@ BACKGROUND_DURATION_MINUTES = (15, 180)
 BACKGROUND_WINDOW = (time(6, 0), time(23, 0))  # local time background symptoms can happen
 
 
+@lru_cache(maxsize=1)
+def ingredient_components() -> dict[str, frozenset[str]]:
+    """Canonical ingredient name -> components it contains (concentration level above 0).
+
+    Reads the file scripts/seed_taxonomy.py loads into the taxonomy tables, so the generator agrees
+    with the database without needing a connection.
+    """
+    found: dict[str, set[str]] = {}
+    with open(INGREDIENT_COMPONENTS_CSV, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if int(row["concentration_level"]) > 0:
+                found.setdefault(row["canonical_name"], set()).add(row["component"])
+    return {name: frozenset(components) for name, components in found.items()}
+
+
 def trigger_meals(meals: list[MealLog], foods: list[MockFood], component: str) -> list[MealLog]:
-    """Meals whose food contains `component` at any level, according to the taxonomy lookup."""
-    service = TaxonomyService()
+    """Meals whose food contains `component` at any level above 0, according to the taxonomy."""
+    by_ingredient = ingredient_components()
     has_component = {
-        food.name: any(component in match.components for match in service.lookup_many(food.ingredients))
+        food.name: any(component in by_ingredient.get(ingredient, ()) for ingredient in food.ingredients)
         for food in foods
     }
     return [meal for meal in meals if has_component.get(meal.food_name, False)]

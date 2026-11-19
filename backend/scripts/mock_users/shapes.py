@@ -37,7 +37,7 @@ class UserType:
 @dataclass(frozen=True)
 class MockFood:
     name: str
-    ingredients: list[str]  # canonical ingredient names that TaxonomyService.lookup resolves
+    ingredients: list[str]  # canonical_name values from data/taxonomy/ingredients.csv
 
 
 @dataclass(frozen=True)
