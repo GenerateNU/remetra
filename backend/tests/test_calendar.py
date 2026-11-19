@@ -147,10 +147,10 @@ class TestLocalDay:
 class TestCalendarRepository:
     def test_groups_by_local_day_in_the_requested_timezone(self, db_session, logs, authenticated_user):
         logs.food_at(at("2026-10-12", 23, 30))  # 23:30 in New York is already the 13th in Tokyo
-        repo = CalendarRepository()
-
-        ny = repo.get_log_counts_by_local_day(db_session, authenticated_user["username"], NY)
-        tokyo = repo.get_log_counts_by_local_day(db_session, authenticated_user["username"], "Asia/Tokyo")
+        ny = CalendarRepository().get_log_counts_by_local_day(db_session, authenticated_user["username"], NY)
+        tokyo = CalendarRepository().get_log_counts_by_local_day(
+            db_session, authenticated_user["username"], "Asia/Tokyo"
+        )
 
         assert ny == [(date(2026, 10, 12), 1, 0)]
         assert tokyo == [(date(2026, 10, 13), 1, 0)]
@@ -163,14 +163,14 @@ class TestCalendarRepository:
         assert rows == [(date(2026, 10, 12), 2, 1)]
 
     def test_query_count_does_not_grow_with_history(self, db_session, logs, authenticated_user):
-        service = CalendarService()
-
         def count_queries() -> int:
             queries = []
             listener = lambda *args: queries.append(1)  # noqa: E731
             event.listen(db_session.bind, "before_cursor_execute", listener)
             try:
-                service.get_month(db_session, authenticated_user["username"], "2026-10", NY, today=date(2026, 10, 31))
+                CalendarService().get_month(
+                    db_session, authenticated_user["username"], "2026-10", NY, today=date(2026, 10, 31)
+                )
             finally:
                 event.remove(db_session.bind, "before_cursor_execute", listener)
             return len(queries)
@@ -188,10 +188,13 @@ class TestCalendarRepository:
             [
                 DailyHealthMetrics(username=username, date=date(2026, 10, 5), timezone=NY, sleep_total_min=420),
                 DailyHealthMetrics(username=username, date=date(2026, 11, 1), timezone=NY, sleep_total_min=400),
-                DailyHealthMetrics(username="someone_else", date=date(2026, 10, 6), timezone=NY, hrv_avg_ms=40),
             ]
         )
         db_session.flush()
+        with other_user_logs._as_user():  # saved as the signed-in user otherwise
+            db_session.add(
+                DailyHealthMetrics(username="someone_else", date=date(2026, 10, 6), timezone=NY, hrv_avg_ms=40)
+            )
 
         dates = CalendarRepository().get_health_dates(db_session, username, date(2026, 10, 1), date(2026, 10, 31))
 

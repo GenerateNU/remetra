@@ -1,129 +1,72 @@
-import logging
-from datetime import date
+from datetime import date, datetime, time, timedelta
 
-from sqlalchemy import func, select, text
+from sqlalchemy import func, literal, select, union_all
 from sqlalchemy.orm import Session
 
+from local_day import local_date_column, parse_timezone
 from models.daily_health_metrics import DailyHealthMetrics
 from models.food_log import FoodLog
 from models.symptom_log import SymptomLog
 
 
 class CalendarRepository:
+    def get_log_counts_by_local_day(self, db: Session, username: str, tz: str) -> list[tuple[date, int, int]]:
+        """(local day, food count, symptom count) for every day the user logged anything, oldest first.
 
-    def get_food_counts(
-        self, db: Session, username: str, month_start: date, month_end: date, tz: str,
-    ) -> dict[date, int]:
+        One query over the user's whole history: the month grid and the streaks both come from it,
+        so the number of queries stays the same however long the history gets.
+        """
+        food = select(
+            local_date_column(FoodLog.timestamp, tz).label("day"),
+            literal(1).label("food"),
+            literal(0).label("symptom"),
+        ).where(FoodLog.username == username)
+        symptoms = select(
+            local_date_column(SymptomLog.timestamp, tz).label("day"),
+            literal(0).label("food"),
+            literal(1).label("symptom"),
+        ).where(SymptomLog.username == username)
+        logs = union_all(food, symptoms).subquery()
+
         stmt = (
-            select(
-                func.date(FoodLog.timestamp.op("AT TIME ZONE")(text(f"'{tz}'"))).label("local_date"),
-                func.count().label("cnt"),
-            )
-            .where(
-                FoodLog.username == username,
-                FoodLog.timestamp >= text(f"'{month_start}'::date AT TIME ZONE '{tz}'"),
-                FoodLog.timestamp < text(f"('{month_end}'::date + 1) AT TIME ZONE '{tz}'"),
-            )
-            .group_by("local_date")
+            select(logs.c.day, func.sum(logs.c.food), func.sum(logs.c.symptom))
+            .group_by(logs.c.day)
+            .order_by(logs.c.day)
         )
-        try:
-            rows = db.execute(stmt).all()
-            return {row.local_date: row.cnt for row in rows}
-        except Exception as e:
-            logging.error(f"Error fetching food counts: {e}")
-            return {}
+        return [(day, int(food_count), int(symptom_count)) for day, food_count, symptom_count in db.execute(stmt)]
 
-    def get_symptom_counts(
-        self, db: Session, username: str, month_start: date, month_end: date, tz: str,
-    ) -> dict[date, int]:
-        stmt = (
-            select(
-                func.date(SymptomLog.timestamp.op("AT TIME ZONE")(text(f"'{tz}'"))).label("local_date"),
-                func.count().label("cnt"),
-            )
-            .where(
-                SymptomLog.username == username,
-                SymptomLog.timestamp >= text(f"'{month_start}'::date AT TIME ZONE '{tz}'"),
-                SymptomLog.timestamp < text(f"('{month_end}'::date + 1) AT TIME ZONE '{tz}'"),
-            )
-            .group_by("local_date")
+    def get_health_dates(self, db: Session, username: str, start: date, end: date) -> set[date]:
+        """Days between start and end (inclusive) that have synced health data."""
+        stmt = select(DailyHealthMetrics.date).where(
+            DailyHealthMetrics.username == username,
+            DailyHealthMetrics.date >= start,
+            DailyHealthMetrics.date <= end,
         )
-        try:
-            rows = db.execute(stmt).all()
-            return {row.local_date: row.cnt for row in rows}
-        except Exception as e:
-            logging.error(f"Error fetching symptom counts: {e}")
-            return {}
+        return set(db.execute(stmt).scalars().all())
 
-    def get_health_synced_dates(self, db: Session, username: str, month_start: date, month_end: date) -> set[date]:
-        stmt = (
-            select(DailyHealthMetrics.date)
-            .where(
-                DailyHealthMetrics.username == username,
-                DailyHealthMetrics.date >= month_start,
-                DailyHealthMetrics.date <= month_end,
-            )
-        )
-        try:
-            rows = db.execute(stmt).scalars().all()
-            return set(rows)
-        except Exception as e:
-            logging.error(f"Error fetching health synced dates: {e}")
-            return set()
-
-    def get_food_logs_for_day(
-        self, db: Session, username: str, day: date, tz: str,
-    ) -> list[FoodLog]:
+    def get_food_logs_for_day(self, db: Session, username: str, day: date, tz: str) -> list[FoodLog]:
+        start, end = _local_day_bounds(day, tz)
         stmt = (
             select(FoodLog)
-            .where(
-                FoodLog.username == username,
-                FoodLog.timestamp >= text(f"'{day}'::date AT TIME ZONE '{tz}'"),
-                FoodLog.timestamp < text(f"('{day}'::date + 1) AT TIME ZONE '{tz}'"),
-            )
+            .where(FoodLog.username == username, FoodLog.timestamp >= start, FoodLog.timestamp < end)
             .order_by(FoodLog.timestamp)
         )
-        try:
-            return list(db.execute(stmt).scalars().all())
-        except Exception as e:
-            logging.error(f"Error fetching food logs for day: {e}")
-            return []
+        return list(db.execute(stmt).scalars().all())
 
-    def get_symptom_logs_for_day(
-        self, db: Session, username: str, day: date, tz: str,
-    ) -> list[SymptomLog]:
+    def get_symptom_logs_for_day(self, db: Session, username: str, day: date, tz: str) -> list[SymptomLog]:
+        start, end = _local_day_bounds(day, tz)
         stmt = (
             select(SymptomLog)
-            .where(
-                SymptomLog.username == username,
-                SymptomLog.timestamp >= text(f"'{day}'::date AT TIME ZONE '{tz}'"),
-                SymptomLog.timestamp < text(f"('{day}'::date + 1) AT TIME ZONE '{tz}'"),
-            )
+            .where(SymptomLog.username == username, SymptomLog.timestamp >= start, SymptomLog.timestamp < end)
             .order_by(SymptomLog.timestamp)
         )
-        try:
-            return list(db.execute(stmt).scalars().all())
-        except Exception as e:
-            logging.error(f"Error fetching symptom logs for day: {e}")
-            return []
+        return list(db.execute(stmt).scalars().all())
 
-    def get_all_logged_dates(self, db: Session, username: str, tz: str) -> set[date]:
-        food_dates = (
-            select(
-                func.date(FoodLog.timestamp.op("AT TIME ZONE")(text(f"'{tz}'"))).label("local_date"),
-            )
-            .where(FoodLog.username == username)
-        )
-        symptom_dates = (
-            select(
-                func.date(SymptomLog.timestamp.op("AT TIME ZONE")(text(f"'{tz}'"))).label("local_date"),
-            )
-            .where(SymptomLog.username == username)
-        )
-        union = food_dates.union(symptom_dates)
-        try:
-            rows = db.execute(union).scalars().all()
-            return set(rows)
-        except Exception as e:
-            logging.error(f"Error fetching all logged dates: {e}")
-            return set()
+
+def _local_day_bounds(day: date, tz: str) -> tuple[datetime, datetime]:
+    """Start (inclusive) and end (exclusive) instants of a local calendar day; DST days are 23 or 25 hours."""
+    zone = parse_timezone(tz)
+    return (
+        datetime.combine(day, time.min, tzinfo=zone),
+        datetime.combine(day + timedelta(days=1), time.min, tzinfo=zone),
+    )

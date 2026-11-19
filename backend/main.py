@@ -133,7 +133,6 @@ app.include_router(health_router)
 app.include_router(user_ingredient_router)
 app.include_router(meal_follow_up_router)
 app.include_router(voice_router)
-app.include_router(calendar_router)
 
 
 @app.get("/scalar", include_in_schema=False)
