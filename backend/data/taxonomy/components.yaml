@@ -9,7 +9,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Fructans are a major FODMAP source in grain foods, and in people with self-reported gluten sensitivity, fructans rather than gluten induced symptoms in a blinded challenge."
     sources: ["https://doi.org/10.1111/j.1365-277X.2010.01139.x", "https://doi.org/10.1053/j.gastro.2017.10.040"]
-    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
     prior_tier: high
     flags: []
   - id: fructans_allium
@@ -19,7 +18,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Garlic, onion, shallot and leek have the highest measured fructan content of common vegetables."
     sources: ["https://doi.org/10.1021/jf070623x", "https://monashfodmap.com/blog/fructans-fodmap-reintroduction/"]
-    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.10}
     prior_tier: high
     flags: []
   - id: fructans_other
@@ -29,7 +27,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Same fermentation mechanism as other fructans, and added inulin is a common processed-food source, but intake varies widely by product."
     sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/", "https://doi.org/10.1021/jf070623x"]
-    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
     prior_tier: medium
     flags: []
   - id: gos
@@ -39,7 +36,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "GOS is one of the FODMAP subgroups clinicians test separately, and legumes are its main dietary source."
     sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
-    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
     prior_tier: high
     flags: []
   - id: lactose
@@ -49,7 +45,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Monash names lactose as the main FODMAP in dairy, and lactose malabsorption is a well-established cause of same-day gut symptoms."
     sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
-    family_profile: {GI: 0.95, SKIN: 0.02, HEAD: 0.03}
     prior_tier: high
     flags: []
   - id: excess_fructose
@@ -59,7 +54,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "A FODMAP subgroup tested separately in clinical reintroduction, with sources (honey, mango) that separate it from sorbitol."
     sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
-    family_profile: {GI: 0.90, SKIN: 0.03, HEAD: 0.07}
     prior_tier: high
     flags: []
   - id: sorbitol
@@ -69,7 +63,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "A polyol subgroup tested separately in clinical reintroduction; effects depend strongly on serving size."
     sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
-    family_profile: {GI: 0.90, SKIN: 0.03, HEAD: 0.07}
     prior_tier: medium
     flags: []
   - id: mannitol
@@ -79,7 +72,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "A polyol subgroup tested separately in clinical reintroduction; effects depend strongly on serving size."
     sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
-    family_profile: {GI: 0.90, SKIN: 0.03, HEAD: 0.07}
     prior_tier: medium
     flags: []
   - id: added_polyols
@@ -89,7 +81,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Same mechanism as natural polyols but often eaten at large doses in sugar-free products; erythritol is mostly absorbed and causes fewer symptoms."
     sources: ["https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/"]
-    family_profile: {GI: 0.90, SKIN: 0.02, HEAD: 0.08}
     prior_tier: medium
     flags: []
   - id: gluten
@@ -99,7 +90,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Gluten is the defining trigger in celiac disease, and FDA defines the gluten-containing grains for labeling."
     sources: ["https://www.fda.gov/food/allergens/gluten-and-food-labeling"]
-    family_profile: {GI: 0.85, SKIN: 0.10, HEAD: 0.15}
     prior_tier: high
     flags: [allergen]
   - id: oats
@@ -109,7 +99,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "FDA does not count oats as a gluten-containing grain, but oats are often cross-contacted with wheat, and some people with celiac react to them."
     sources: ["https://ofwlaw.com/gluten-free-now-has-an-official-fda-definition/"]
-    family_profile: {GI: 0.85, SKIN: 0.05, HEAD: 0.05}
     prior_tier: low
     flags: []
   - id: milk_protein
@@ -119,7 +108,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Milk is a FALCPA major allergen that reacts within hours, and it is separable from lactose through lactose-free milk and aged cheese."
     sources: ["https://www.dailyintakeblog.com/2025/01/fda-issues-two-final-guidance-documents-on-allergens/", "https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
-    family_profile: {GI: 0.75, SKIN: 0.20, HEAD: 0.05}
     prior_tier: medium
     flags: [allergen]
   - id: egg
@@ -129,7 +117,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Egg is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
     sources: ["https://www.dailyintakeblog.com/2025/01/fda-issues-two-final-guidance-documents-on-allergens/", "https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
-    family_profile: {GI: 0.70, SKIN: 0.25, HEAD: 0.05}
     prior_tier: medium
     flags: [allergen]
   - id: soy
@@ -139,7 +126,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Soy is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
     sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
-    family_profile: {GI: 0.75, SKIN: 0.20, HEAD: 0.05}
     prior_tier: medium
     flags: [allergen]
   - id: peanut
@@ -149,7 +135,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Peanut is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
     sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
-    family_profile: {GI: 0.50, SKIN: 0.45, HEAD: 0.05}
     prior_tier: low
     flags: [allergen]
   - id: tree_nuts
@@ -159,7 +144,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Tree nuts are a FALCPA major allergen with reactions within hours; included mainly so the app can flag them and never introduce them."
     sources: ["https://menutrinfo.com/blog/its-official-coconut-is-no-longer-a-tree-nut/", "https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
-    family_profile: {GI: 0.55, SKIN: 0.40, HEAD: 0.05}
     prior_tier: low
     flags: [allergen]
   - id: sesame
@@ -169,7 +153,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Sesame became the ninth US major food allergen under the FASTER Act; included mainly so the app can flag it and never introduce it."
     sources: ["https://www.canr.msu.edu/news/the-faster-act-sesame-as-major-food-allergen"]
-    family_profile: {GI: 0.50, SKIN: 0.45, HEAD: 0.05}
     prior_tier: low
     flags: [allergen]
   - id: fish
@@ -179,7 +162,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Fish is a FALCPA major allergen with reactions within hours; included mainly so the app can flag it and never introduce it."
     sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents"]
-    family_profile: {GI: 0.55, SKIN: 0.40, HEAD: 0.05}
     prior_tier: low
     flags: [allergen]
   - id: shellfish
@@ -189,7 +171,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Crustacean shellfish is a FALCPA major allergen and molluscs are an EU allergen; included mainly so the app can flag them and never introduce them."
     sources: ["https://biopreviewuat.hoganlovells.com/en/publications/fda-finalizes-two-food-allergenrelated-guidance-documents", "https://www.fsai.ie/enforcement-and-legislation/legislation/food-legislation/food-information-fic-(labelling)/list-of-14-allergens"]
-    family_profile: {GI: 0.55, SKIN: 0.40, HEAD: 0.05}
     prior_tier: low
     flags: [allergen]
   - id: corn
@@ -199,7 +180,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "Commonly suspected by users, but I found no clinical source showing a symptom mechanism; kept with a low prior because users will ask."
     sources: []
-    family_profile: {GI: 0.85, SKIN: 0.10, HEAD: 0.05}
     prior_tier: low
     flags: [contested]
   - id: mammalian_meat
@@ -209,7 +189,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Alpha-gal syndrome is an established delayed allergy; symptoms appear 2 to 10 hours after eating meat or dairy, inside the 36-hour window."
     sources: ["https://www.cdc.gov/alpha-gal-syndrome/data-research/products-containing-alpha-gal/", "https://www3.maine.gov/dhhs/mecdc/sites/maine.gov.dhhs.mecdc/files/epi/Alpha-Gal-FS.pdf"]
-    family_profile: {GI: 0.60, SKIN: 0.35, HEAD: 0.05}
     prior_tier: low
     flags: [clinician_if_skin]
   - id: biogenic_amines
@@ -219,7 +198,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Low-histamine diets have growing support, though some studies are limited by patient numbers or diet duration; fermented foods are the most consistent source."
     sources: ["https://pmc.ncbi.nlm.nih.gov/articles/PMC8143338/"]
-    family_profile: {GI: 0.35, SKIN: 0.35, HEAD: 0.30}
     prior_tier: medium
     flags: []
   - id: histamine_liberators
@@ -229,7 +207,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "Common in elimination diets, but no clinical studies in humans support the idea that foods release histamine."
     sources: ["https://pmc.ncbi.nlm.nih.gov/articles/PMC8143338/"]
-    family_profile: {GI: 0.30, SKIN: 0.50, HEAD: 0.20}
     prior_tier: low
     flags: [contested]
   - id: alcohol
@@ -239,7 +216,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Alcohol relaxes the esophageal sphincter and can damage the lining of the stomach and esophagus, a same-day effect."
     sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://www.niaaa.nih.gov/alcohols-effects-health/overview-alcohol-consumption/what-standard-drink"]
-    family_profile: {GI: 0.45, SKIN: 0.25, HEAD: 0.30}
     prior_tier: medium
     flags: []
   - id: caffeine
@@ -249,7 +225,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Caffeine relaxes the esophageal sphincter, which can increase reflux, but study results on coffee and reflux are mixed."
     sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://www.fda.gov/consumers/consumer-updates/spilling-beans-how-much-caffeine-too-much"]
-    family_profile: {GI: 0.50, SKIN: 0.05, HEAD: 0.45}
     prior_tier: medium
     flags: []
   - id: cocoa
@@ -259,7 +234,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Chocolate can worsen reflux by relaxing the esophageal sphincter; it is on most clinical reflux lists."
     sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://med.virginia.edu/ginutrition/wp-content/uploads/sites/199/2025/10/GERD-2023.pdf", "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-B/part-163"]
-    family_profile: {GI: 0.60, SKIN: 0.10, HEAD: 0.30}
     prior_tier: low
     flags: []
   - id: sulfites
@@ -269,7 +243,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Reactions come within 15 to 30 minutes of eating but are uncommon, and reactions in people without asthma are extremely rare."
     sources: ["https://ask.ifas.ufl.edu/publication/FY731"]
-    family_profile: {GI: 0.30, SKIN: 0.40, HEAD: 0.30}
     prior_tier: low
     flags: []
   - id: added_glutamate
@@ -279,7 +252,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "FDA has received reports of headache and nausea after foods with MSG; kept mainly because users ask about it."
     sources: ["https://www.fda.gov/food/food-additives-petitions/questions-and-answers-monosodium-glutamate-msg"]
-    family_profile: {GI: 0.30, SKIN: 0.20, HEAD: 0.50}
     prior_tier: low
     flags: [contested]
   - id: nitrites
@@ -289,7 +261,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "Commonly blamed for headaches, but I found no clinical source; kept so cured meats can be separated from aged foods."
     sources: ["https://www.fsis.usda.gov/sites/default/files/media_file/2021-03/FPLIC_4b_Sausage_Operations.pdf"]
-    family_profile: {GI: 0.30, SKIN: 0.10, HEAD: 0.60}
     prior_tier: low
     flags: []
   - id: salicylates
@@ -299,7 +270,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "Salicylate sensitivity can cause stomach pain, nausea, diarrhoea and headaches, but food content data is inconsistent across studies."
     sources: ["https://bda.uk.com/static/5284c6c5-ee49-43f5-a50cede11ba44e85/Salicylate-Sensitivity-2022.pdf"]
-    family_profile: {GI: 0.40, SKIN: 0.40, HEAD: 0.20}
     prior_tier: low
     flags: [contested]
   - id: artificial_sweeteners
@@ -309,7 +279,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "Studies report effects on gut microbiome composition and function, but I found no source showing symptoms within 36 hours."
     sources: ["https://www.fda.gov/food/food-additives-petitions/high-intensity-sweeteners"]
-    family_profile: {GI: 0.60, SKIN: 0.05, HEAD: 0.35}
     prior_tier: low
     flags: [contested]
   - id: emulsifiers_gums
@@ -319,7 +288,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "Evidence is mostly from animal and lab studies of long-term inflammation, which may not meet the 36-hour mechanism rule."
     sources: ["https://pmc.ncbi.nlm.nih.gov/articles/PMC7986288"]
-    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
     prior_tier: low
     flags: [contested]
   - id: colors_preservatives
@@ -329,7 +297,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "It is unclear whether benzoates and artificial colorings act like salicylates, and evidence is mostly from behavior studies in children."
     sources: ["https://bda.uk.com/static/5284c6c5-ee49-43f5-a50cede11ba44e85/Salicylate-Sensitivity-2022.pdf", "https://www.fda.gov/industry/color-additives/fdc-red-no-3"]
-    family_profile: {GI: 0.20, SKIN: 0.60, HEAD: 0.20}
     prior_tier: low
     flags: [contested]
   - id: capsaicin
@@ -339,7 +306,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Spicy foods are on every clinical reflux list found and act within hours."
     sources: ["https://med.virginia.edu/ginutrition/wp-content/uploads/sites/199/2025/10/GERD-2023.pdf", "https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn"]
-    family_profile: {GI: 0.80, SKIN: 0.15, HEAD: 0.05}
     prior_tier: medium
     flags: []
   - id: fat_load
@@ -349,7 +315,6 @@ components:
     inclusion_confidence: high
     inclusion_rationale: "Fatty foods can relax the lower esophageal sphincter and delay stomach emptying, a direct same-meal effect."
     sources: ["https://cancerreferraltest.ohiohealth.com/siteassets/find-a-location/hospitals/mansfield-hospital/services/heartburn-clinic/medical-management-of-gerd.pdf", "https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://fdc.nal.usda.gov/download-datasets"]
-    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
     prior_tier: medium
     flags: [meal_level]
   - id: insoluble_fiber_load
@@ -359,7 +324,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Large fiber loads plausibly change stool and bloating within a day, but I found no source for this one."
     sources: ["https://fdc.nal.usda.gov/download-datasets"]
-    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
     prior_tier: medium
     flags: [meal_level]
   - id: carbonation
@@ -369,7 +333,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Carbonated drinks are a listed reflux trigger, though associations are heterogeneous across studies."
     sources: ["https://pubmed.ncbi.nlm.nih.gov/41132014/", "https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn"]
-    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
     prior_tier: medium
     flags: []
   - id: acidic
@@ -379,7 +342,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Citrus fruits and tomatoes increase stomach acidity, but study associations are mixed."
     sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://www.clemson.edu/extension/food/_files/ph-of-common-foods-table.pdf"]
-    family_profile: {GI: 0.90, SKIN: 0.05, HEAD: 0.05}
     prior_tier: medium
     flags: []
   - id: mint
@@ -389,7 +351,6 @@ components:
     inclusion_confidence: medium
     inclusion_rationale: "Peppermint relaxes the esophageal sphincter and can make reflux worse, even though people use it to settle the stomach."
     sources: ["https://www.loyolamedicine.org/about-us/blog/gerd-triggers-and-heartburn", "https://med.virginia.edu/ginutrition/wp-content/uploads/sites/199/2025/10/GERD-2023.pdf"]
-    family_profile: {GI: 0.95, SKIN: 0.01, HEAD: 0.05}
     prior_tier: low
     flags: []
   - id: nightshades
@@ -399,7 +360,6 @@ components:
     inclusion_confidence: low
     inclusion_rationale: "Often removed on autoimmune elimination diets, but I found no source showing a symptom mechanism; kept because users will ask."
     sources: ["https://journals.indianapolis.iu.edu/index.php/ias/article/download/8321/8298/14470", "https://www.helpfightra.org/should-i-eat-nightshade-vegetables/"]
-    family_profile: {GI: 0.50, SKIN: 0.30, HEAD: 0.20}
     prior_tier: low
     flags: [contested]
 merge_groups:

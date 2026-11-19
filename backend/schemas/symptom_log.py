@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import StrEnum
 from typing import Optional
 from uuid import UUID
 
@@ -24,9 +25,35 @@ class SymptomLogUpdate(BaseModel):
     notes: Optional[str] = Field(None, description="Additional notes about the symptom")
 
 
-class SymptomLogResponse(SymptomLogBase):
+class SymptomFamily(StrEnum):
+    GI = "gi"
+    SKIN = "skin"
+    HEAD = "head"
+    OTHER = "other"
+
+
+class SymptomRouteType(StrEnum):
+    RED_FLAG = "red_flag"
+    ALLERGY_LIKE = "allergy_like"
+    MODEL = "model"
+
+
+class SymptomRoute(BaseModel):
+    family: Optional[SymptomFamily] = Field(None, description="Symptom family; only set when route is model")
+    route: SymptomRouteType = Field(..., description="Where to route this symptom")
+    safety_message: Optional[str] = Field(None, description="Safety message for allergy-like and red flag symptoms")
+
+
+class SymptomLogResponse(SymptomLogBase, SymptomRoute):
+    """family, route and safety_message are computed from the symptom on every response, never stored."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID = Field(..., description="Unique ID for this symptom log")
     username: str = Field(..., description="Username")
     created_at: datetime = Field(..., description="When this log was created")
+
+
+class WashoutStatus(BaseModel):
+    active: bool = Field(False, description="If washout is happening")
+    ends_at: Optional[datetime] = Field(None, description="When the washout period ends")

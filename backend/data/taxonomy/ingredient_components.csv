@@ -1,4 +1,4 @@
-ingredient_id,canonical_name,component,level,confidence,rationale,source,level_basis,notes
+ingredient_id,canonical_name,component,concentration_level,confidence,rationale,source,concentration_basis,notes
 wheat_bread,wheat bread,fructans_grain,2,high,"Wheat, rye and barley products are the main fructan sources in Western diets, and a normal serving is mostly grain.",https://doi.org/10.1111/j.1365-277X.2010.01139.x,design doc worked example,Must match design doc worked example.
 wheat_bread,wheat bread,gluten,3,high,"Made from wheat, rye or barley, which FDA names as gluten-containing grains.",https://www.fda.gov/food/allergens/gluten-and-food-labeling,design doc worked example,Must match design doc worked example.
 whole_wheat_bread,whole wheat bread,fructans_grain,3,high,"Wheat, rye and barley products are the main fructan sources in Western diets, and a normal serving is mostly grain.",https://doi.org/10.1111/j.1365-277X.2010.01139.x,judgment,
