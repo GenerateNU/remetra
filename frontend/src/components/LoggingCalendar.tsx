@@ -1,15 +1,14 @@
 /**
  * Month calendar of how completely each day was logged. Cells use the same size, gap, radius and
  * outline as the health calendar. Each cell is split on the diagonal: food fills the top-left
- * triangle, a symptom the bottom-right. Status never relies on color alone: logged days also carry
- * the log modal's icons (fork and knife for food, stethoscope for a symptom, both when fully
- * logged), empty days are outlined, and every cell has a screen-reader label. The marks only say
- * what was logged; nothing celebrates a day or hints at how bad the symptoms were.
+ * triangle, a symptom the bottom-right; the legend names each color. Empty days are outlined, and
+ * every cell has a screen-reader label with its status. The fills only say what was logged;
+ * nothing celebrates a day or hints at how bad the symptoms were.
  */
 import { useMemo } from 'react';
 import { ActivityIndicator, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import Svg, { Polygon } from 'react-native-svg';
-import { ChevronLeft, ChevronRight, Flame, Stethoscope, Utensils, type LucideIcon } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Flame } from 'lucide-react-native';
 import type { CalendarDayResponse, CalendarMonthResponse, DayStatus } from '../api/calendar_service';
 import { buildCalendarGrid, CalendarCell, monthOf, monthRange, shiftMonth } from '../utils/calendarGrid';
 import { parseDayKey } from '../utils/dayKey';
@@ -21,14 +20,6 @@ const EMPTY_BORDER = '#d8d6d0';
 const SELECTED_BORDER = '#5C2E14'; // remetra-espresso
 const FOOD_COLOR = '#fca450'; // remetra-orange, same as FoodCard
 const SYMPTOM_COLOR = '#b2939b'; // remetra-mauve, same as SymptomCard
-const MARK_COLOR = '#5C2E14'; // remetra-espresso, readable on both fills and on white
-
-const STATUS_ICONS: Record<DayStatus, LucideIcon[]> = {
-  complete: [Utensils, Stethoscope],
-  food_only: [Utensils],
-  symptoms_only: [Stethoscope],
-  empty: [],
-};
 
 const STATUS_LABELS: Record<DayStatus, string> = {
   complete: 'fully logged',
@@ -59,35 +50,20 @@ function StatusFill({ status, width, height = width }: { status: DayStatus; widt
   );
 }
 
-function StatusMark({ status, size }: { status: DayStatus; size: number }) {
-  const icons = STATUS_ICONS[status];
-  if (icons.length === 0) return null;
-  return (
-    <View style={{ flexDirection: 'row', gap: 1 }}>
-      {icons.map((Icon, i) => (
-        <Icon key={i} size={size} color={MARK_COLOR} strokeWidth={2.25} />
-      ))}
-    </View>
-  );
-}
-
 function LegendItem({ status, label }: { status: DayStatus; label: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
       <View
         style={{
-          width: status === 'complete' ? 24 : 16,
+          width: 16,
           height: 16,
           borderRadius: 3,
           overflow: 'hidden',
           borderWidth: status === 'empty' ? 1 : 0,
           borderColor: EMPTY_BORDER,
-          alignItems: 'center',
-          justifyContent: 'center',
         }}
       >
-        <StatusFill status={status} width={status === 'complete' ? 24 : 16} height={16} />
-        <StatusMark status={status} size={10} />
+        <StatusFill status={status} width={16} />
       </View>
       <Text style={{ fontSize: 11, color: '#666' }}>{label}</Text>
     </View>
@@ -118,8 +94,6 @@ export function LoggingCalendar({ month, data, today, selectedDay, onSelectDay, 
     const isSelected = c.day === selectedDay;
     const dateLabel = c.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
     const borderWidth = isSelected ? 2 : status === 'empty' ? 1 : 0;
-    // Two icons share the width on fully logged days
-    const markSize = Math.max(8, Math.round(cellSize * (status === 'complete' ? 0.26 : 0.3)));
 
     return (
       <TouchableOpacity
@@ -152,7 +126,6 @@ export function LoggingCalendar({ month, data, today, selectedDay, onSelectDay, 
         >
           {c.date.getDate()}
         </Text>
-        {!isFuture && <StatusMark status={status} size={markSize} />}
       </TouchableOpacity>
     );
   };
