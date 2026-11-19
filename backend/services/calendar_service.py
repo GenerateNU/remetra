@@ -8,7 +8,7 @@ from local_day import parse_timezone
 from repositories.calendar_repository import CalendarRepository
 from schemas.calendar import CalendarDayResponse, CalendarDaySummary, CalendarMonthResponse
 from schemas.food_log import FoodLogResponse
-from schemas.symptom_log import SymptomLogResponse
+from services.symptom_log_service import to_symptom_log_response
 
 MONTH_FORMAT = re.compile(r"^(\d{4})-(0[1-9]|1[0-2])$")
 
@@ -63,7 +63,7 @@ class CalendarService:
         return CalendarDayResponse(
             date=day,
             food_logs=[FoodLogResponse.model_validate(log) for log in food_logs],
-            symptom_logs=[SymptomLogResponse.model_validate(log) for log in symptom_logs],
+            symptom_logs=[to_symptom_log_response(log) for log in symptom_logs],
         )
 
 
