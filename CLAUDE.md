@@ -19,8 +19,9 @@ All development commands use the `just` command runner (see `justfile`). Run `ju
 | `just logs` | View backend logs (all services) |
 | `just logs-backend` | Tail backend logs only |
 | `just logs-db` | Tail database logs only |
-| `just seed` | Seed dev data (idempotent) |
-| `just seed-clear` | Clear and re-seed dev data |
+| `just mock` | Create mock users (count, seed, days). Replaces existing `mock_` users |
+| `just mock-clear` | Delete `mock_` users only |
+| `just mock-check` | Check that planted triggers stand out from background symptoms |
 | `just seed-rag` | Ingest PDFs into RAG pipeline |
 | `just reset-db` | Destructive schema reset (wipes all data) |
 | `just clean` | Wipe Docker volumes |
