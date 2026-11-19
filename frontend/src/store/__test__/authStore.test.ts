@@ -115,6 +115,116 @@ describe("AuthStore navigation states", () => {
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 
+  test("an empty disease list means onboarding is already finished", async () => {
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      disease: [],
+    });
+
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
+    expect(getInitialScreen()).toBe("main");
+  });
+
+  test("saved diagnoses mean onboarding is already finished", async () => {
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      disease: ["Celiac disease"],
+    });
+
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
+    expect(getInitialScreen()).toBe("main");
+  });
+
+  test("a date of birth alone does not skip onboarding", async () => {
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      dob: "2000-01-01",
+      disease: null,
+    });
+
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(false);
+    expect(getInitialScreen()).toBe("onboarding");
+  });
+
+  test("logout then login follows the server profile", async () => {
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      disease: ["IBS"],
+    });
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
+
+    useAuthStore.getState().logout();
+
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      disease: null,
+    });
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(false);
+    expect(getInitialScreen()).toBe("onboarding");
+
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      disease: [],
+    });
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(true);
+    expect(getInitialScreen()).toBe("main");
+  });
+
+  test("refreshProfile drops a local completion flag when disease is null", async () => {
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      disease: ["IBS"],
+    });
+    await useAuthStore.getState().login({
+      username: "testuser",
+      password: "password123",
+    });
+
+    mockGetMe.mockResolvedValue({
+      username: "testuser",
+      email: "testuser@example.com",
+      dob: "2000-01-01",
+      disease: null,
+    });
+    await useAuthStore.getState().refreshProfile();
+
+    expect(useAuthStore.getState().hasCompletedOnboarding).toBe(false);
+  });
+
   test("logout clears the session and signs out of Clerk", async () => {
     await useAuthStore.getState().login({
       username: "testuser",
