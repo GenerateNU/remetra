@@ -7,7 +7,6 @@ from models.user_component_state import UserComponentState
 
 
 class UserComponentStateRepository:
-
     def has_state(self, db: Session, username: str) -> bool:
         result = db.execute(
             select(UserComponentState.id).where(UserComponentState.username == username).limit(1)

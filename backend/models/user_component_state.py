@@ -28,6 +28,4 @@ class UserComponentState(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    __table_args__ = (
-        UniqueConstraint("username", "component_id", "family", name="uq_user_component_family"),
-    )
+    __table_args__ = (UniqueConstraint("username", "component_id", "family", name="uq_user_component_family"),)

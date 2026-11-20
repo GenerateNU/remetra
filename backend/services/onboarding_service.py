@@ -1,15 +1,15 @@
-from datetime import datetime, timedelta
 import math
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import yaml
 from sqlalchemy.orm import Session
 
+from analysis.nightly_refresh import nightly_refresh
 from models.user_component_state import UserComponentState
-from repositories.user_component_state_repository import UserComponentStateRepository
 from repositories.food_log_repository import FoodLogRepository
 from repositories.symptom_log_repository import SymptomLogRepository
-from analysis.nightly_refresh import nightly_refresh
+from repositories.user_component_state_repository import UserComponentStateRepository
 
 CONDITION_FILE = Path(__file__).resolve().parent.parent / "data" / "taxonomy" / "condition_multipliers.yaml"
 FAMILIES = ["GI", "SKIN", "HEAD"]
@@ -32,7 +32,6 @@ def _compute_multiplier(user_diseases: list[str], component_slug: str, config: d
 
 
 class OnboardingService:
-
     def __init__(self):
         self.repo = UserComponentStateRepository()
         self.food_repo = FoodLogRepository()
@@ -69,7 +68,7 @@ class OnboardingService:
                         background_rate=background_rate,
                         background_total=0.0,
                         hours_since_onboarding=0.0,
-                        last_update=datetime.now(),
+                        last_update=datetime.now(timezone.utc),
                     )
                 )
 
@@ -97,7 +96,7 @@ class OnboardingService:
         for symptom in symptoms:
             if symptom.timestamp >= start:
                 new_symptoms.append(symptom)
-        new_states = nightly_refresh(new_meals, new_symptoms, as_of, last_update, states)
-        for s in new_states:
+        nightly_refresh(new_meals, new_symptoms, as_of, last_update, states)
+        for s in states:
             s.last_update = as_of
-        self.repo.update_states(db, new_states)
+        self.repo.update_states(db, states)
