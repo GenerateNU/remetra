@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from models.metrics import Metrics
+from models.user_component_state import UserComponentState
 from schemas.food_log import FoodLogResponse
 from schemas.symptom_log import SymptomLogResponse
 
@@ -14,12 +14,46 @@ class SymptomMealMap:
     food_time: datetime
 
 
+@dataclass(frozen=True)
+class PairTiming:
+    """Timing curve weight for one food log - symptom log pair."""
+
+    food_log_id: UUID
+    symptom_log_id: UUID
+    time_elapsed: timedelta
+    weight: float
+
+
 def nightly_refresh(
     new_meals: list[FoodLogResponse],
     new_symptoms: list[SymptomLogResponse],
-    metrics: list[Metrics],
-):
-    # TODO later
+    now: datetime,
+    last_update: datetime,
+    uc_states: list[UserComponentState],
+) -> list[PairTiming]:
+    """Return the timing curve weight for every linked food log - symptom log pair."""
+    symptoms_by_id = {symptom.id: symptom for symptom in new_symptoms}
+    results = []
+    for meal_map in symptom_meal_map(new_meals, new_symptoms, now, last_update):
+        for symptom_log_id, time_elapsed in meal_map.symptoms.items():
+            weight = update(
+                food_log_id=meal_map.food_log.id,
+                symptom_log_id=symptom_log_id,
+                time_elapsed=time_elapsed,
+                family=symptoms_by_id[symptom_log_id].family,
+            )
+            results.append(PairTiming(meal_map.food_log.id, symptom_log_id, time_elapsed, weight))
+
+    return results
+
+
+def update(
+    food_log_id: UUID,
+    symptom_log_id: UUID,
+    time_elapsed: timedelta,
+    family: str,
+) -> float:
+    """Return how strongly the timing links this meal to this symptom."""
     pass
 
 
@@ -27,11 +61,16 @@ def symptom_meal_map(
     new_meals: list[FoodLogResponse],
     new_symptoms: list[SymptomLogResponse],
     now: datetime,
+    last_update: datetime | None = None,
 ):
-    day_ago = now - timedelta(hours=24)
+    """Map each symptom to the meals that occurred within the relevant lookback window."""
     meal_dict = {}
     for symptom in new_symptoms:
-        if symptom.timestamp >= day_ago and symptom.timestamp <= now:
+        if last_update is None:
+            in_window = now - timedelta(hours=24) <= symptom.timestamp <= now
+        else:
+            in_window = last_update < symptom.timestamp <= now
+        if in_window:
             lookback = 36
             if symptom.family == "SKIN":
                 lookback = 48
