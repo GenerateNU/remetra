@@ -69,6 +69,7 @@ class OnboardingService:
                         background_rate=background_rate,
                         background_total=0.0,
                         hours_since_onboarding=0.0,
+                        last_update=datetime.now(),
                     )
                 )
 
