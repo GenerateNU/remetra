@@ -1,36 +1,31 @@
-import { useEffect, useRef, type ReactNode } from 'react';
-import { Keyboard, KeyboardAvoidingView, ScrollView, type KeyboardAvoidingViewProps, type ScrollViewInstance } from 'react-native';
+import type { ReactNode } from 'react';
+import {
+  KeyboardAvoidingView,
+  KeyboardAwareScrollView as KCKeyboardAwareScrollView,
+  type KeyboardAvoidingViewProps,
+} from 'react-native-keyboard-controller';
 
-// Shrinks its content by the keyboard's height so inputs and buttons near the
-// bottom stay visible while typing. Modals render in their own window, so this
-// must go *inside* a <Modal>, not around it.
-export function KeyboardAvoider({ className, ...props }: KeyboardAvoidingViewProps) {
-  return <KeyboardAvoidingView behavior="padding" className={`flex-1 ${className ?? ''}`} {...props} />;
+// Shrinks its content by the keyboard's height, frame-by-frame with the keyboard
+// animation, so inputs and buttons near the bottom stay visible while typing.
+// Modals render in their own window, so this must go *inside* a <Modal>.
+// Uses `style`, not `className`: NativeWind doesn't map classes onto
+// third-party components unless they're registered with cssInterop.
+export function KeyboardAvoider({ style, ...props }: KeyboardAvoidingViewProps) {
+  return <KeyboardAvoidingView behavior="padding" style={[{ flex: 1 }, style]} {...props} />;
 }
 
-// Full-screen version for forms whose inputs sit at the bottom of the content
-// (e.g. login/signup): scrolls to the end when the keyboard opens so the fields
-// and submit button stay in view. Tapping empty space dismisses the keyboard.
+// Full-screen scrolling form (e.g. login/signup): scrolls just enough to keep
+// the *focused* input visible above the keyboard. Tapping empty space dismisses
+// the keyboard.
 export function KeyboardAwareScrollView({ children }: { children: ReactNode }) {
-  const scrollRef = useRef<ScrollViewInstance>(null);
-
-  useEffect(() => {
-    const sub = Keyboard.addListener('keyboardDidShow', () => {
-      scrollRef.current?.scrollToEnd({ animated: true });
-    });
-    return () => sub.remove();
-  }, []);
-
   return (
-    <KeyboardAvoider>
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-        bounces={false}
-      >
-        {children}
-      </ScrollView>
-    </KeyboardAvoider>
+    <KCKeyboardAwareScrollView
+      bottomOffset={24}
+      contentContainerStyle={{ flexGrow: 1 }}
+      keyboardShouldPersistTaps="handled"
+      bounces={false}
+    >
+      {children}
+    </KCKeyboardAwareScrollView>
   );
 }

@@ -83,7 +83,7 @@ export function SignupScreen() {
       <View className="flex-1">
         <BackgroundGradient />
         <KeyboardAwareScrollView>
-  
+
         <View className="flex-1 justify-start items-center px-6 pt-[15%]">
         
           <View className="pt-36 items-center mb-16">
