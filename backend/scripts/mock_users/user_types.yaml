@@ -1,0 +1,22 @@
+# Mock user types. Each user gets one type: a single planted trigger component, or none.
+
+background_symptoms_per_day: 0.15
+
+user_types:
+  onion_garlic:
+    trigger:
+      component: fructans_allium
+      delay_hours: [2, 12]
+      symptom: {sensation: Bloating, location: Abdomen}
+  lactose:
+    trigger:
+      component: lactose
+      delay_hours: [1, 6]
+      symptom: {sensation: Cramping, location: Abdomen}
+  alcohol:
+    trigger:
+      component: alcohol
+      delay_hours: [6, 14]
+      symptom: {sensation: Throbbing, location: Head}
+  no_trigger:
+    trigger: null

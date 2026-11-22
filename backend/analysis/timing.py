@@ -42,14 +42,12 @@ def timing_density(family: SymptomFamily, delta: float) -> float:
     if family == SymptomFamily.SKIN:
         m_early, s_early = params[0]
         m_late, s_late = params[1]
-        numerator = (
-            SKIN_EARLY_WEIGHT * _log_normal_pdf(delta, m_early, s_early)
-            + (1 - SKIN_EARLY_WEIGHT) * _log_normal_pdf(delta, m_late, s_late)
-        )
-        denominator = (
-            SKIN_EARLY_WEIGHT * _log_normal_cdf(t_f, m_early, s_early)
-            + (1 - SKIN_EARLY_WEIGHT) * _log_normal_cdf(t_f, m_late, s_late)
-        )
+        numerator = SKIN_EARLY_WEIGHT * _log_normal_pdf(delta, m_early, s_early) + (
+            1 - SKIN_EARLY_WEIGHT
+        ) * _log_normal_pdf(delta, m_late, s_late)
+        denominator = SKIN_EARLY_WEIGHT * _log_normal_cdf(t_f, m_early, s_early) + (
+            1 - SKIN_EARLY_WEIGHT
+        ) * _log_normal_cdf(t_f, m_late, s_late)
     else:
         m, sigma = params[0]
         numerator = _log_normal_pdf(delta, m, sigma)
@@ -72,14 +70,12 @@ def timing_share(family: SymptomFamily, a: float, b: float) -> float:
     if family == SymptomFamily.SKIN:
         m_early, s_early = params[0]
         m_late, s_late = params[1]
-        numerator = (
-            SKIN_EARLY_WEIGHT * (_log_normal_cdf(b, m_early, s_early) - _log_normal_cdf(a, m_early, s_early))
-            + (1 - SKIN_EARLY_WEIGHT) * (_log_normal_cdf(b, m_late, s_late) - _log_normal_cdf(a, m_late, s_late))
-        )
-        denominator = (
-            SKIN_EARLY_WEIGHT * _log_normal_cdf(t_f, m_early, s_early)
-            + (1 - SKIN_EARLY_WEIGHT) * _log_normal_cdf(t_f, m_late, s_late)
-        )
+        numerator = SKIN_EARLY_WEIGHT * (
+            _log_normal_cdf(b, m_early, s_early) - _log_normal_cdf(a, m_early, s_early)
+        ) + (1 - SKIN_EARLY_WEIGHT) * (_log_normal_cdf(b, m_late, s_late) - _log_normal_cdf(a, m_late, s_late))
+        denominator = SKIN_EARLY_WEIGHT * _log_normal_cdf(t_f, m_early, s_early) + (
+            1 - SKIN_EARLY_WEIGHT
+        ) * _log_normal_cdf(t_f, m_late, s_late)
     else:
         m, sigma = params[0]
         numerator = _log_normal_cdf(b, m, sigma) - _log_normal_cdf(a, m, sigma)

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity } from 'react-native';
+import { KeyboardAvoider } from './KeyboardAvoider';
 
 interface BaseAddModalProps {
   visible: boolean;
@@ -13,6 +14,7 @@ interface BaseAddModalProps {
 export function BaseAddModal({ visible, onClose, onAdd, addLabel, error, children }: BaseAddModalProps) {
   return (
     <Modal visible={visible} transparent animationType="fade">
+      <KeyboardAvoider>
       <View className="flex-1 bg-black/50 justify-center items-center">
         <View className="bg-white rounded-[20px] p-8 w-4/5">
           {children}
@@ -30,6 +32,7 @@ export function BaseAddModal({ visible, onClose, onAdd, addLabel, error, childre
           </View>
         </View>
       </View>
+      </KeyboardAvoider>
     </Modal>
   );
 }

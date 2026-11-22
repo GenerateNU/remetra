@@ -29,7 +29,6 @@ class UserIngredientService:
             preferences[ingredient_id] = IngredientPreference.SUSPECT
         for ingredient_id in data.safe:
             preferences[ingredient_id] = IngredientPreference.SAFE
-        
 
         missing = set(preferences) - self.repo.get_existing_ingredient_ids(db, set(preferences))
         if missing:

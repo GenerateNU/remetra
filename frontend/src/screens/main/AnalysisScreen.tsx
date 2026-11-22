@@ -2,8 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
 import { SymptomsOverTimeChart } from '../../components/SymptomsOverTimeChart';
+import { HealthTrendsChart } from '../../components/HealthTrendsChart';
+import { HealthBreakdownPieChart } from '../../components/HealthBreakdownPieChart';
+import { HealthCalendarHeatmap } from '../../components/HealthCalendarHeatmap';
 import { symptomLogService, SymptomLogResponse } from '../../api/symptom_log_service';
 import { foodLogService } from '../../api/food_log_service';
+import { healthService, HealthDayResponse } from '../../api/health_service';
+import { rangeBounds, toDayKey } from '../../utils/healthChartData';
 import { useBankStore } from '../../store/bankStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useAlgorithmStore } from '../../store/useAlgorithmStore';
@@ -11,6 +16,12 @@ import { useAppNavigation } from '../../navigation/hooks';
 import { ChevronRight } from 'lucide-react-native';
 
 const MIN_LOGS_FOR_ANALYSIS = 30;
+// Fetch the longest chart range once; the 7/30-day toggles slice it client-side
+const HEALTH_TREND_DAYS = 90;
+
+function getHealthTrendRange(): { start: string; end: string } {
+  return rangeBounds(toDayKey(new Date()), HEALTH_TREND_DAYS);
+}
 
 interface SymptomCount {
   symptomId: string;
@@ -30,6 +41,10 @@ export function AnalysisScreen() {
   const [totalLogs, setTotalLogs] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [healthRange] = useState(getHealthTrendRange);
+  const [healthDays, setHealthDays] = useState<HealthDayResponse[]>([]);
+  const [healthLoading, setHealthLoading] = useState(true);
+  const [healthError, setHealthError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -91,6 +106,15 @@ export function AnalysisScreen() {
     load();
   }, []);
 
+  // Loaded separately so a health-data failure doesn't block the symptom analysis
+  useEffect(() => {
+    healthService
+      .getHealthTrends(healthRange.start, healthRange.end)
+      .then(setHealthDays)
+      .catch((err: any) => setHealthError(err.message ?? 'Failed to load health data'))
+      .finally(() => setHealthLoading(false));
+  }, [healthRange]);
+
   const belowThreshold = totalLogs < MIN_LOGS_FOR_ANALYSIS;
 
   return (
@@ -137,6 +161,21 @@ export function AnalysisScreen() {
             </View>
           </>
         )}
+
+        <View className="mt-6">
+          <SectionDivider label="Health Trends" />
+          {healthLoading ? (
+            <ActivityIndicator color="#b2939b" style={{ marginTop: 24 }} />
+          ) : healthError ? (
+            <Text className="text-remetra-burgundy text-center mt-6">{healthError}</Text>
+          ) : (
+            <>
+              <HealthTrendsChart days={healthDays} end={healthRange.end} />
+              <HealthBreakdownPieChart days={healthDays} end={healthRange.end} />
+              <HealthCalendarHeatmap days={healthDays} end={healthRange.end} />
+            </>
+          )}
+        </View>
       </ScrollView>
     </View>
   );
