@@ -3,7 +3,7 @@ import { useBankStore } from "../store/bankStore";
 import { symptomLogService } from "../api/symptom_log_service";
 import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, Modal } from "react-native";
 import { ArrowLeft } from "lucide-react-native";
 import { LogDateTimePicker } from "./LogDateTimePicker";
 import { sensationOptions, locationOptions } from "../types/symptomOptions";
@@ -13,9 +13,10 @@ import { ComboBox } from "./ComboBox";
 interface SymptomLogFormProps {
   onSubmit: (entry: SymptomLogEntry) => void;
   onBack: () => void;
+  initialTimestamp?: Date;
 }
 
-export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack }) => {
+export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack, initialTimestamp }) => {
   const username = useAuthStore((s) => s.user.name) ?? "";
   const { symptoms, addSymptom } = useBankStore();
 
@@ -28,10 +29,21 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [intensity, setIntensity] = useState(5);
-  const [timestamp, setTimestamp] = useState(new Date());
+  const [timestamp, setTimestamp] = useState(() => initialTimestamp ?? new Date());
+
+  // The form can stay mounted between opens (e.g. when the modal opens straight to symptom)
+  const [prevInitialTimestamp, setPrevInitialTimestamp] = useState(initialTimestamp);
+  if (initialTimestamp !== prevInitialTimestamp) {
+    setPrevInitialTimestamp(initialTimestamp);
+    if (initialTimestamp) setTimestamp(initialTimestamp);
+  }
   const [showDuration, setShowDuration] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Safety message from the backend for red-flag / allergy-like symptoms; blocks until the user taps OK
+  const [safetyMessage, setSafetyMessage] = useState<string | null>(null);
+  const [pendingEntry, setPendingEntry] = useState<SymptomLogEntry | null>(null);
 
   const filtered = symptoms.filter((sy) =>
     sy.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -67,8 +79,9 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
       return;
     }
 
+    let safety: string | null = null;
     try {
-      await symptomLogService.createSymptomLog({
+      const created = await symptomLogService.createSymptomLog({
         symptom_id: symptomId,
         intensity,
         timestamp: timestamp.toISOString(),
@@ -76,6 +89,7 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
         notes: notes.trim() || undefined,
         username,
       });
+      safety = created.safety_message;
       useUIStore.getState().notifyLogCreated()
     } catch (error) {
       console.error("Failed to create symptom log entry:", error);
@@ -92,7 +106,18 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
       timestamp,
       durationMinutes: showDuration ? parseFloat(durationMinutes) || null : null,
     };
+    if (safety) {
+      setPendingEntry(entry);
+      setSafetyMessage(safety);
+      return;
+    }
     onSubmit(entry);
+  };
+
+  const handleSafetyAcknowledged = () => {
+    setSafetyMessage(null);
+    if (pendingEntry) onSubmit(pendingEntry);
+    setPendingEntry(null);
   };
 
   const isValid = isCustom
@@ -263,6 +288,24 @@ export const SymptomLogForm: React.FC<SymptomLogFormProps> = ({ onSubmit, onBack
           </TouchableOpacity>
         </>
       )}
+
+      {/* Blocking: only OK dismisses it (Android back is ignored) */}
+      <Modal visible={safetyMessage !== null} transparent animationType="fade" onRequestClose={() => {}}>
+        <View className="flex-1 bg-black/40 justify-center items-center" accessibilityViewIsModal>
+          <View className="bg-remetra-surface-accent rounded-[20px] p-8 w-4/5">
+            <Text className="text-base font-ptserif text-remetra-espresso leading-6" accessibilityLiveRegion="assertive">
+              {safetyMessage}
+            </Text>
+            <TouchableOpacity
+              onPress={handleSafetyAcknowledged}
+              className="bg-remetra-espresso rounded-full py-3.5 items-center mt-6"
+              accessibilityRole="button"
+            >
+              <Text className="text-base font-ptserif text-white">OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };

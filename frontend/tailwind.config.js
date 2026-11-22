@@ -5,6 +5,9 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
   presets: [require('nativewind/preset')],
+  // "class" (not the default "media") so NativeWind on web doesn't throw when the page sets a color scheme.
+  // The app is light-only (app.json userInterfaceStyle), so this doesn't change how anything looks.
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
