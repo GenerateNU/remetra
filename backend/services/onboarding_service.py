@@ -47,6 +47,8 @@ class OnboardingService:
 
         user = self.repo.get_user(db, username)
         components = self.repo.get_all_components(db)
+        if not components:
+            raise ValueError("No components in the database; run scripts/seed_taxonomy.py first")
         config = _load_condition_multipliers()
         user_diseases = user.disease or []
         now = datetime.now(timezone.utc)

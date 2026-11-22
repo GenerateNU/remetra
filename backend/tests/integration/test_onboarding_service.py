@@ -209,6 +209,14 @@ class TestInitializeUserState:
                 expected = base
             assert s.log_odds == pytest.approx(expected), slug_by_id[s.component_id]
 
+    def test_no_components_raises(self, db_session, authenticated_user):
+        """Seeding before the taxonomy is loaded is an error, not a silent 0-row 'already seeded'."""
+        service = OnboardingService()
+
+        with patch.object(service.repo, "get_all_components", return_value=[]):
+            with pytest.raises(ValueError, match="seed_taxonomy"):
+                service.initialize_user_state(db_session, authenticated_user["username"])
+
     def test_new_rows_have_utc_last_update(self, db_session, authenticated_user):
         """Freshly seeded rows are stamped with the current UTC time."""
         username = authenticated_user["username"]
