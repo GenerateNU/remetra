@@ -2,7 +2,7 @@
 
 import uuid
 
-from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -25,3 +25,6 @@ class SymptomLog(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     symptom = relationship("Symptom", back_populates="symptom_logs")
+
+    # Washout reads a user's logs in a time window on every pool build
+    __table_args__ = (Index("ix_symptom_logs_username_timestamp", "username", "timestamp"),)

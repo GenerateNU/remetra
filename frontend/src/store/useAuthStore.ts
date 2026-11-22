@@ -5,6 +5,7 @@ import { authService, MeResponse } from '../api/auth_service';
 import { clerkSignIn, clerkSignOut, clerkSignUp } from '../auth/clerkSession';
 import { useBankStore } from './bankStore';
 import { useOnboardingStore } from './onboardingStore';
+import { useCalendarStore } from './calendarStore';
 
 interface UserProfile {
   id: string | null;
@@ -124,12 +125,14 @@ export const useAuthStore = create<AuthStore>()(
       clearLocal: () => {
         useBankStore.getState().clearBank();
         useOnboardingStore.getState().reset();
+        useCalendarStore.getState().clearCalendar();
         set(clearedSession);
       },
 
       logout: () => {
         useBankStore.getState().clearBank();
         useOnboardingStore.getState().reset();
+        useCalendarStore.getState().clearCalendar();
         set(clearedSession);
         void clerkSignOut().catch(() => {});
       },
