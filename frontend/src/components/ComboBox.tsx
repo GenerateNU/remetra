@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   type TextInputInstance,
 } from 'react-native';
+import { KeyboardAvoider } from './KeyboardAvoider';
 
 interface ComboBoxProps {
   value: string;
@@ -74,6 +75,7 @@ export function ComboBox({
         onRequestClose={close}
         onShow={() => inputRef.current?.focus()}
       >
+        <KeyboardAvoider>
         <Pressable
           onPress={close}
           className="flex-1 bg-black/50 justify-center items-center px-6"
@@ -117,6 +119,7 @@ export function ComboBox({
             </ScrollView>
           </Pressable>
         </Pressable>
+        </KeyboardAvoider>
       </Modal>
     </>
   );

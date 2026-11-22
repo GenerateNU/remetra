@@ -4,6 +4,7 @@ import { X, Utensils, Stethoscope } from "lucide-react-native";
 
 import { LogEntry, ModalStep } from "../types/logs";
 import { FoodLogForm } from "./FoodLogForm";
+import { KeyboardAvoider } from "./KeyboardAvoider";
 import { SymptomLogForm } from "./SymptomLogForm";
 
 interface LogEntryModalProps {
@@ -43,6 +44,7 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
       transparent={true}
       onRequestClose={handleClose}
     >
+      <KeyboardAvoider>
       <TouchableOpacity
         className="flex-1 bg-black/50 justify-center items-center px-5"
         activeOpacity={1}
@@ -101,6 +103,7 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
           </ScrollView>
         </View>
       </TouchableOpacity>
+      </KeyboardAvoider>
     </Modal>
   );
 };
