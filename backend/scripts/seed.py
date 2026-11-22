@@ -30,6 +30,7 @@ from models.food import Food
 from models.food_log import FoodLog
 from models.metrics import Metrics
 from models.symptom import Symptom
+from models.symptom_family import family_for_symptom
 from models.symptom_log import SymptomLog
 from models.tag import FoodTag, Tag
 from models.user import User
@@ -140,6 +141,8 @@ def seed_symptoms(db) -> tuple[dict[tuple[str, str], Symptom], int]:
         sensation = definition["sensation"]
         location = definition["location"]
         display_name = f"{sensation} — {location}"
+        family = family_for_symptom(location, sensation)
+        family_value = family.value if family else None
         symptom = db.execute(
             select(Symptom).where(
                 Symptom.username == username,
@@ -152,10 +155,13 @@ def seed_symptoms(db) -> tuple[dict[tuple[str, str], Symptom], int]:
                 name=display_name,
                 sensation=sensation,
                 location=location,
+                family=family_value,
             )
             db.add(symptom)
             db.flush()
             created += 1
+        elif symptom.family != family_value:
+            symptom.family = family_value
         symptom_map[(username, raw_symptom)] = symptom
     db.commit()
     skipped = len(pairs) - created - skipped_unknown

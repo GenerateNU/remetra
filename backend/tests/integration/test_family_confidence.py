@@ -276,3 +276,11 @@ class TestFamilyConfidenceService:
         early = datetime(2000, 1, 1, tzinfo=timezone.utc)
         with pytest.raises(ValueError, match="before user creation"):
             service.get_background_rate(db_session, user.username, SymptomFamily.GI, early)
+
+    def test_get_background_rate_raises_if_user_missing(self, db_session, setup_user_and_components):
+        from services.family_confidence_service import FamilyConfidenceService
+
+        service = FamilyConfidenceService()
+
+        with pytest.raises(ValueError, match="not found"):
+            service.get_background_rate(db_session, "no_such_user", SymptomFamily.GI, datetime.now(timezone.utc))

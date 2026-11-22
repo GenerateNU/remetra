@@ -6,15 +6,15 @@ from sqlalchemy.orm import Session
 
 from analysis.model_constants import background_rate
 from models.symptom_family import SymptomFamily
-from models.user import User
 from repositories.family_confidence_repository import FamilyConfidenceRepository
+from repositories.user_repository import UserRepository
 from schemas.family_confidence import ComponentConfidenceResponse, FamilyConfidenceResponse
 
 
 class FamilyConfidenceService:
-
     def __init__(self):
         self.repo = FamilyConfidenceRepository()
+        self.user_repo = UserRepository()
 
     def ensure_initialized(self, db: Session, username: str) -> None:
         """Initialize 120 confidence rows + 3 background rows if the user has none."""
@@ -55,11 +55,11 @@ class FamilyConfidenceService:
             )
         return results
 
-    def get_background_rate(
-        self, db: Session, username: str, family: SymptomFamily, as_of: datetime
-    ) -> float:
+    def get_background_rate(self, db: Session, username: str, family: SymptomFamily, as_of: datetime) -> float:
         """Compute lambda_f using the prior-weighted formula from the spec."""
-        user = db.query(User).filter(User.username == username).one()
+        user = self.user_repo.get_by_username(db, username)
+        if user is None:
+            raise ValueError(f"User '{username}' not found")
         if as_of < user.created_at:
             raise ValueError("as_of is before user creation")
 
