@@ -64,10 +64,12 @@ export function SignupScreen() {
       try {
         await register({username, email, password});
     } catch (err) {
-      console.log(err)
       if (err instanceof ApiError) {
-        if (err.message.includes('already registered')) { 
+        if (err.message.includes('already registered')) {
           setErrors({ username: 'Username already taken' });
+        } else if (err.message.toLowerCase().includes('password')) {
+          // e.g. Clerk's breached-password / weak-password rejections
+          setErrors({ password: err.message });
         } else {
           setErrors({ general: err.message });
         }
@@ -152,6 +154,9 @@ export function SignupScreen() {
           />
           {errors.password && (
             <Text className="text-red-400 mb-2">{errors.password}</Text>
+          )}
+          {errors.general && (
+            <Text className="text-red-400 mb-2">{errors.general}</Text>
           )}
           </View>
   
