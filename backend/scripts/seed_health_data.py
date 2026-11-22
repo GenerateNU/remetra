@@ -6,7 +6,7 @@ POST /health/sync — only the HTTP/Clerk auth layer is skipped.
 
 How to run:
     1. Start the stack with `just dev`, sign up in the app and finish onboarding, so the user exists.
-    
+
     2. From the repo root, with the stack running:
 
         docker compose exec backend python scripts/seed_health_data.py --username <username>

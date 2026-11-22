@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
@@ -36,6 +37,17 @@ class FoodLogRepository:
         """Retrieve all food logs for a given user."""
         logger.info("Retrieving food logs for user: %s", username)
         return db.query(FoodLog).filter(FoodLog.username == username).all()
+
+    def get_food_logs_by_username_between(
+        self, db: Session, username: str, start: datetime, end: datetime
+    ) -> list[FoodLog]:
+        """Food logs for a user with start <= timestamp <= end, oldest first."""
+        return (
+            db.query(FoodLog)
+            .filter(FoodLog.username == username, FoodLog.timestamp >= start, FoodLog.timestamp <= end)
+            .order_by(FoodLog.timestamp.asc())
+            .all()
+        )
 
     def update_food_log_by_id(self, db: Session, food_log_id: UUID, data: FoodLogUpdate) -> Optional[FoodLog]:
         """Update a food log by its ID. Returns the updated log or None if not found."""
