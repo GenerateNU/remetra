@@ -1,4 +1,4 @@
-"""Integration tests for UserComponentStateRepository and OnboardingService."""
+"""Integration tests for OnboardingService: seeding a user's model state and running their nights."""
 
 import math
 from datetime import datetime, timedelta, timezone
@@ -13,8 +13,10 @@ from models.component import Component
 from models.symptom import Symptom
 from models.symptom_family import MODELED_FAMILIES, SymptomFamily
 from models.symptom_log import SymptomLog
+from repositories.family_confidence_repository import FamilyConfidenceRepository
 from repositories.food_log_repository import FoodLogRepository
-from repositories.user_component_state_repository import UserComponentStateRepository
+from repositories.user_model_run_repository import UserModelRunRepository
+from repositories.user_repository import UserRepository
 from schemas.food_log import FoodLogCreate
 from services.onboarding_service import CONDITION_FILE, OnboardingService
 
@@ -24,15 +26,7 @@ T0 = datetime(2025, 3, 1, 3, 0, tzinfo=timezone.utc)  # pinned "last update" aft
 NIGHT_1 = T0 + timedelta(days=1)
 NIGHT_2 = T0 + timedelta(days=2)
 
-STATE_FIELDS = (
-    "log_odds",
-    "expected_reactions",
-    "exposure_count",
-    "background_rate",
-    "background_total",
-    "hours_since_onboarding",
-    "last_update",
-)
+CONFIDENCE_FIELDS = ("log_odds", "expected_reactions")
 
 
 def _load_config():
@@ -40,41 +34,51 @@ def _load_config():
         return yaml.safe_load(f)
 
 
-def _snapshot(states):
-    """Plain copy of every state's values, keyed by (component_id, family)."""
-    return {(s.component_id, s.family): {f: getattr(s, f) for f in STATE_FIELDS} for s in states}
+def _snapshot(db_session, username):
+    """Plain copy of the user's stored model state, read from the database, not the session cache."""
+    db_session.expire_all()
+    repo = FamilyConfidenceRepository()
+    run = UserModelRunRepository().get(db_session, username)
+    return {
+        "confidences": {
+            (row.component_id, row.family): {f: getattr(row, f) for f in CONFIDENCE_FIELDS}
+            for row in repo.get_all_confidences(db_session, username)
+        },
+        "background": {f: repo.get_background_total(db_session, username, f) for f in MODELED_FAMILIES},
+        "last_update": run.last_update if run else None,
+    }
 
 
 def _assert_same_states(actual, expected):
-    assert actual.keys() == expected.keys()
-    for key in expected:
-        for field in STATE_FIELDS:
-            a, e = actual[key][field], expected[key][field]
-            if isinstance(e, float):
-                assert a == pytest.approx(e), (key, field)
-            else:
-                assert a == e, (key, field)
+    assert actual["last_update"] == expected["last_update"]
+    assert actual["background"] == pytest.approx(expected["background"])
+    assert actual["confidences"].keys() == expected["confidences"].keys()
+    for key, values in expected["confidences"].items():
+        for field, value in values.items():
+            assert actual["confidences"][key][field] == pytest.approx(value), (key, field)
 
 
-def _set_states(db_session, repo, username, values_by_key):
-    """Overwrite stored states, e.g. to pin last_update or rewind to a snapshot."""
-    states = repo.get_states_for_user(db_session, username)
-    for s in states:
-        for field, value in values_by_key[(s.component_id, s.family)].items():
-            setattr(s, field, value)
-    repo.update_states(db_session, states)
+def _restore(db_session, username, snapshot):
+    """Rewind the stored confidences and last_update to a snapshot."""
+    for row in FamilyConfidenceRepository().get_all_confidences(db_session, username):
+        for field, value in snapshot["confidences"][(row.component_id, row.family)].items():
+            setattr(row, field, value)
+    db_session.commit()
+    run_repo = UserModelRunRepository()
+    run_repo.set_last_update(db_session, run_repo.get(db_session, username), snapshot["last_update"])
 
 
-def _stored_last_updates(db_session, repo, username):
-    """last_update values as stored in the database, not the session cache."""
+def _stored_last_update(db_session, username):
+    """last_update as stored in the database, not the session cache."""
     db_session.expire_all()
-    return {s.last_update for s in repo.get_states_for_user(db_session, username)}
+    run = UserModelRunRepository().get(db_session, username)
+    return run.last_update if run else None
 
 
 @pytest.fixture(autouse=True)
 def components(db_session):
     """Load the 40 taxonomy components; the test database starts with none."""
-    repo = UserComponentStateRepository()
+    repo = FamilyConfidenceRepository()
     existing = repo.get_all_components(db_session)
     if existing:
         return existing
@@ -93,15 +97,12 @@ def components(db_session):
 def seeded_user(db_session, authenticated_user):
     """Authenticated user with seeded state, last_update pinned to T0."""
     username = authenticated_user["username"]
-    service = OnboardingService()
-    repo = UserComponentStateRepository()
+    OnboardingService().initialize_user_state(db_session, username)
+    run_repo = UserModelRunRepository()
+    run_repo.set_last_update(db_session, run_repo.get(db_session, username), T0)
 
-    service.initialize_user_state(db_session, username)
-    states = repo.get_states_for_user(db_session, username)
-    _set_states(db_session, repo, username, {(s.component_id, s.family): {"last_update": T0} for s in states})
-
-    stored = _stored_last_updates(db_session, repo, username)
-    assert stored == {T0}, f"update_states did not persist last_update: {stored}"
+    stored = _stored_last_update(db_session, username)
+    assert stored == T0, f"set_last_update did not persist last_update: {stored}"
     return username
 
 
@@ -113,38 +114,31 @@ def two_days_of_meals(db_session, authenticated_user, created_food):
         repo.create_food_log(db_session, FoodLogCreate(food_id=created_food.id, timestamp=ts))
 
 
-class TestUserComponentStateRepository:
-    """Integration tests for UserComponentStateRepository."""
+class TestUserModelRunRepository:
+    """Integration tests for UserModelRunRepository."""
 
     def test_all_components_present(self, db_session):
         """The 40 components from #152 are in the database."""
-        repo = UserComponentStateRepository()
+        assert len(FamilyConfidenceRepository().get_all_components(db_session)) == 40
 
-        assert len(repo.get_all_components(db_session)) == 40
+    def test_no_run_before_seeding(self, db_session, authenticated_user):
+        """A new user has no run marker."""
+        assert UserModelRunRepository().get(db_session, authenticated_user["username"]) is None
 
-    def test_has_state_false_before_seeding(self, db_session, authenticated_user):
-        """A new user has no state."""
-        repo = UserComponentStateRepository()
+    def test_runs_are_scoped_to_user(self, db_session, seeded_user):
+        """Another user's lookup finds nothing; this user's finds their own row."""
+        repo = UserModelRunRepository()
 
-        assert repo.has_state(db_session, authenticated_user["username"]) is False
+        assert repo.get(db_session, "no_such_user") is None
+        assert repo.get(db_session, seeded_user).username == seeded_user
 
-    def test_states_are_scoped_to_user(self, db_session, seeded_user):
-        """Another user sees none of this user's state."""
-        repo = UserComponentStateRepository()
-
-        assert repo.get_states_for_user(db_session, "no_such_user") == []
-        assert all(s.username == seeded_user for s in repo.get_states_for_user(db_session, seeded_user))
-
-    def test_update_states_persists_last_update(self, db_session, seeded_user):
+    def test_set_last_update_persists(self, db_session, seeded_user):
         """A saved last_update survives a re-read from the database."""
-        repo = UserComponentStateRepository()
-        states = repo.get_states_for_user(db_session, seeded_user)
-        for s in states:
-            s.last_update = NIGHT_1
+        repo = UserModelRunRepository()
 
-        repo.update_states(db_session, states)
+        repo.set_last_update(db_session, repo.get(db_session, seeded_user), NIGHT_1)
 
-        assert _stored_last_updates(db_session, repo, seeded_user) == {NIGHT_1}
+        assert _stored_last_update(db_session, seeded_user) == NIGHT_1
 
 
 class TestConditionFile:
@@ -152,8 +146,7 @@ class TestConditionFile:
 
     def test_condition_components_exist(self, db_session):
         """Every component slug in condition_multipliers.yaml is a real component."""
-        repo = UserComponentStateRepository()
-        slugs = {c.slug for c in repo.get_all_components(db_session)}
+        slugs = {c.slug for c in FamilyConfidenceRepository().get_all_components(db_session)}
 
         for name, condition in _load_config()["conditions"].items():
             missing = set(condition["components"]) - slugs
@@ -164,50 +157,47 @@ class TestInitializeUserState:
     """Integration tests for OnboardingService.initialize_user_state."""
 
     def test_creates_rows_for_every_component_and_family(self, db_session, authenticated_user):
-        """Seeding stores one row per component per family."""
+        """Seeding stores one confidence row per component per family, plus a background total per family."""
         username = authenticated_user["username"]
-        service = OnboardingService()
-        repo = UserComponentStateRepository()
+        repo = FamilyConfidenceRepository()
         components = repo.get_all_components(db_session)
 
-        count = service.initialize_user_state(db_session, username)
+        count = OnboardingService().initialize_user_state(db_session, username)
 
-        states = repo.get_states_for_user(db_session, username)
-        assert count == len(states) == len(components) * len(MODELED_FAMILIES)
-        assert {(s.component_id, s.family) for s in states} == {(c.id, f) for c in components for f in MODELED_FAMILIES}
+        rows = repo.get_all_confidences(db_session, username)
+        assert count == len(rows) == len(components) * len(MODELED_FAMILIES)
+        assert {(r.component_id, r.family) for r in rows} == {(c.id, f) for c in components for f in MODELED_FAMILIES}
+        for family in MODELED_FAMILIES:
+            assert repo.get_background_total(db_session, username, family) == 0.0
 
     def test_seeding_twice_is_a_no_op(self, db_session, authenticated_user):
         """A second seed returns 0 and leaves the stored rows alone."""
         username = authenticated_user["username"]
         service = OnboardingService()
-        repo = UserComponentStateRepository()
         service.initialize_user_state(db_session, username)
-        before = _snapshot(repo.get_states_for_user(db_session, username))
+        before = _snapshot(db_session, username)
 
         assert service.initialize_user_state(db_session, username) == 0
-        _assert_same_states(_snapshot(repo.get_states_for_user(db_session, username)), before)
+        _assert_same_states(_snapshot(db_session, username), before)
 
     def test_condition_multiplier_applied(self, db_session, authenticated_user):
         """A user's onboarding condition raises the starting confidence of its components only."""
         username = authenticated_user["username"]
-        service = OnboardingService()
-        repo = UserComponentStateRepository()
+        repo = FamilyConfidenceRepository()
         config = _load_config()
         name, condition = next(iter(config["conditions"].items()))
-        user = repo.get_user(db_session, username)
+        user = UserRepository().get_by_username(db_session, username)
         user.disease = [name]
         db_session.flush()
 
-        service.initialize_user_state(db_session, username)
+        OnboardingService().initialize_user_state(db_session, username)
 
-        base = INITIAL_LOG_ODDS
-        slug_by_id = {c.id: c.slug for c in repo.get_all_components(db_session)}
-        for s in repo.get_states_for_user(db_session, username):
-            if slug_by_id[s.component_id] in condition["components"]:
-                expected = base + math.log(condition["multiplier"])
+        for row in repo.get_all_confidences(db_session, username):
+            if row.component.slug in condition["components"]:
+                expected = INITIAL_LOG_ODDS + math.log(condition["multiplier"])
             else:
-                expected = base
-            assert s.log_odds == pytest.approx(expected), slug_by_id[s.component_id]
+                expected = INITIAL_LOG_ODDS
+            assert row.log_odds == pytest.approx(expected), row.component.slug
 
     def test_no_components_raises(self, db_session, authenticated_user):
         """Seeding before the taxonomy is loaded is an error, not a silent 0-row 'already seeded'."""
@@ -217,18 +207,29 @@ class TestInitializeUserState:
             with pytest.raises(ValueError, match="seed_taxonomy"):
                 service.initialize_user_state(db_session, authenticated_user["username"])
 
-    def test_new_rows_have_utc_last_update(self, db_session, authenticated_user):
-        """Freshly seeded rows are stamped with the current UTC time."""
+    def test_unknown_user_raises(self, db_session):
+        with pytest.raises(ValueError, match="not found"):
+            OnboardingService().initialize_user_state(db_session, "no_such_user")
+
+    def test_new_run_has_utc_last_update(self, db_session, authenticated_user):
+        """A freshly seeded user's run marker is stamped with the current UTC time."""
         username = authenticated_user["username"]
         before = datetime.now(timezone.utc)
 
         OnboardingService().initialize_user_state(db_session, username)
 
         after = datetime.now(timezone.utc)
-        repo = UserComponentStateRepository()
-        for stored in _stored_last_updates(db_session, repo, username):
-            assert stored is not None
-            assert before - timedelta(seconds=1) <= stored <= after + timedelta(seconds=1)
+        stored = _stored_last_update(db_session, username)
+        assert stored is not None
+        assert before - timedelta(seconds=1) <= stored <= after + timedelta(seconds=1)
+
+    def test_existing_confidences_still_get_a_run_marker(self, db_session, authenticated_user):
+        """A user whose confidences were created elsewhere (FamilyConfidenceService) gets only the run marker."""
+        username = authenticated_user["username"]
+        FamilyConfidenceRepository().initialize_for_user(db_session, username)
+
+        assert OnboardingService().initialize_user_state(db_session, username) == 0
+        assert _stored_last_update(db_session, username) is not None
 
 
 class TestRunUserNight:
@@ -237,76 +238,63 @@ class TestRunUserNight:
     def test_first_night_for_new_user(self, db_session, authenticated_user):
         """A user with no state is seeded, the night runs, and last_update moves to as_of."""
         username = authenticated_user["username"]
-        repo = UserComponentStateRepository()
         as_of = datetime.now(timezone.utc) + timedelta(days=1)
 
         OnboardingService().run_user_night(db_session, username, as_of)
 
-        assert _stored_last_updates(db_session, repo, username) == {as_of}
+        assert _stored_last_update(db_session, username) == as_of
+        assert FamilyConfidenceRepository().has_confidences(db_session, username)
 
     def test_stamps_last_update(self, db_session, seeded_user, two_days_of_meals):
-        """After a run every stored row has last_update == as_of."""
-        repo = UserComponentStateRepository()
-
+        """After a run the stored last_update is as_of."""
         OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
 
-        assert _stored_last_updates(db_session, repo, seeded_user) == {NIGHT_1}
+        assert _stored_last_update(db_session, seeded_user) == NIGHT_1
 
     def test_stamps_last_update_with_no_logs(self, db_session, seeded_user):
         """A night with nothing logged still moves last_update forward."""
-        repo = UserComponentStateRepository()
-
         OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
 
-        assert _stored_last_updates(db_session, repo, seeded_user) == {NIGHT_1}
+        assert _stored_last_update(db_session, seeded_user) == NIGHT_1
 
     def test_same_night_twice_changes_nothing(self, db_session, seeded_user, two_days_of_meals):
         """Running the same night again leaves every stored value unchanged."""
         service = OnboardingService()
-        repo = UserComponentStateRepository()
         service.run_user_night(db_session, seeded_user, NIGHT_1)
-        db_session.expire_all()
-        after_first = _snapshot(repo.get_states_for_user(db_session, seeded_user))
+        after_first = _snapshot(db_session, seeded_user)
 
         service.run_user_night(db_session, seeded_user, NIGHT_1)
 
-        db_session.expire_all()
-        _assert_same_states(_snapshot(repo.get_states_for_user(db_session, seeded_user)), after_first)
+        _assert_same_states(_snapshot(db_session, seeded_user), after_first)
 
     def test_late_run_for_earlier_night_is_a_no_op(self, db_session, seeded_user, two_days_of_meals):
         """A delayed job for a night already covered by catch-up changes nothing."""
         service = OnboardingService()
-        repo = UserComponentStateRepository()
         service.run_user_night(db_session, seeded_user, NIGHT_2)
-        db_session.expire_all()
-        after_catch_up = _snapshot(repo.get_states_for_user(db_session, seeded_user))
+        after_catch_up = _snapshot(db_session, seeded_user)
 
         service.run_user_night(db_session, seeded_user, NIGHT_1)
 
-        db_session.expire_all()
-        _assert_same_states(_snapshot(repo.get_states_for_user(db_session, seeded_user)), after_catch_up)
+        _assert_same_states(_snapshot(db_session, seeded_user), after_catch_up)
 
-    @pytest.mark.xfail(reason="nightly_refresh does not update states yet", strict=True)
+    @pytest.mark.xfail(reason="nightly_refresh does not update confidences yet", strict=True)
     def test_missed_night_matches_running_every_night(self, db_session, seeded_user, two_days_of_meals):
         """Skipping a night and catching up ends in the same state as running both nights."""
         service = OnboardingService()
-        repo = UserComponentStateRepository()
-        initial = _snapshot(repo.get_states_for_user(db_session, seeded_user))
+        initial = _snapshot(db_session, seeded_user)
 
         # Missed night: jump straight to night 2.
         service.run_user_night(db_session, seeded_user, NIGHT_2)
-        db_session.expire_all()
-        caught_up = _snapshot(repo.get_states_for_user(db_session, seeded_user))
+        caught_up = _snapshot(db_session, seeded_user)
 
         # Rewind, then run both nights in order.
-        _set_states(db_session, repo, seeded_user, initial)
+        _restore(db_session, seeded_user, initial)
         service.run_user_night(db_session, seeded_user, NIGHT_1)
         service.run_user_night(db_session, seeded_user, NIGHT_2)
-        db_session.expire_all()
-        every_night = _snapshot(repo.get_states_for_user(db_session, seeded_user))
+        every_night = _snapshot(db_session, seeded_user)
 
-        assert sum(v["exposure_count"] for v in every_night.values()) > 0, (
-            "no exposures counted; created_food needs at least one component for this test to mean anything"
+        assert caught_up["confidences"] != initial["confidences"], (
+            "no confidences changed; created_food needs at least one component for this test to mean anything"
         )
         _assert_same_states(caught_up, every_night)
 
@@ -440,7 +428,7 @@ class TestRunUserNightWithSymptoms:
         with patch("services.onboarding_service.nightly_refresh") as refresh:
             OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
 
-        meals, symptoms, now, last_update, _states = refresh.call_args.args
+        meals, symptoms, now, last_update = refresh.call_args.args
         assert _ids(meals) == {meal.id}
         assert _ids(symptoms) == {symptom.id}
         assert (now, last_update) == (NIGHT_1, T0)
@@ -449,11 +437,10 @@ class TestRunUserNightWithSymptoms:
         """Regression: symptom_meal_map reads symptom.family, which raw SymptomLog rows lack."""
         log_symptom("skin", T0 + timedelta(hours=5))
         log_meal(T0 + timedelta(hours=1))
-        repo = UserComponentStateRepository()
 
         OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
 
-        assert _stored_last_updates(db_session, repo, seeded_user) == {NIGHT_1}
+        assert _stored_last_update(db_session, seeded_user) == NIGHT_1
 
 
 class TestWithoutSignedInUser:
@@ -466,8 +453,8 @@ class TestWithoutSignedInUser:
         current_username.reset(token)
 
     def test_owned_rows_are_hidden_without_system_access(self, db_session, seeded_user, no_user):
-        """Why the script needs system_access(): the ownership filter hides every state row."""
-        assert UserComponentStateRepository().has_state(db_session, no_user) is False
+        """Why the script needs system_access(): the ownership filter hides the run marker."""
+        assert UserModelRunRepository().get(db_session, no_user) is None
 
     def test_reseeding_under_system_access_is_a_no_op(self, db_session, seeded_user, no_user):
         with system_access():
@@ -475,11 +462,10 @@ class TestWithoutSignedInUser:
 
     def test_run_user_night_under_system_access(self, db_session, seeded_user, log_meal):
         log_meal(T0 + timedelta(hours=2))  # logged while signed in, so the row has an owner
-        repo = UserComponentStateRepository()
         token = current_username.set(None)
         try:
             with system_access():
                 OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
-                assert _stored_last_updates(db_session, repo, seeded_user) == {NIGHT_1}
+                assert _stored_last_update(db_session, seeded_user) == NIGHT_1
         finally:
             current_username.reset(token)
