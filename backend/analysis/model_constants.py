@@ -31,6 +31,9 @@ LOOKBACK_HOURS = {
     SymptomFamily.SKIN: 48,
 }
 
+# Lookback for symptoms with no modeled family (None or OTHER), so meals still link to them
+DEFAULT_LOOKBACK_HOURS = 36
+
 # Timing curve parameters: (median_hours, spread)
 # GI and HEAD use a single log-normal; SKIN mixes an early and a late curve
 TIMING_PARAMS = {
