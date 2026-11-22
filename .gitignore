@@ -271,3 +271,5 @@ coverage/
 
 # Claude Code
 .claude/settings.local.json
+# Mock user generator output
+backend/scripts/mock_users/output/

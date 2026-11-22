@@ -38,5 +38,14 @@ from models import (
     user as user,
 )
 from models import (
+    user_background_total as user_background_total,
+)
+from models import (
+    user_family_confidence as user_family_confidence,
+)
+from models import (
+    user_ingredient as user_ingredient,
+)
+from models import (
     user_component_state as user_component_state,
 )

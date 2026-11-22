@@ -1,25 +1,29 @@
 import { Modal, ScrollView, View, TouchableOpacity, Text } from "react-native";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Utensils, Stethoscope } from "lucide-react-native";
 
 import { LogEntry, ModalStep } from "../types/logs";
 import { FoodLogForm } from "./FoodLogForm";
+import { KeyboardAvoider } from "./KeyboardAvoider";
 import { SymptomLogForm } from "./SymptomLogForm";
 
 interface LogEntryModalProps {
   visible: boolean;
   onClose: () => void;
   onLogEntry: (entry: LogEntry) => void;
-  initialStep?: ModalStep; 
+  initialStep?: ModalStep;
+  initialTimestamp?: Date;
 }
-const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep }) => {
+const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEntry, initialStep, initialTimestamp }) => {
   const [step, setStep] = useState<ModalStep>(initialStep ?? "select_type");
+  const [openSnapshot, setOpenSnapshot] = useState({ visible, initialStep });
 
-  useEffect(() => {
+  if (visible !== openSnapshot.visible || initialStep !== openSnapshot.initialStep) {
+    setOpenSnapshot({ visible, initialStep });
     if (visible) {
       setStep(initialStep ?? "select_type");
     }
-  }, [visible, initialStep]);
+  }
 
   const handleSubmit = (entry: LogEntry) => {
     onLogEntry(entry);
@@ -40,6 +44,7 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
       transparent={true}
       onRequestClose={handleClose}
     >
+      <KeyboardAvoider>
       <TouchableOpacity
         className="flex-1 bg-black/50 justify-center items-center px-5"
         activeOpacity={1}
@@ -83,16 +88,22 @@ const LogEntryModal: React.FC<LogEntryModalProps> = ({ visible, onClose, onLogEn
             {step === "food" && (
               <FoodLogForm 
               onSubmit={handleSubmit} 
-              onBack={() => setStep("select_type")} 
-              onCloseModal={handleClose} /> 
+              onBack={() => setStep("select_type")}
+              onCloseModal={handleClose}
+              initialTimestamp={initialTimestamp} />
             )}
 
             {step === "symptom" && (
-              <SymptomLogForm onSubmit={handleSubmit} onBack={() => setStep("select_type")} />
+              <SymptomLogForm
+                onSubmit={handleSubmit}
+                onBack={() => setStep("select_type")}
+                initialTimestamp={initialTimestamp}
+              />
             )}
           </ScrollView>
         </View>
       </TouchableOpacity>
+      </KeyboardAvoider>
     </Modal>
   );
 };

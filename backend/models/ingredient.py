@@ -16,7 +16,6 @@ class Ingredient(Base):
     slug = Column(String, unique=True, nullable=False)
     canonical_name = Column(String, nullable=False)
     aliases = Column(JSONB, nullable=False, default=list)
-    groups = Column(JSONB, nullable=False, default=list)
     std_serving_g = Column(Integer, nullable=True)
     fat_g_per_100g = Column(Float, nullable=True)
     fiber_g_per_100g = Column(Float, nullable=True)

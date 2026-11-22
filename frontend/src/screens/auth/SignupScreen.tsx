@@ -1,9 +1,11 @@
-import { View, Text, Pressable, TextInput, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, Pressable, TextInput } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useState } from 'react'
 import { useAppNavigation } from '../../navigation/hooks';
 import { PTSerif_400Regular } from '@expo-google-fonts/pt-serif';
 import { BackgroundGradient } from '../../components/BackgroundGradient';
+import { PasswordInput } from '../../components/PasswordInput';
+import { KeyboardAwareScrollView } from '../../components/KeyboardAvoider';
 import { ApiError } from '../../api/client';
 import { useAuthStore } from '../../store/useAuthStore';
 
@@ -62,10 +64,12 @@ export function SignupScreen() {
       try {
         await register({username, email, password});
     } catch (err) {
-      console.log(err)
       if (err instanceof ApiError) {
-        if (err.message.includes('already registered')) { 
+        if (err.message.includes('already registered')) {
           setErrors({ username: 'Username already taken' });
+        } else if (err.message.toLowerCase().includes('password')) {
+          // e.g. Clerk's breached-password / weak-password rejections
+          setErrors({ password: err.message });
         } else {
           setErrors({ general: err.message });
         }
@@ -78,9 +82,9 @@ export function SignupScreen() {
   };
   if (!fontsLoaded) return null;
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View className="flex-1">
         <BackgroundGradient />
+        <KeyboardAwareScrollView>
 
         <View className="flex-1 justify-start items-center px-6 pt-[15%]">
         
@@ -138,20 +142,21 @@ export function SignupScreen() {
 
           {/* password field */}
 
-          <TextInput
+          <PasswordInput
             placeholder="Password"
             placeholderTextColor='#B8624F' /* remetra-burgundy */
-            secureTextEntry
             value={password}
             onChangeText={(text) => {
               setPassword(text);
               if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
             }}
-            autoCapitalize="none"
-            className="border border-remetra-burgundy text-remetra-burgundy py-3 pl-2 mb-2"
+            className="border border-remetra-burgundy text-remetra-burgundy py-3 pl-2"
           />
           {errors.password && (
             <Text className="text-red-400 mb-2">{errors.password}</Text>
+          )}
+          {errors.general && (
+            <Text className="text-red-400 mb-2">{errors.general}</Text>
           )}
           </View>
   
@@ -173,7 +178,7 @@ export function SignupScreen() {
             </Pressable>
           </View>
         </View>
+        </KeyboardAwareScrollView>
       </View>
-      </TouchableWithoutFeedback>
     );
   }

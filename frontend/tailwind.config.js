@@ -5,6 +5,9 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}"
   ],
   presets: [require('nativewind/preset')],
+  // "class" (not the default "media") so NativeWind on web doesn't throw when the page sets a color scheme.
+  // The app is light-only (app.json userInterfaceStyle), so this doesn't change how anything looks.
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -25,14 +28,32 @@ module.exports = {
         'remetra-muted':          '#aaa',     // secondary / meta text
         'remetra-surface-accent': '#fff5f0',  // selected-item card background
         'remetra-text-holder':    '#676767',  // Placeholder text
+        // Welcome splash (Remetra v22)
+        'remetra-canvas':         '#fef4ee',
+        'remetra-primary':        '#b5582f',
+        'remetra-text-primary':   '#3b2a24',
+        'remetra-text-secondary': '#6e5a50',
+        'remetra-ember':          '#c42f55',
+        'remetra-sheet':          '#faf8f6',
+        'remetra-dawn':           '#fdddcc',
+        'remetra-dawn-mid':       '#fef0e7',
+        'remetra-chip-line':      '#e8e2dc',
+        'remetra-chip-strong':    '#92472a',
+        'remetra-peach-line':     '#f2875a',
+        'remetra-text-tertiary':  '#7a7068',
+        'remetra-line-subtle':    '#f4f0ec',
+        'remetra-ember-end':      '#ffe09e',
       },
       fontSize: {
         // Brand wordmark used across onboarding screens
         brand: '32px',
       },
       fontFamily: {
-        lora:    ['Lora_400Regular'],
-        ptserif: ['PTSerif_400Regular'],
+        lora:              ['Lora_400Regular'],
+        ptserif:           ['PTSerif_400Regular'],
+        prata:             ['Prata_400Regular'],
+        figtree:           ['Figtree_400Regular'],
+        'figtree-semibold': ['Figtree_600SemiBold'],
       },
     },
   },

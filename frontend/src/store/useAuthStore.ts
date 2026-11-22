@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService, MeResponse } from '../api/auth_service';
 import { clerkSignIn, clerkSignOut, clerkSignUp } from '../auth/clerkSession';
 import { useBankStore } from './bankStore';
+import { useOnboardingStore } from './onboardingStore';
+import { useCalendarStore } from './calendarStore';
 
 interface UserProfile {
   id: string | null;
@@ -72,6 +74,15 @@ const mapMeToUser = (me: MeResponse): UserProfile => ({
   medication: me.medication ?? [],
 });
 
+const marksOnboarding = (me: MeResponse) =>
+  me.dob != null || (me.disease?.length ?? 0) > 0;
+
+const keepOnboarding = (me: MeResponse, previous: AuthState) =>
+  marksOnboarding(me) ||
+  (previous.user.email != null &&
+    previous.user.email === me.email &&
+    previous.hasCompletedOnboarding);
+
 const clearedSession = {
   isAuthenticated: false,
   hasCompletedOnboarding: false,
@@ -86,7 +97,7 @@ const initialState: AuthState = {
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initialState,
 
       login: async (payload) => {
@@ -95,7 +106,7 @@ export const useAuthStore = create<AuthStore>()(
         set({
           user: mapMeToUser(me),
           isAuthenticated: true,
-          hasCompletedOnboarding: me.dob != null,
+          hasCompletedOnboarding: keepOnboarding(me, get()),
         });
       },
 
@@ -105,7 +116,7 @@ export const useAuthStore = create<AuthStore>()(
         set({
           user: mapMeToUser(me),
           isAuthenticated: true,
-          hasCompletedOnboarding: me.dob != null,
+          hasCompletedOnboarding: keepOnboarding(me, get()),
         });
       },
 
@@ -113,11 +124,15 @@ export const useAuthStore = create<AuthStore>()(
 
       clearLocal: () => {
         useBankStore.getState().clearBank();
+        useOnboardingStore.getState().reset();
+        useCalendarStore.getState().clearCalendar();
         set(clearedSession);
       },
 
       logout: () => {
         useBankStore.getState().clearBank();
+        useOnboardingStore.getState().reset();
+        useCalendarStore.getState().clearCalendar();
         set(clearedSession);
         void clerkSignOut().catch(() => {});
       },
@@ -133,14 +148,14 @@ export const useAuthStore = create<AuthStore>()(
       setUserFromMe: (me) =>
         set({
           user: mapMeToUser(me),
-          hasCompletedOnboarding: me.dob != null,
+          hasCompletedOnboarding: keepOnboarding(me, get()),
         }),
 
       refreshProfile: async () => {
         const me = await authService.getMe();
         set({
           user: mapMeToUser(me),
-          hasCompletedOnboarding: me.dob != null,
+          hasCompletedOnboarding: keepOnboarding(me, get()),
         });
       },
     }),
