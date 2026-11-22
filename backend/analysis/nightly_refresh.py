@@ -2,9 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from uuid import UUID
 
+from models.symptom_family import SymptomFamily
 from models.user_component_state import UserComponentState
 from schemas.food_log import FoodLogResponse
 from schemas.symptom_log import SymptomLogResponse
+
+
+def lookback(family: SymptomFamily | None) -> timedelta:
+    """How far before a symptom a meal can still have caused it: 48h for skin, 36h otherwise."""
+    return timedelta(hours=48) if family == SymptomFamily.SKIN else timedelta(hours=36)
 
 
 @dataclass
@@ -71,11 +77,7 @@ def symptom_meal_map(
         else:
             in_window = last_update < symptom.timestamp <= now
         if in_window:
-            lookback = 36
-            if symptom.family == "SKIN":
-                lookback = 48
-
-            lookback_end = symptom.timestamp - timedelta(hours=lookback)
+            lookback_end = symptom.timestamp - lookback(symptom.family)
 
             for meal in new_meals:
                 if meal.timestamp >= lookback_end and meal.timestamp <= symptom.timestamp:

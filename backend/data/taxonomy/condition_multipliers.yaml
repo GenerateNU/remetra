@@ -1,11 +1,10 @@
 # Condition-to-component multipliers for onboarding.
 # When a user selects a condition, the listed components get their
 # starting confidence multiplied by the given factor.
-# Base confidence for all components is 0.04 (4%).
+# Base confidence for all components is P0 in analysis/model_constants.py.
 # Suspected foods get a blanket 3x multiplier on their components.
 
 defaults:
-  base_confidence: 0.04
   suspected_multiplier: 3.0
 
 conditions:

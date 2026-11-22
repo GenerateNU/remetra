@@ -4,7 +4,7 @@ Behavior under test:
 - Only symptoms with timestamp in [now - 24h, now] (inclusive) are considered.
 - Each considered symptom links to every meal with timestamp in
   [symptom - lookback, symptom] (inclusive), where lookback is 48h for the
-  "SKIN" family and 36h otherwise.
+  skin family and 36h otherwise.
 - One SymptomMealMap is returned per input meal, in input order, mapping
   symptom id -> (symptom.timestamp - meal.timestamp).
 
@@ -18,18 +18,13 @@ from uuid import UUID, uuid4
 import pytest
 
 from analysis.nightly_refresh import SymptomMealMap, symptom_meal_map
+from models.symptom_family import SymptomFamily
 from schemas.food_log import FoodLogResponse
-from schemas.symptom_log import SymptomLogResponse
+from schemas.symptom_log import SymptomLogResponse, SymptomRouteType
 
 NOW = datetime(2026, 3, 16, 12, 0, 0, tzinfo=timezone.utc)
 TICK = timedelta(microseconds=1)
 USERNAME = "test_user"
-
-
-class FamilySymptomLog(SymptomLogResponse):
-    """SymptomLogResponse doesn't define `family` yet; symptom_meal_map reads it."""
-
-    family: str
 
 
 def make_meal(timestamp: datetime) -> FoodLogResponse:
@@ -42,8 +37,8 @@ def make_meal(timestamp: datetime) -> FoodLogResponse:
     )
 
 
-def make_symptom(timestamp: datetime, family: str = "DIGESTIVE") -> FamilySymptomLog:
-    return FamilySymptomLog(
+def make_symptom(timestamp: datetime, family: SymptomFamily | None = SymptomFamily.GI) -> SymptomLogResponse:
+    return SymptomLogResponse(
         id=uuid4(),
         symptom_id=uuid4(),
         username=USERNAME,
@@ -51,6 +46,7 @@ def make_symptom(timestamp: datetime, family: str = "DIGESTIVE") -> FamilySympto
         timestamp=timestamp,
         created_at=timestamp + timedelta(minutes=3),  # logged after onset; must not be used for deltas
         family=family,
+        route=SymptomRouteType.MODEL,
     )
 
 
@@ -62,7 +58,7 @@ def run(meals, symptoms, now: datetime = NOW) -> list[SymptomMealMap]:
     return symptom_meal_map(meals, symptoms, now=now)
 
 
-def linked(meal: FoodLogResponse, symptom: FamilySymptomLog, now: datetime = NOW) -> dict[UUID, timedelta]:
+def linked(meal: FoodLogResponse, symptom: SymptomLogResponse, now: datetime = NOW) -> dict[UUID, timedelta]:
     """Run the map for a single meal/symptom pair and return that meal's symptom dict."""
     [result] = run([meal], [symptom], now=now)
     return result.symptoms
@@ -73,7 +69,7 @@ class TestOutputShape:
         assert run([], []) == []
 
     def test_no_meals_returns_empty_list_even_with_symptoms(self):
-        symptoms = [make_symptom(NOW - hours(1)), make_symptom(NOW - hours(2), family="SKIN")]
+        symptoms = [make_symptom(NOW - hours(1)), make_symptom(NOW - hours(2), family=SymptomFamily.SKIN)]
 
         assert run([], symptoms) == []
 
@@ -161,7 +157,7 @@ class TestSymptomRecencyWindow:
         assert linked(meal, symptom) == {}
 
     def test_skin_symptom_uses_same_24h_recency_window(self):
-        symptom = make_symptom(NOW - hours(24) - TICK, family="SKIN")
+        symptom = make_symptom(NOW - hours(24) - TICK, family=SymptomFamily.SKIN)
         meal = make_meal(symptom.timestamp - hours(1))
 
         assert linked(meal, symptom) == {}
@@ -191,8 +187,8 @@ class TestLookbackWindow:
     @pytest.mark.parametrize(
         "family, lookback",
         [
-            pytest.param("DIGESTIVE", hours(36), id="default-36h"),
-            pytest.param("SKIN", hours(48), id="skin-48h"),
+            pytest.param(SymptomFamily.GI, hours(36), id="default-36h"),
+            pytest.param(SymptomFamily.SKIN, hours(48), id="skin-48h"),
         ],
     )
     @pytest.mark.parametrize(
@@ -218,16 +214,16 @@ class TestLookbackWindow:
 
     def test_meal_between_36h_and_48h_links_only_skin_symptom(self):
         symptom_time = NOW - hours(1)
-        skin = make_symptom(symptom_time, family="SKIN")
-        other = make_symptom(symptom_time, family="DIGESTIVE")
+        skin = make_symptom(symptom_time, family=SymptomFamily.SKIN)
+        other = make_symptom(symptom_time, family=SymptomFamily.GI)
         meal = make_meal(symptom_time - hours(40))
 
         [result] = run([meal], [skin, other])
 
         assert result.symptoms == {skin.id: hours(40)}
 
-    @pytest.mark.parametrize("family", ["skin", "Skin", " SKIN", "SKIN ", "SKINCARE", ""])
-    def test_skin_family_match_is_exact_and_case_sensitive(self, family):
+    @pytest.mark.parametrize("family", [SymptomFamily.GI, SymptomFamily.HEAD, SymptomFamily.OTHER, None])
+    def test_only_skin_gets_the_longer_lookback(self, family):
         symptom = make_symptom(NOW - hours(1), family=family)
         meal = make_meal(symptom.timestamp - hours(40))  # only inside a 48h lookback
 
@@ -245,7 +241,7 @@ class TestManyToMany:
     def test_meal_links_to_multiple_symptoms_with_individual_deltas(self):
         meal = make_meal(NOW - hours(10))
         s1 = make_symptom(NOW - hours(8))
-        s2 = make_symptom(NOW - hours(2), family="SKIN")
+        s2 = make_symptom(NOW - hours(2), family=SymptomFamily.SKIN)
         s3 = make_symptom(NOW)
 
         [result] = run([meal], [s1, s2, s3])
@@ -275,7 +271,7 @@ class TestManyToMany:
 
         stale = make_symptom(NOW - hours(25))  # outside recency window
         digestive = make_symptom(NOW - hours(5))  # window [41h, 5h] ago
-        skin = make_symptom(NOW - hours(4), family="SKIN")  # window [52h, 4h] ago
+        skin = make_symptom(NOW - hours(4), family=SymptomFamily.SKIN)  # window [52h, 4h] ago
         latest = make_symptom(NOW - hours(1))  # window [37h, 1h] ago
         meals = [meal_60h, meal_40h, meal_30h, meal_10h, meal_2h, meal_now]
 

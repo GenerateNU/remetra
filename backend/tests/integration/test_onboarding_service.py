@@ -2,15 +2,21 @@
 
 import math
 from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 
 import pytest
 import yaml
 
+from analysis.model_constants import INITIAL_LOG_ODDS
+from auth_context import current_username, system_access
 from models.component import Component
+from models.symptom import Symptom
+from models.symptom_family import MODELED_FAMILIES, SymptomFamily
+from models.symptom_log import SymptomLog
 from repositories.food_log_repository import FoodLogRepository
 from repositories.user_component_state_repository import UserComponentStateRepository
 from schemas.food_log import FoodLogCreate
-from services.onboarding_service import CONDITION_FILE, FAMILIES, OnboardingService
+from services.onboarding_service import CONDITION_FILE, OnboardingService
 
 COMPONENTS_FILE = CONDITION_FILE.parent / "components.yaml"
 
@@ -27,10 +33,6 @@ STATE_FIELDS = (
     "hours_since_onboarding",
     "last_update",
 )
-
-
-def _logit(p):
-    return math.log(p / (1 - p))
 
 
 def _load_config():
@@ -171,8 +173,8 @@ class TestInitializeUserState:
         count = service.initialize_user_state(db_session, username)
 
         states = repo.get_states_for_user(db_session, username)
-        assert count == len(states) == len(components) * len(FAMILIES)
-        assert {(s.component_id, s.family) for s in states} == {(c.id, f) for c in components for f in FAMILIES}
+        assert count == len(states) == len(components) * len(MODELED_FAMILIES)
+        assert {(s.component_id, s.family) for s in states} == {(c.id, f) for c in components for f in MODELED_FAMILIES}
 
     def test_seeding_twice_is_a_no_op(self, db_session, authenticated_user):
         """A second seed returns 0 and leaves the stored rows alone."""
@@ -198,7 +200,7 @@ class TestInitializeUserState:
 
         service.initialize_user_state(db_session, username)
 
-        base = _logit(config["defaults"]["base_confidence"])
+        base = INITIAL_LOG_ODDS
         slug_by_id = {c.id: c.slug for c in repo.get_all_components(db_session)}
         for s in repo.get_states_for_user(db_session, username):
             if slug_by_id[s.component_id] in condition["components"]:
@@ -299,3 +301,177 @@ class TestRunUserNight:
             "no exposures counted; created_food needs at least one component for this test to mean anything"
         )
         _assert_same_states(caught_up, every_night)
+
+
+# (location, sensation) pairs that symptom_routing.yaml sends to each outcome
+SYMPTOM_KINDS = {
+    "gi": ("Abdomen", "Cramping"),
+    "skin": ("Skin", "Itching"),
+    "head": ("Head", "Throbbing"),
+    "other": ("Joints", "Aching"),
+    "red_flag": ("Chest", "Pain"),
+}
+
+
+@pytest.fixture
+def log_symptom(db_session, authenticated_user):
+    """Factory: log a symptom of the given kind at a time, returning the SymptomLog."""
+    symptoms = {}
+
+    def _log(kind, timestamp):
+        if kind not in symptoms:
+            location, sensation = SYMPTOM_KINDS[kind]
+            symptom = Symptom(
+                username=authenticated_user["username"], name=kind, location=location, sensation=sensation
+            )
+            db_session.add(symptom)
+            db_session.flush()
+            symptoms[kind] = symptom
+        log = SymptomLog(
+            username=authenticated_user["username"], symptom_id=symptoms[kind].id, intensity=5, timestamp=timestamp
+        )
+        db_session.add(log)
+        db_session.flush()
+        return log
+
+    return _log
+
+
+@pytest.fixture
+def log_meal(db_session, created_food):
+    """Factory: log a meal of created_food at a time, returning the FoodLog."""
+    repo = FoodLogRepository()
+
+    def _log(timestamp):
+        return repo.create_food_log(db_session, FoodLogCreate(food_id=created_food.id, timestamp=timestamp))
+
+    return _log
+
+
+def _ids(logs):
+    return {log.id for log in logs}
+
+
+class TestCollectNightLogs:
+    """Which logs a nightly run observes for the window (T0, NIGHT_1]."""
+
+    def test_no_symptoms_reads_only_meals_since_last_update(self, db_session, seeded_user, log_meal):
+        """With nothing to explain, meals before last_update are not read."""
+        old = log_meal(T0 - timedelta(hours=2))
+        new = log_meal(T0 + timedelta(hours=2))
+
+        meals, symptoms = OnboardingService().collect_night_logs(db_session, seeded_user, T0, NIGHT_1)
+
+        assert symptoms == []
+        assert _ids(meals) == {new.id}
+        assert old.id not in _ids(meals)
+
+    def test_symptoms_before_last_update_are_not_observed(self, db_session, seeded_user, log_symptom):
+        """A symptom at exactly last_update belongs to the previous night."""
+        log_symptom("gi", T0)
+        log_symptom("gi", T0 - timedelta(hours=3))
+
+        _, symptoms = OnboardingService().collect_night_logs(db_session, seeded_user, T0, NIGHT_1)
+
+        assert symptoms == []
+
+    def test_gi_symptom_widens_meal_window_by_36h(self, db_session, seeded_user, log_meal, log_symptom):
+        """A new symptom pulls in older meals that could have caused it, up to its lookback."""
+        symptom_time = T0 + timedelta(hours=2)
+        symptom = log_symptom("gi", symptom_time)
+        inside = log_meal(symptom_time - timedelta(hours=36))
+        outside = log_meal(symptom_time - timedelta(hours=36, seconds=1))
+
+        meals, symptoms = OnboardingService().collect_night_logs(db_session, seeded_user, T0, NIGHT_1)
+
+        assert [s.id for s in symptoms] == [symptom.id]
+        assert symptoms[0].family == SymptomFamily.GI
+        assert inside.id in _ids(meals)
+        assert outside.id not in _ids(meals)
+
+    def test_skin_symptom_widens_meal_window_by_48h(self, db_session, seeded_user, log_meal, log_symptom):
+        symptom_time = T0 + timedelta(hours=2)
+        log_symptom("skin", symptom_time)
+        inside = log_meal(symptom_time - timedelta(hours=48))
+        outside = log_meal(symptom_time - timedelta(hours=48, seconds=1))
+
+        meals, _ = OnboardingService().collect_night_logs(db_session, seeded_user, T0, NIGHT_1)
+
+        assert inside.id in _ids(meals)
+        assert outside.id not in _ids(meals)
+
+    def test_earliest_symptom_sets_the_window(self, db_session, seeded_user, log_meal, log_symptom):
+        """Several symptoms: the window reaches back to whichever needs the oldest meals."""
+        log_symptom("gi", T0 + timedelta(hours=20))
+        log_symptom("head", T0 + timedelta(hours=1))
+        meal = log_meal(T0 + timedelta(hours=1) - timedelta(hours=35))
+
+        meals, symptoms = OnboardingService().collect_night_logs(db_session, seeded_user, T0, NIGHT_1)
+
+        assert len(symptoms) == 2
+        assert meal.id in _ids(meals)
+
+    @pytest.mark.parametrize("kind", ["other", "red_flag"])
+    def test_unmodeled_symptoms_are_ignored(self, db_session, seeded_user, log_meal, log_symptom, kind):
+        """Symptoms with no family confidences neither count nor widen the meal window."""
+        log_symptom(kind, T0 + timedelta(hours=2))
+        old = log_meal(T0 - timedelta(hours=2))
+
+        meals, symptoms = OnboardingService().collect_night_logs(db_session, seeded_user, T0, NIGHT_1)
+
+        assert symptoms == []
+        assert old.id not in _ids(meals)
+
+
+class TestRunUserNightWithSymptoms:
+    def test_passes_widened_logs_to_nightly_refresh(self, db_session, seeded_user, log_meal, log_symptom):
+        """run_user_night hands nightly_refresh the window's symptoms and their candidate meals."""
+        symptom = log_symptom("gi", T0 + timedelta(hours=2))
+        meal = log_meal(T0 - timedelta(hours=10))
+
+        with patch("services.onboarding_service.nightly_refresh") as refresh:
+            OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
+
+        meals, symptoms, now, last_update, _states = refresh.call_args.args
+        assert _ids(meals) == {meal.id}
+        assert _ids(symptoms) == {symptom.id}
+        assert (now, last_update) == (NIGHT_1, T0)
+
+    def test_runs_with_real_symptoms(self, db_session, seeded_user, log_meal, log_symptom):
+        """Regression: symptom_meal_map reads symptom.family, which raw SymptomLog rows lack."""
+        log_symptom("skin", T0 + timedelta(hours=5))
+        log_meal(T0 + timedelta(hours=1))
+        repo = UserComponentStateRepository()
+
+        OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
+
+        assert _stored_last_updates(db_session, repo, seeded_user) == {NIGHT_1}
+
+
+class TestWithoutSignedInUser:
+    """Seeding script and nightly jobs run with no request user, as scripts/seed_onboarding.py does."""
+
+    @pytest.fixture
+    def no_user(self, authenticated_user):
+        token = current_username.set(None)
+        yield authenticated_user["username"]
+        current_username.reset(token)
+
+    def test_owned_rows_are_hidden_without_system_access(self, db_session, seeded_user, no_user):
+        """Why the script needs system_access(): the ownership filter hides every state row."""
+        assert UserComponentStateRepository().has_state(db_session, no_user) is False
+
+    def test_reseeding_under_system_access_is_a_no_op(self, db_session, seeded_user, no_user):
+        with system_access():
+            assert OnboardingService().initialize_user_state(db_session, no_user) == 0
+
+    def test_run_user_night_under_system_access(self, db_session, seeded_user, log_meal):
+        log_meal(T0 + timedelta(hours=2))  # logged while signed in, so the row has an owner
+        repo = UserComponentStateRepository()
+        token = current_username.set(None)
+        try:
+            with system_access():
+                OnboardingService().run_user_night(db_session, seeded_user, NIGHT_1)
+                assert _stored_last_updates(db_session, repo, seeded_user) == {NIGHT_1}
+        finally:
+            current_username.reset(token)

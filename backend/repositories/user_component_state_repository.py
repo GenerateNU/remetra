@@ -14,8 +14,12 @@ class UserComponentStateRepository:
         return result is not None
 
     def bulk_insert(self, db: Session, rows: list[UserComponentState]) -> None:
-        db.add_all(rows)
-        db.commit()
+        try:
+            db.add_all(rows)
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
 
     def get_all_components(self, db: Session) -> list[Component]:
         return db.query(Component).all()
@@ -27,5 +31,9 @@ class UserComponentStateRepository:
         return db.query(UserComponentState).filter(UserComponentState.username == username).all()
 
     def update_states(self, db: Session, states: list[UserComponentState]) -> None:
-        db.add_all(states)
-        db.commit()
+        try:
+            db.add_all(states)
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise

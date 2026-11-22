@@ -13,6 +13,7 @@ from sqlalchemy import text
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from auth_context import system_access
 from database import Base, SessionLocal, engine
 from models.user import User
 from services.onboarding_service import OnboardingService
@@ -31,20 +32,23 @@ def main():
     db = SessionLocal()
     service = OnboardingService()
     try:
-        if args.user:
-            count = service.initialize_user_state(db, args.user)
-            print(f"  {args.user}: created {count} rows.")
-        else:
-            users = db.query(User).all()
-            total = 0
-            skipped = 0
-            for user in users:
-                count = service.initialize_user_state(db, user.username)
-                if count:
-                    total += count
-                else:
-                    skipped += 1
-            print(f"  Seeded {total} rows across {len(users) - skipped} users, skipped {skipped} already seeded.")
+        # No signed-in user here, so without system_access() the ownership filter hides every
+        # user_component_states row: has_state() is always False and re-seeding hits uq_user_component_family.
+        with system_access():
+            if args.user:
+                count = service.initialize_user_state(db, args.user)
+                print(f"  {args.user}: created {count} rows.")
+            else:
+                users = db.query(User).all()
+                total = 0
+                skipped = 0
+                for user in users:
+                    count = service.initialize_user_state(db, user.username)
+                    if count:
+                        total += count
+                    else:
+                        skipped += 1
+                print(f"  Seeded {total} rows across {len(users) - skipped} users, skipped {skipped} already seeded.")
 
         print("Done.")
     finally:
