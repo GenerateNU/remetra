@@ -20,13 +20,12 @@ class SymptomRepository:
         # No local state needed for DB-driven IDs
         pass
 
-    def create_symptom(self, db: Session, symptom: SymptomCreate, family: Optional[str] = None) -> Symptom:
+    def create_symptom(self, db: Session, symptom: SymptomCreate) -> Symptom:
         """
         Create a new symptom in the database.
 
         Args:
             symptom: Validated data from SymptomCreate model
-            family: Symptom family the model groups this symptom into, or None if unmodeled
 
         Returns:
             The created symptom with generated ID and timestamps
@@ -36,7 +35,7 @@ class SymptomRepository:
 
         try:
             symptom_dict = symptom.model_dump()
-            db_symptom = Symptom(**symptom_dict, family=family)
+            db_symptom = Symptom(**symptom_dict)
 
             db.add(db_symptom)
             db.commit()

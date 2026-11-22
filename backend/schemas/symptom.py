@@ -37,7 +37,6 @@ class SymptomResponse(SymptomBase):
 
     id: UUID
     username: Optional[str] = None
-    family: Optional[str] = None
     created_at: datetime
 
     class Config:

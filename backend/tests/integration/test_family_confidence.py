@@ -8,7 +8,7 @@ from sqlalchemy import delete
 
 from analysis.model_constants import INITIAL_LOG_ODDS, P0
 from models.component import Component
-from models.symptom_family import SymptomFamily
+from models.symptom_family import MODELED_FAMILIES, SymptomFamily
 from models.user import User
 from models.user_background_total import UserBackgroundTotal
 from models.user_family_confidence import UserFamilyConfidence
@@ -41,6 +41,18 @@ def setup_user_and_components(db_session):
     db_session.add_all([gluten, lactose])
     db_session.flush()
     return user, gluten, lactose
+
+
+def test_routed_families_match_confidence_families():
+    """route_symptom's families are the ones the confidence tables and constants are keyed by."""
+    from analysis.model_constants import DAILY_BACKGROUND
+    from services.symptom_routing import route_symptom
+
+    assert set(DAILY_BACKGROUND) == set(MODELED_FAMILIES)
+    assert route_symptom("Bloating", "Abdomen").family == SymptomFamily.GI
+    assert route_symptom("Itching", "Skin").family == SymptomFamily.SKIN
+    assert route_symptom("Throbbing", "Head").family == SymptomFamily.HEAD
+    assert route_symptom("Aching", "Knees").family not in MODELED_FAMILIES
 
 
 class TestFamilyConfidenceRepository:
@@ -79,7 +91,7 @@ class TestFamilyConfidenceRepository:
 
         repo.initialize_for_user(db_session, user.username)
 
-        for family in SymptomFamily:
+        for family in MODELED_FAMILIES:
             total = repo.get_background_total(db_session, user.username, family)
             assert total == 0.0
 
@@ -105,7 +117,7 @@ class TestFamilyConfidenceRepository:
         gi_rows = repo.get_confidences(db_session, user.username, SymptomFamily.GI)
         assert len(gi_rows) == 2
         for row in gi_rows:
-            assert row.family == "GI"
+            assert row.family == SymptomFamily.GI
 
     def test_get_confidences_filters_by_component_ids(self, db_session, setup_user_and_components):
         user, gluten, lactose = setup_user_and_components
@@ -223,7 +235,7 @@ class TestFamilyConfidenceService:
         slugs = {r.component_slug for r in results}
         families = {r.family for r in results}
         assert slugs == {"gluten", "lactose"}
-        assert families == {"GI", "SKIN", "HEAD"}
+        assert families == set(MODELED_FAMILIES)
 
     def test_get_component_confidences_returns_one_per_component(self, db_session, setup_user_and_components):
         user, _, _ = setup_user_and_components

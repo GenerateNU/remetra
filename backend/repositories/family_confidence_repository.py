@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, contains_eager
 
 from analysis.model_constants import INITIAL_LOG_ODDS
 from models.component import Component
-from models.symptom_family import SymptomFamily
+from models.symptom_family import MODELED_FAMILIES, SymptomFamily
 from models.user_background_total import UserBackgroundTotal
 from models.user_family_confidence import UserFamilyConfidence
 
@@ -29,11 +29,11 @@ class FamilyConfidenceRepository:
                     "log_odds": INITIAL_LOG_ODDS,
                 }
                 for component_id in component_ids
-                for family in SymptomFamily
+                for family in MODELED_FAMILIES
             ]
             if confidence_rows:
                 db.execute(insert(UserFamilyConfidence).values(confidence_rows).on_conflict_do_nothing())
-            background_rows = [{"username": username, "family": family.value} for family in SymptomFamily]
+            background_rows = [{"username": username, "family": family.value} for family in MODELED_FAMILIES]
             db.execute(insert(UserBackgroundTotal).values(background_rows).on_conflict_do_nothing())
             db.commit()
         except Exception:

@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from analysis.model_constants import background_rate
-from models.symptom_family import SymptomFamily
+from models.symptom_family import MODELED_FAMILIES, SymptomFamily
 from repositories.family_confidence_repository import FamilyConfidenceRepository
 from repositories.user_repository import UserRepository
 from schemas.family_confidence import ComponentConfidenceResponse, FamilyConfidenceResponse
@@ -45,7 +45,7 @@ class FamilyConfidenceService:
         results = []
         for slug, family_qs in by_component.items():
             product = 1.0
-            for f in SymptomFamily:
+            for f in MODELED_FAMILIES:
                 product *= 1.0 - family_qs.get(f.value, 0.0)
             results.append(
                 ComponentConfidenceResponse(

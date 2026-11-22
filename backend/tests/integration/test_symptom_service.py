@@ -40,35 +40,6 @@ class TestSymptomService:
         assert symptom.location == "cheeks"
         assert symptom.sensation == "burning"
 
-    def test_create_symptom_sets_family(self, db_session, authenticated_user, sample_symptom_data):
-        """Family is derived from location and sensation on create."""
-        service = SymptomService()
-        data = {**sample_symptom_data, "location": "Abdomen", "sensation": "Cramping"}
-
-        symptom = service.create_symptom(db_session, SymptomCreate(**data))
-
-        assert symptom.family == "GI"
-
-    def test_create_symptom_unmodeled_family_is_none(self, db_session, authenticated_user, sample_symptom_data):
-        """Symptoms the model doesn't cover get no family."""
-        service = SymptomService()
-        data = {**sample_symptom_data, "location": "Knees", "sensation": "Stiffness"}
-
-        symptom = service.create_symptom(db_session, SymptomCreate(**data))
-
-        assert symptom.family is None
-
-    def test_update_symptom_recomputes_family(self, db_session, authenticated_user, sample_symptom_data):
-        """Changing location or sensation updates the family; a partial update keeps the other field."""
-        service = SymptomService()
-        data = {**sample_symptom_data, "location": "Abdomen", "sensation": "Cramping"}
-        created = service.create_symptom(db_session, SymptomCreate(**data))
-
-        updated = service.update_symptom_by_id(db_session, created.id, {"location": "Head"})
-
-        assert updated.family == "HEAD"
-        assert updated.sensation == "Cramping"
-
     def test_update_symptom_not_there(self, db_session, authenticated_user, sample_symptom_data):
         """Test updating a symptom that does not exist."""
         service = SymptomService()

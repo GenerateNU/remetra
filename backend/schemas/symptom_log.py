@@ -5,6 +5,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from models.symptom_family import SymptomFamily
+
 
 class SymptomLogBase(BaseModel):
     symptom_id: UUID = Field(..., description="ID of the associated symptom")
@@ -23,13 +25,6 @@ class SymptomLogUpdate(BaseModel):
     timestamp: Optional[datetime] = Field(None, description="When the symptom occurred")
     duration: Optional[int] = Field(None, description="Duration in minutes", ge=0)
     notes: Optional[str] = Field(None, description="Additional notes about the symptom")
-
-
-class SymptomFamily(StrEnum):
-    GI = "gi"
-    SKIN = "skin"
-    HEAD = "head"
-    OTHER = "other"
 
 
 class SymptomRouteType(StrEnum):

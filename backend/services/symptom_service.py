@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from auth_context import current_username
 from models.symptom import Symptom
-from models.symptom_family import family_for_symptom
 from repositories.symptom_repository import SymptomRepository
 from schemas.symptom import SymptomCreate, SymptomResponse
 
@@ -51,8 +50,7 @@ class SymptomService:
                 f"sensation '{symptom_data.sensation}' already exists."
             )
 
-        family = family_for_symptom(symptom_data.location, symptom_data.sensation)
-        created_symptom = self.symptom_repo.create_symptom(db, symptom_data, family=family.value if family else None)
+        created_symptom = self.symptom_repo.create_symptom(db, symptom_data)
         return SymptomResponse.model_validate(created_symptom)
 
     def update_symptom_by_id(self, db: Session, symptom_id: UUID, symptom_data: dict) -> Optional[SymptomResponse]:
@@ -70,13 +68,6 @@ class SymptomService:
         exisiting_symptom = self.symptom_repo.get_symptom_by_id(db, symptom_id)
         if not exisiting_symptom:
             return None
-
-        # Keep the family in step with location/sensation; clients can't set it directly.
-        family = family_for_symptom(
-            symptom_data.get("location", exisiting_symptom.location),
-            symptom_data.get("sensation", exisiting_symptom.sensation),
-        )
-        symptom_data = {**symptom_data, "family": family.value if family else None}
 
         updated_symptom = self.symptom_repo.update_symptom_by_id(db, symptom_id, symptom_data)
 

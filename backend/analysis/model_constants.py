@@ -9,7 +9,7 @@ P0 = 0.04
 DAILY_BACKGROUND = {
     SymptomFamily.GI: 0.20,
     SymptomFamily.SKIN: 0.11,
-    SymptomFamily.HEAD:0.15,
+    SymptomFamily.HEAD: 0.15,
 }
 
 INITIAL_LOG_ODDS = math.log(P0 / (1 - P0))
