@@ -1,0 +1,32 @@
+# Sets a new PR's title from its branch name, so merge commits (which use the PR title)
+# follow Conventional Commits: feat/store-family-confidences -> "feat: store family confidences".
+# Runs only when a PR is opened, so later manual title edits are kept.
+name: PR title from branch
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set title from branch name
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          type="${BRANCH%%/*}"
+          rest="${BRANCH#*/}"
+          if [ "$type" = "$BRANCH" ] || [ -z "$rest" ]; then
+            echo "Branch '$BRANCH' has no type/ prefix; leaving the title alone."
+            exit 0
+          fi
+          title="${type,,}: ${rest//[-_]/ }"
+          echo "Setting title to: $title"
+          gh pr edit "$PR" --repo "$REPO" --title "$title"

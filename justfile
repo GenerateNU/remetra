@@ -23,13 +23,17 @@ down:
 clean:
     docker compose down -v
 
-# Seed the database with mock data from data_generator/ (idempotent)
-seed:
-    docker compose run --rm backend python scripts/seed.py
+# Create mock users, replacing existing mock_ users. Usage: just mock [count] [seed] [days]
+mock count="20" seed="42" days="60":
+    docker compose run --rm backend python -m scripts.mock_users.generate --count {{count}} --seed {{seed}} --days {{days}}
 
-# Wipe all seed data and reseed from scratch
-seed-clear:
-    docker compose run --rm backend python scripts/seed.py --clear
+# Delete mock_ users and their rows, leaving every other user alone
+mock-clear:
+    docker compose run --rm backend python -m scripts.mock_users.clear
+
+# Check that the last `just mock` run's planted triggers stand out from background symptoms
+mock-check:
+    docker compose run --rm backend python -m scripts.mock_users.check
 
 # Drop all tables and recreate schema from scratch (destructive — local use only)
 reset-db:

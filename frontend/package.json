@@ -46,6 +46,7 @@
     "react-dom": "19.3.0",
     "react-native": "0.88.1",
     "react-native-element-dropdown": "^2.12.4",
+    "react-native-keyboard-controller": "1.22.7",
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.11.1",
     "react-native-screens": "~4.30.1",
@@ -77,6 +78,9 @@
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@sentry/.*|native-base|react-native-svg)"
     ],
+    "moduleNameMapper": {
+      "^lucide-react-native$": "<rootDir>/node_modules/lucide-react-native/dist/cjs/lucide-react-native.js"
+    },
     "setupFiles": [
       "<rootDir>/jest.setup.js"
     ]
