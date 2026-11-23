@@ -62,6 +62,24 @@ class UserIngredientsUpdate(BaseModel):
         return self
 
 
+class UserIngredientLabelsUpdate(BaseModel):
+    """Onboarding food-group labels. Replaces the user's ingredient preferences.
+
+    The same label may appear in more than one list. Avoid wins over suspect, and suspect wins over safe.
+    """
+
+    avoid: list[str] = []
+    suspect: list[str] = []
+    safe: list[str] = []
+
+    @model_validator(mode="after")
+    def dedupe(self):
+        self.avoid = list(dict.fromkeys(self.avoid))
+        self.suspect = list(dict.fromkeys(self.suspect))
+        self.safe = list(dict.fromkeys(self.safe))
+        return self
+
+
 class UserIngredientsResponse(BaseModel):
     """The user's ingredient preferences, grouped by category. All three lists are always present."""
 

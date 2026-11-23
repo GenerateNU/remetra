@@ -74,14 +74,8 @@ const mapMeToUser = (me: MeResponse): UserProfile => ({
   medication: me.medication ?? [],
 });
 
-const marksOnboarding = (me: MeResponse) =>
-  me.dob != null || (me.disease?.length ?? 0) > 0;
-
-const keepOnboarding = (me: MeResponse, previous: AuthState) =>
-  marksOnboarding(me) ||
-  (previous.user.email != null &&
-    previous.user.email === me.email &&
-    previous.hasCompletedOnboarding);
+// disease stays null until onboarding is saved. [] means they finished and skipped conditions.
+const marksOnboarding = (me: MeResponse) => me.disease != null;
 
 const clearedSession = {
   isAuthenticated: false,
@@ -97,7 +91,7 @@ const initialState: AuthState = {
 
 export const useAuthStore = create<AuthStore>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
 
       login: async (payload) => {
@@ -106,7 +100,7 @@ export const useAuthStore = create<AuthStore>()(
         set({
           user: mapMeToUser(me),
           isAuthenticated: true,
-          hasCompletedOnboarding: keepOnboarding(me, get()),
+          hasCompletedOnboarding: marksOnboarding(me),
         });
       },
 
@@ -116,7 +110,7 @@ export const useAuthStore = create<AuthStore>()(
         set({
           user: mapMeToUser(me),
           isAuthenticated: true,
-          hasCompletedOnboarding: keepOnboarding(me, get()),
+          hasCompletedOnboarding: marksOnboarding(me),
         });
       },
 
@@ -148,14 +142,14 @@ export const useAuthStore = create<AuthStore>()(
       setUserFromMe: (me) =>
         set({
           user: mapMeToUser(me),
-          hasCompletedOnboarding: keepOnboarding(me, get()),
+          hasCompletedOnboarding: marksOnboarding(me),
         }),
 
       refreshProfile: async () => {
         const me = await authService.getMe();
         set({
           user: mapMeToUser(me),
-          hasCompletedOnboarding: keepOnboarding(me, get()),
+          hasCompletedOnboarding: marksOnboarding(me),
         });
       },
     }),
