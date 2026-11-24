@@ -43,3 +43,25 @@ class TaxonomyRepository:
             .order_by(IngredientComponent.component_id)
         )
         return [(component_id, concentration_level) for component_id, concentration_level in db.execute(query).all()]
+
+    def ingredient_ids_for(
+        self,
+        db: Session,
+        *,
+        component_slugs: set[str],
+        ingredient_slugs: set[str],
+    ) -> set[UUID]:
+        """Ingredient ids that match any of the component slugs or ingredient slugs."""
+        ids: set[UUID] = set()
+        if ingredient_slugs:
+            query = sa.select(Ingredient.id).where(Ingredient.slug.in_(ingredient_slugs))
+            ids.update(db.execute(query).scalars().all())
+        if component_slugs:
+            query = (
+                sa.select(Ingredient.id)
+                .join(IngredientComponent, IngredientComponent.ingredient_id == Ingredient.id)
+                .join(Component, Component.id == IngredientComponent.component_id)
+                .where(Component.slug.in_(component_slugs))
+            )
+            ids.update(db.execute(query).scalars().all())
+        return ids
