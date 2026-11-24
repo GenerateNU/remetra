@@ -35,9 +35,9 @@ def _owned_models() -> tuple[type, ...]:
     from models.metrics import Metrics
     from models.symptom import Symptom
     from models.symptom_log import SymptomLog
-    from models.user_component_state import UserComponentState
+    from models.user_model_run import UserModelRun
 
-    return (Food, FoodLog, Symptom, SymptomLog, Metrics, DailyHealthMetrics, HealthKitEvent, UserComponentState)
+    return (Food, FoodLog, Symptom, SymptomLog, Metrics, DailyHealthMetrics, HealthKitEvent, UserModelRun)
 
 
 def _no_rows(_cls):

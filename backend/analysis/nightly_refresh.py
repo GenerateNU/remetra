@@ -2,15 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from uuid import UUID
 
+from analysis.model_constants import DEFAULT_LOOKBACK_HOURS, LOOKBACK_HOURS
 from models.symptom_family import SymptomFamily
-from models.user_component_state import UserComponentState
 from schemas.food_log import FoodLogResponse
 from schemas.symptom_log import SymptomLogResponse
 
 
 def lookback(family: SymptomFamily | None) -> timedelta:
-    """How far before a symptom a meal can still have caused it: 48h for skin, 36h otherwise."""
-    return timedelta(hours=48) if family == SymptomFamily.SKIN else timedelta(hours=36)
+    """How far before a symptom a meal can still have caused it (LOOKBACK_HOURS, or the default if unmodeled)."""
+    return timedelta(hours=LOOKBACK_HOURS.get(family, DEFAULT_LOOKBACK_HOURS))
 
 
 @dataclass
@@ -35,7 +35,6 @@ def nightly_refresh(
     new_symptoms: list[SymptomLogResponse],
     now: datetime,
     last_update: datetime,
-    uc_states: list[UserComponentState],
 ) -> list[PairTiming]:
     """Return the timing curve weight for every linked food log - symptom log pair."""
     symptoms_by_id = {symptom.id: symptom for symptom in new_symptoms}

@@ -5,13 +5,14 @@ from pathlib import Path
 import yaml
 from sqlalchemy.orm import Session
 
-from analysis.model_constants import INITIAL_LOG_ODDS, initial_background_rate
+from analysis.model_constants import INITIAL_LOG_ODDS
 from analysis.nightly_refresh import lookback, nightly_refresh
 from models.symptom_family import MODELED_FAMILIES
-from models.user_component_state import UserComponentState
+from repositories.family_confidence_repository import FamilyConfidenceRepository
 from repositories.food_log_repository import FoodLogRepository
 from repositories.symptom_log_repository import SymptomLogRepository
-from repositories.user_component_state_repository import UserComponentStateRepository
+from repositories.user_model_run_repository import UserModelRunRepository
+from repositories.user_repository import UserRepository
 from schemas.food_log import FoodLogResponse
 from schemas.symptom_log import SymptomLogResponse
 from services.symptom_log_service import to_symptom_log_response
@@ -36,44 +37,39 @@ def _compute_multiplier(user_diseases: list[str], component_slug: str, config: d
 
 class OnboardingService:
     def __init__(self):
-        self.repo = UserComponentStateRepository()
+        self.repo = FamilyConfidenceRepository()
+        self.run_repo = UserModelRunRepository()
+        self.user_repo = UserRepository()
         self.food_repo = FoodLogRepository()
         self.symptom_repo = SymptomLogRepository()
 
     def initialize_user_state(self, db: Session, username: str) -> int:
-        """Create one row per component per modeled family for a new user. Returns row count, 0 if already seeded."""
-        if self.repo.has_state(db, username):
-            return 0
+        """Seed a new user's model state: family confidences raised by their onboarding conditions, background
+        totals, and the nightly run marker (last_update = now).
 
-        user = self.repo.get_user(db, username)
-        components = self.repo.get_all_components(db)
-        if not components:
-            raise ValueError("No components in the database; run scripts/seed_taxonomy.py first")
-        config = _load_condition_multipliers()
-        user_diseases = user.disease or []
-        now = datetime.now(timezone.utc)
+        Returns the number of confidence rows created, 0 if the user already had them. Safe to call again: each
+        piece is only created if it is missing.
+        """
+        created = 0
+        if not self.repo.has_confidences(db, username):
+            user = self.user_repo.get_by_username(db, username)
+            if user is None:
+                raise ValueError(f"User '{username}' not found")
+            components = self.repo.get_all_components(db)
+            if not components:
+                raise ValueError("No components in the database; run scripts/seed_taxonomy.py first")
+            config = _load_condition_multipliers()
+            user_diseases = user.disease or []
+            starting_log_odds = {
+                component.id: INITIAL_LOG_ODDS + math.log(_compute_multiplier(user_diseases, component.slug, config))
+                for component in components
+            }
+            self.repo.initialize_for_user(db, username, starting_log_odds)
+            created = len(components) * len(MODELED_FAMILIES)
 
-        rows = []
-        for component in components:
-            log_odds = INITIAL_LOG_ODDS + math.log(_compute_multiplier(user_diseases, component.slug, config))
-            for family in MODELED_FAMILIES:
-                rows.append(
-                    UserComponentState(
-                        username=username,
-                        component_id=component.id,
-                        family=family.value,
-                        log_odds=log_odds,
-                        expected_reactions=0.0,
-                        exposure_count=0,
-                        background_rate=initial_background_rate(family),
-                        background_total=0.0,
-                        hours_since_onboarding=0.0,
-                        last_update=now,
-                    )
-                )
-
-        self.repo.bulk_insert(db, rows)
-        return len(rows)
+        if self.run_repo.get(db, username) is None:
+            self.run_repo.create(db, username, datetime.now(timezone.utc))
+        return created
 
     def collect_night_logs(
         self, db: Session, username: str, last_update: datetime, as_of: datetime
@@ -104,17 +100,13 @@ class OnboardingService:
 
         Runs outside a request, so callers must wrap it in auth_context.system_access().
         """
-        states = self.repo.get_states_for_user(db, username)
-        if not states:
-            self.initialize_user_state(db, username)
-            states = self.repo.get_states_for_user(db, username)
+        self.initialize_user_state(db, username)
+        run = self.run_repo.get(db, username)
 
-        last_update = min(s.last_update for s in states)
+        last_update = run.last_update
         if as_of <= last_update:
             return
 
         meals, symptoms = self.collect_night_logs(db, username, last_update, as_of)
-        nightly_refresh(meals, symptoms, as_of, last_update, states)
-        for s in states:
-            s.last_update = as_of
-        self.repo.update_states(db, states)
+        nightly_refresh(meals, symptoms, as_of, last_update)
+        self.run_repo.set_last_update(db, run, as_of)

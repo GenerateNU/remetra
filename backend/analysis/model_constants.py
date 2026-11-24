@@ -1,4 +1,4 @@
-"""Fixed values for model v2, from docs/model-vs-draft.md (Starting values)."""
+"""Fixed values for model v2, from docs/model-v2-draft.md (Starting values)."""
 
 import math
 
@@ -15,6 +15,35 @@ DAILY_BACKGROUND = {
 INITIAL_LOG_ODDS = math.log(P0 / (1 - P0))
 
 BACKGROUND_PRIOR_HOURS = 168
+
+# s_f: chance a real trigger causes a reaction in the family from one full serving
+REACTION_CHANCE = {
+    SymptomFamily.GI: 0.40,
+    SymptomFamily.SKIN: 0.30,
+    SymptomFamily.HEAD: 0.25,
+}
+
+
+# T_f: meal lookback window per family (hours)
+LOOKBACK_HOURS = {
+    SymptomFamily.GI: 36,
+    SymptomFamily.HEAD: 36,
+    SymptomFamily.SKIN: 48,
+}
+
+# Lookback for symptoms with no modeled family (None or OTHER), so meals still link to them
+DEFAULT_LOOKBACK_HOURS = 36
+
+# Timing curve parameters: (median_hours, spread)
+# GI and HEAD use a single log-normal; SKIN mixes an early and a late curve
+TIMING_PARAMS = {
+    SymptomFamily.GI: [(4, 0.8)],
+    SymptomFamily.HEAD: [(8, 0.8)],
+    SymptomFamily.SKIN: [(1, 0.7), (24, 0.5)],
+}
+
+# SKIN mixing weight: 50% early, 50% late
+SKIN_EARLY_WEIGHT = 0.5
 
 
 def initial_background_rate(family: SymptomFamily) -> float:

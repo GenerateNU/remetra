@@ -3,7 +3,7 @@
 import os
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
@@ -18,6 +18,19 @@ else:
     SessionLocal = None
 
 Base = declarative_base()
+
+# Tables whose models were removed. drop_all only knows the current models, and these still hold foreign keys to
+# tables it drops (users, components), so a full reset must drop them first.
+LEGACY_TABLES = ("user_component_states",)
+
+
+def drop_all_tables(bind) -> None:
+    """Drop every model table plus any legacy tables left over from removed models. Destructive."""
+    with bind.begin() as conn:
+        for table in LEGACY_TABLES:
+            conn.execute(text(f"DROP TABLE IF EXISTS {table}"))
+    Base.metadata.drop_all(bind=bind)
+
 
 from auth_context import register_ownership_filter  # noqa: E402
 
