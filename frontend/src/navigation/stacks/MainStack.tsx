@@ -7,6 +7,7 @@ import { AboutScreen } from '../../screens/main/AboutScreen';
 import { EditWeightScreen } from '../../screens/main/EditWeightScreen';
 import { EditConditionsScreen } from '../../screens/main/EditConditionsScreen';
 import { EditMedicationsScreen } from '../../screens/main/EditMedicationsScreen';
+import { WeeklyResultsScreen } from '../../screens/main/WeeklyResultsScreen';
 
 export type MainStackParamList = {
   Tabs: undefined;
@@ -16,6 +17,7 @@ export type MainStackParamList = {
   EditWeight: undefined;
   EditConditions: undefined;
   EditMedications: undefined;
+  WeeklyResults: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -25,6 +27,10 @@ export const MainStack = () => (
     <Stack.Screen name="Tabs" component={MainTabs} />
     <Stack.Screen name="BarcodeScanner" component={BarcodeScannerScreen} />
     <Stack.Screen name="Correlations" component={CorrelationsScreen} />
+    {/* Weekly results (GET /results/weekly) */}
+    <Stack.Screen name="WeeklyResults">
+      {({ navigation }) => <WeeklyResultsScreen onBack={() => navigation.goBack()} />}
+    </Stack.Screen>
     <Stack.Screen
       name="About"
       component={AboutScreen}

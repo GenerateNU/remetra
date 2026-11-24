@@ -116,6 +116,7 @@ export function AnalysisScreen() {
   }, [healthRange]);
 
   const belowThreshold = totalLogs < MIN_LOGS_FOR_ANALYSIS;
+  const navigation = useAppNavigation(); // TEMP: for the weekly results preview button
 
   return (
     <View className="flex-1">
@@ -124,6 +125,15 @@ export function AnalysisScreen() {
         <Text className="text-2xl font-semibold text-remetra-mauve italic tracking-[1px] text-center mb-8">
           YOUR ANALYSIS
         </Text>
+
+        {/* TEMP: preview entry for the weekly results screen. Remove once it has a real entry point. */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('WeeklyResults')}
+          className="bg-white/35 rounded-xl p-4 mb-6 flex-row items-center justify-between"
+        >
+          <Text className="text-[15px] text-remetra-espresso font-semibold">Weekly results (preview)</Text>
+          <ChevronRight size={18} color="#7A4F35" />
+        </TouchableOpacity>
 
         <SectionDivider label="Symptoms by Occurrences"/>
 
