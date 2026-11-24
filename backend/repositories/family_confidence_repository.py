@@ -14,11 +14,21 @@ from models.user_family_confidence import UserFamilyConfidence
 class FamilyConfidenceRepository:
     """Access to a user's per-family component confidences and background totals."""
 
-    def initialize_for_user(self, db: Session, username: str) -> None:
+    def get_all_components(self, db: Session) -> list[Component]:
+        """Return every component in the taxonomy."""
+        return list(db.execute(sa.select(Component)).scalars().all())
+
+    def initialize_for_user(
+        self, db: Session, username: str, starting_log_odds: dict[UUID, float] | None = None
+    ) -> None:
         """Insert a confidence row for every component and family, and a background total for every family.
+
+        `starting_log_odds` overrides the starting log-odds per component (e.g. raised by onboarding conditions);
+        components not in it start at INITIAL_LOG_ODDS.
 
         Idempotent: rows that already exist are left alone, so calling this twice changes nothing.
         """
+        starting_log_odds = starting_log_odds or {}
         try:
             component_ids = db.execute(sa.select(Component.id)).scalars().all()
             confidence_rows = [
@@ -26,7 +36,7 @@ class FamilyConfidenceRepository:
                     "username": username,
                     "component_id": component_id,
                     "family": family.value,
-                    "log_odds": INITIAL_LOG_ODDS,
+                    "log_odds": starting_log_odds.get(component_id, INITIAL_LOG_ODDS),
                 }
                 for component_id in component_ids
                 for family in MODELED_FAMILIES

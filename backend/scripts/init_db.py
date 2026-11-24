@@ -26,7 +26,7 @@ import models.symptom  # noqa: F401
 import models.symptom_log  # noqa: F401
 import models.tag  # noqa: F401
 import models.user  # noqa: F401
-from database import Base, engine
+from database import Base, drop_all_tables, engine
 
 
 def init_db(reset: bool = False) -> None:
@@ -41,7 +41,7 @@ def init_db(reset: bool = False) -> None:
 
     if reset:
         print("--reset flag detected: dropping all tables...")
-        Base.metadata.drop_all(bind=engine)
+        drop_all_tables(engine)
         print("Tables dropped.")
 
     Base.metadata.create_all(bind=engine)

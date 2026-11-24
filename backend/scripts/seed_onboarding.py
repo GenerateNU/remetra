@@ -1,4 +1,4 @@
-"""Seed initial user_component_states from onboarding conditions.
+"""Seed each user's starting family confidences (from onboarding conditions) and nightly run marker.
 
 Usage inside Docker:
     python scripts/seed_onboarding.py                  # all users without state
@@ -33,7 +33,7 @@ def main():
     service = OnboardingService()
     try:
         # No signed-in user here, so without system_access() the ownership filter hides every
-        # user_component_states row: has_state() is always False and re-seeding hits uq_user_component_family.
+        # user_model_runs row: the run marker always looks missing and re-seeding hits its unique username.
         with system_access():
             if args.user:
                 count = service.initialize_user_state(db, args.user)

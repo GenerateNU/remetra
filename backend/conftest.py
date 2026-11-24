@@ -19,7 +19,7 @@ import os
 import pytest
 from sqlalchemy import create_engine, text
 
-from database import Base
+from database import Base, drop_all_tables
 from models.food import Food
 from models.food_log import FoodLog
 from models.symptom import Symptom
@@ -45,7 +45,7 @@ def db_engine():
         conn.commit()
     Base.metadata.create_all(bind=engine)
     yield engine
-    Base.metadata.drop_all(bind=engine)
+    drop_all_tables(engine)
 
 
 @pytest.fixture(scope="function")
