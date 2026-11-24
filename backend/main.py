@@ -29,6 +29,7 @@ from routers.symptom_router import router as symptom_router
 from routers.tag_router import router as tag_router
 from routers.user_ingredient_router import router as user_ingredient_router
 from routers.voice_router import router as voice_router
+from routers.weekly_results_router import router as weekly_results_router
 
 logger = logging.getLogger(__name__)
 
@@ -135,6 +136,7 @@ app.include_router(user_ingredient_router)
 app.include_router(meal_follow_up_router)
 app.include_router(voice_router)
 app.include_router(chat_router)
+app.include_router(weekly_results_router)
 
 
 @app.get("/scalar", include_in_schema=False)
