@@ -46,3 +46,8 @@ class WeeklyResultsRepository:
             .where(FoodLog.username == username, FoodLog.timestamp <= eaten_before)
         )
         return [ingredients or [] for ingredients in db.execute(query).scalars().all()]
+
+    def get_first_meal_time(self, db: Session, username: str) -> datetime | None:
+        """Return when the user's earliest food log was eaten, or None if they have none."""
+        query = sa.select(sa.func.min(FoodLog.timestamp)).where(FoodLog.username == username)
+        return db.execute(query).scalar_one_or_none()

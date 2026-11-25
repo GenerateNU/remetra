@@ -57,9 +57,12 @@ class WeeklyResultsService:
 
         meals = self._settled_meals(db, username, now)
 
-        response = WeeklyResultsResponse()
+        units = _units(display_names, load_merge_groups())
+        response = WeeklyResultsResponse(
+            groups_total=len(units), first_meal_at=self.repo.get_first_meal_time(db, username)
+        )
         labelled: list[tuple[float, Label]] = []
-        for unit in _units(display_names, load_merge_groups()):
+        for unit in units:
             exposure_count = sum(1 for meal in meals if meal.intersection(unit.members))
             if exposure_count == 0:
                 continue
@@ -79,6 +82,7 @@ class WeeklyResultsService:
         for items in (response.likely_trigger, response.still_learning, response.looks_fine):
             items.sort(key=lambda item: item.display_name.lower())
         response.no_clear_pattern = is_no_clear_pattern(labelled)
+        response.groups_checked = len(response.likely_trigger) + len(response.looks_fine)
         return response
 
     def _settled_meals(self, db: Session, username: str, now: datetime) -> list[set[str]]:

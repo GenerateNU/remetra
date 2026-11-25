@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from analysis.weekly_labels import Label
@@ -26,3 +28,6 @@ class WeeklyResultsResponse(BaseModel):
     no_clear_pattern: bool = Field(
         default=False, description="True when at least 60% look fine and nothing is close to a trigger"
     )
+    groups_checked: int = Field(default=0, description="Food groups with a result: likely trigger or looks fine")
+    groups_total: int = Field(default=0, description="Every food group the model tracks, counting merge groups once")
+    first_meal_at: datetime | None = Field(default=None, description="When the user's first meal was eaten")

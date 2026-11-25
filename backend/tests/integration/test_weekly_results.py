@@ -136,12 +136,25 @@ class TestWeeklyResultsRepository:
         meals = WeeklyResultsRepository().get_meal_ingredients(db_session, username, NOW - timedelta(hours=48))
         assert meals == [["eggs"]]
 
+    def test_first_meal_time_is_the_earliest_log_or_none(self, db_session, authenticated_user):
+        username = authenticated_user["username"]
+        repo = WeeklyResultsRepository()
+        assert repo.get_first_meal_time(db_session, username) is None
+
+        _log_meal(db_session, username, ["eggs"], FRESH)
+        _log_meal(db_session, username, ["eggs"], SETTLED)
+        db_session.flush()
+
+        assert repo.get_first_meal_time(db_session, username) == SETTLED
+
 
 class TestWeeklyResultsService:
     def test_no_confidences_returns_empty_results(self, db_session, authenticated_user, taxonomy):
         results = WeeklyResultsService().get_weekly_results(db_session, authenticated_user["username"], now=NOW)
         assert results.likely_trigger == results.still_learning == results.looks_fine == []
         assert results.no_clear_pattern is False
+        assert results.groups_checked == results.groups_total == 0
+        assert results.first_meal_at is None
 
     def test_planted_trigger_stands_out(self, db_session, planted_onion_user):
         results = WeeklyResultsService().get_weekly_results(db_session, planted_onion_user, now=NOW)
@@ -150,6 +163,14 @@ class TestWeeklyResultsService:
         assert {item.id for item in results.looks_fine} == {"egg_protein", "wheat"}
         assert results.still_learning == []
         assert results.no_clear_pattern is False
+
+    def test_progress_counts_groups_once_and_reports_first_meal(self, db_session, planted_onion_user):
+        results = WeeklyResultsService().get_weekly_results(db_session, planted_onion_user, now=NOW)
+
+        # Units: wheat group, dairy group, onion, egg. Onion (trigger) and egg + wheat (fine) have results.
+        assert results.groups_total == 4
+        assert results.groups_checked == 3
+        assert results.first_meal_at == SETTLED
 
     def test_always_together_foods_are_one_group(self, db_session, planted_onion_user):
         results = WeeklyResultsService().get_weekly_results(db_session, planted_onion_user, now=NOW)
@@ -209,7 +230,16 @@ class TestWeeklyResultsEndpoint:
 
         assert response.status_code == 200
         body = response.json()
-        assert set(body) == {"likely_trigger", "still_learning", "looks_fine", "no_clear_pattern"}
+        assert set(body) == {
+            "likely_trigger",
+            "still_learning",
+            "looks_fine",
+            "no_clear_pattern",
+            "groups_checked",
+            "groups_total",
+            "first_meal_at",
+        }
+        assert (body["groups_checked"], body["groups_total"]) == (3, 4)
         assert [item["label"] for item in body["likely_trigger"]] == ["likely_trigger"]
         for items in (body["likely_trigger"], body["still_learning"], body["looks_fine"]):
             for item in items:

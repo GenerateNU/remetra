@@ -43,6 +43,13 @@ module.exports = {
         'remetra-text-tertiary':  '#7a7068',
         'remetra-line-subtle':    '#f4f0ec',
         'remetra-ember-end':      '#ffe09e',
+        // Insight states (Ask Remetra, Insights)
+        'remetra-trigger-bg':     '#fffbeb',
+        'remetra-trigger-line':   '#f59e0b',
+        'remetra-trigger-text':   '#78350f',
+        'remetra-fine-bg':        '#f0fdf4',
+        'remetra-fine-line':      '#247f48',
+        'remetra-fine-text':      '#065f46',
       },
       fontSize: {
         // Brand wordmark used across onboarding screens

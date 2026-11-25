@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { MainTabs } from '../MainTabs';
 import { BarcodeScannerScreen } from '../../components/BarcodeScannerScreen';
 import { CorrelationsScreen } from '../../screens/main/CorrelationsScreen';
+import { WeeklyResultsScreen } from '../../screens/main/WeeklyResultsScreen';
 import { AboutScreen } from '../../screens/main/AboutScreen';
 import { EditWeightScreen } from '../../screens/main/EditWeightScreen';
 import { EditConditionsScreen } from '../../screens/main/EditConditionsScreen';
@@ -12,6 +13,7 @@ export type MainStackParamList = {
   Tabs: undefined;
   BarcodeScanner: { onScanned?: (food: { name: string; ingredients: string[] }) => void };
   Correlations: { initialSymptomId?: string } | undefined;
+  WeeklyResults: undefined;
   About: undefined;
   EditWeight: undefined;
   EditConditions: undefined;
@@ -25,6 +27,7 @@ export const MainStack = () => (
     <Stack.Screen name="Tabs" component={MainTabs} />
     <Stack.Screen name="BarcodeScanner" component={BarcodeScannerScreen} />
     <Stack.Screen name="Correlations" component={CorrelationsScreen} />
+    <Stack.Screen name="WeeklyResults" component={WeeklyResultsScreen} options={{ gestureEnabled: true }} />
     <Stack.Screen
       name="About"
       component={AboutScreen}
