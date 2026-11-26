@@ -9,7 +9,7 @@ export function StillLearningCard({ count }: { count: number }) {
   return (
     <View
       testID="still-learning-card"
-      className="w-full gap-3 rounded-[24px] border-[0.5px] border-remetra-chip-line bg-remetra-sheet p-5"
+      className="w-full gap-[12px] rounded-[24px] border-[0.5px] border-remetra-chip-line bg-remetra-sheet p-[20px]"
     >
       <InsightTag label="Still learning" color={SECONDARY_TEXT} Icon={SparkleLearning} />
       <InsightTitle>{count === 1 ? '1 food group' : `${count} food groups`}</InsightTitle>

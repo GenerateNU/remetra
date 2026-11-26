@@ -8,7 +8,7 @@ import { allStillLearning, empty, noClearPattern, withTrigger } from '../../../a
 jest.mock('expo-font', () => ({ useFonts: () => [true] }));
 jest.mock('@expo-google-fonts/prata', () => ({ Prata_400Regular: 0 }));
 jest.mock('@expo-google-fonts/figtree', () => ({ Figtree_400Regular: 0, Figtree_600SemiBold: 0 }));
-jest.mock('../../../components/weekly/HaloBackground', () => ({ HaloBackground: () => null }));
+jest.mock('../../../components/weekly/SkyBackground', () => ({ SkyBackground: () => null }));
 jest.mock('../../../api/weekly_results_service', () => ({
   weeklyResultsService: { getWeekly: jest.fn() },
 }));

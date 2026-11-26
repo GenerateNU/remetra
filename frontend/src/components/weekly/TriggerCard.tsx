@@ -10,7 +10,7 @@ export function TriggerCard({ item }: { item: WeeklyLabelItem }) {
   return (
     <View
       testID={`trigger-card-${item.id}`}
-      className="w-full gap-3 rounded-[24px] border-[0.5px] border-remetra-trigger-line bg-remetra-trigger-bg p-5"
+      className="w-full gap-[12px] rounded-[24px] border-[0.5px] border-remetra-trigger-line bg-remetra-trigger-bg p-[20px]"
     >
       <InsightTag label="Likely trigger" color={TRIGGER_TEXT} Icon={SparkleTrigger} />
       <InsightTitle>{item.display_name}</InsightTitle>

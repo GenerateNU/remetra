@@ -7,7 +7,7 @@ import type { SvgProps } from 'react-native-svg';
 /** Figma "Overline": the small uppercase heading above each section. */
 export function Overline({ children }: { children: string }) {
   return (
-    <Text className="font-figtree-semibold text-[12px] uppercase leading-4 tracking-[0.96px] text-remetra-text-tertiary">
+    <Text className="font-figtree-semibold text-[12px] uppercase leading-[16px] tracking-[0.96px] text-remetra-text-tertiary">
       {children}
     </Text>
   );
@@ -16,7 +16,7 @@ export function Overline({ children }: { children: string }) {
 /** A section: overline heading, then its card. */
 export function InsightSection({ title, children, testID }: { title: string; children: ReactNode; testID?: string }) {
   return (
-    <View testID={testID} className="w-full gap-3">
+    <View testID={testID} className="w-full gap-[12px]">
       <Overline>{title}</Overline>
       {children}
     </View>
@@ -26,9 +26,9 @@ export function InsightSection({ title, children, testID }: { title: string; chi
 /** Figma "Tag": white pill with a sparkle, at the top of an insight card. */
 export function InsightTag({ label, color, Icon }: { label: string; color: string; Icon: FC<SvgProps> }) {
   return (
-    <View className="flex-row items-center gap-2 self-start rounded-full bg-white px-3 py-1">
+    <View className="flex-row items-center gap-[8px] self-start rounded-full bg-white px-[12px] py-[4px]">
       <Icon width={14} height={14} />
-      <Text style={{ color }} className="font-figtree-semibold text-[12px] leading-4 tracking-[0.12px]">
+      <Text style={{ color }} className="font-figtree-semibold text-[12px] leading-[16px] tracking-[0.12px]">
         {label}
       </Text>
     </View>
@@ -37,9 +37,9 @@ export function InsightTag({ label, color, Icon }: { label: string; color: strin
 
 /** Figma "Title/Small" and "Body/Regular" inside an insight card. */
 export function InsightTitle({ children }: { children: string }) {
-  return <Text className="font-prata text-[20px] leading-7 text-remetra-text-primary">{children}</Text>;
+  return <Text className="font-prata text-[20px] leading-[28px] text-remetra-text-primary">{children}</Text>;
 }
 
 export function InsightBody({ children }: { children: string }) {
-  return <Text className="font-figtree text-[14px] leading-5 text-remetra-text-secondary">{children}</Text>;
+  return <Text className="font-figtree text-[14px] leading-[20px] text-remetra-text-secondary">{children}</Text>;
 }

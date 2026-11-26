@@ -4,7 +4,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useFonts } from 'expo-font';
 import { Prata_400Regular } from '@expo-google-fonts/prata';
 import { Figtree_400Regular, Figtree_600SemiBold } from '@expo-google-fonts/figtree';
-import { HaloBackground } from '../../components/weekly/HaloBackground';
+import { SkyBackground } from '../../components/weekly/SkyBackground';
 import { InsightSection } from '../../components/weekly/InsightParts';
 import { ProgressCard } from '../../components/weekly/ProgressCard';
 import { AskEntryCard } from '../../components/weekly/AskEntryCard';
@@ -69,7 +69,7 @@ export function WeeklyResultsScreen() {
   const fontsReady = fontsLoaded || Boolean(fontError);
   if (!fontsReady) {
     return (
-      <View className="flex-1 bg-remetra-sheet">
+      <View className="flex-1 bg-white">
         <ActivityIndicator testID="weekly-results-loading" color="#b2939b" style={{ marginTop: 120 }} />
       </View>
     );
@@ -79,38 +79,41 @@ export function WeeklyResultsScreen() {
   const eyebrow = update ? `Week ${update.week} update, ${shortDate(update.updateDate)}` : 'Weekly update';
 
   return (
-    <View className="flex-1 bg-remetra-sheet">
-      <HaloBackground />
+    <View className="flex-1 bg-white">
+      <SkyBackground />
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingTop: 56, paddingBottom: 48 }}
       >
         {/* Figma "Top bar", with a back link because this screen is pushed from the Analysis tab */}
-        <View className="w-full gap-1 px-6 py-3">
+        <View className="w-full gap-[4px] px-[24px] py-[12px]">
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             accessibilityRole="button"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            className="-ml-1.5 mb-1 flex-row items-center gap-0.5 self-start"
+            className="ml-[-6px] mb-[4px] flex-row items-center gap-[2px] self-start"
           >
             <ChevronLeft size={18} color={TEXT_PRIMARY} strokeWidth={2} />
             <Text className="font-figtree-semibold text-[14px] text-remetra-text-primary">Back</Text>
           </TouchableOpacity>
-          <Text className="font-figtree-semibold text-[12px] uppercase leading-4 tracking-[0.96px] text-remetra-text-tertiary">
-            {eyebrow}
-          </Text>
-          <Text className="font-prata text-[32px] leading-10 text-remetra-text-primary">Insights</Text>
+          {/* Figma "Titles": eyebrow and title, 2px apart */}
+          <View className="gap-[2px]">
+            <Text className="font-figtree-semibold text-[12px] uppercase leading-[16px] tracking-[0.96px] text-remetra-text-tertiary">
+              {eyebrow}
+            </Text>
+            <Text className="font-prata text-[32px] leading-[40px] text-remetra-text-primary">Insights</Text>
+          </View>
         </View>
 
         {isLoading ? (
           <ActivityIndicator testID="weekly-results-loading" color="#b2939b" style={{ marginTop: 48 }} />
         ) : error || !results ? (
-          <View className="mt-10 items-center gap-3">
+          <View className="mt-[40px] items-center gap-[12px]">
             <Text className="text-center font-figtree text-[14px] text-remetra-rose">{error}</Text>
             <TouchableOpacity
               onPress={retry}
               accessibilityRole="button"
-              className="rounded-full bg-remetra-primary px-5 py-2.5"
+              className="rounded-full bg-remetra-primary px-[20px] py-[10px]"
             >
               <Text className="font-figtree-semibold text-[14px] text-white">Try again</Text>
             </TouchableOpacity>
@@ -143,7 +146,7 @@ function WeeklyResultsBody({
   const sectionsY = useRef(0);
 
   return (
-    <View className="mt-5 gap-5" onLayout={(e) => (bodyY.current = e.nativeEvent.layout.y)}>
+    <View className="mt-[20px] gap-[20px]" onLayout={(e) => (bodyY.current = e.nativeEvent.layout.y)}>
       {state !== 'empty' && nextUpdate && (
         <ProgressCard
           checked={results.groups_checked}
@@ -153,14 +156,14 @@ function WeeklyResultsBody({
         />
       )}
       <AskEntryCard />
-      <View className="gap-5" onLayout={(e) => (sectionsY.current = e.nativeEvent.layout.y)}>
+      <View className="gap-[20px]" onLayout={(e) => (sectionsY.current = e.nativeEvent.layout.y)}>
         {message && (
           <View
             testID={`weekly-results-${state}`}
-            className="w-full gap-3 rounded-[24px] border-[0.5px] border-remetra-line-subtle bg-white p-5"
+            className="w-full gap-[12px] rounded-[24px] border-[0.5px] border-remetra-line-subtle bg-white p-[20px]"
           >
-            <Text className="font-prata text-[20px] leading-7 text-remetra-text-primary">{message.title}</Text>
-            <Text className="font-figtree text-[14px] leading-5 text-remetra-text-secondary">{message.body}</Text>
+            <Text className="font-prata text-[20px] leading-[28px] text-remetra-text-primary">{message.title}</Text>
+            <Text className="font-figtree text-[14px] leading-[20px] text-remetra-text-secondary">{message.body}</Text>
           </View>
         )}
         {results.likely_trigger.length > 0 && (
@@ -181,7 +184,7 @@ function WeeklyResultsBody({
           </InsightSection>
         )}
         {state !== 'empty' && (
-          <Text className="text-center font-figtree text-[12px] leading-4 text-remetra-text-tertiary">
+          <Text className="text-center font-figtree text-[12px] leading-[16px] text-remetra-text-tertiary">
             These are patterns in your logs, not a diagnosis.
           </Text>
         )}

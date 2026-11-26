@@ -17,7 +17,7 @@ export function ProgressCard({
   return (
     <View
       testID="progress-card"
-      className="w-full flex-row items-center gap-4 rounded-[24px] border-[0.5px] border-remetra-line-subtle bg-white p-5"
+      className="w-full flex-row items-center gap-[16px] rounded-[24px] border-[0.5px] border-remetra-line-subtle bg-white p-[20px]"
       style={{
         shadowColor: '#63311f',
         shadowOpacity: 0.08,
@@ -27,18 +27,18 @@ export function ProgressCard({
       }}
     >
       <BloomRing progress={total > 0 ? checked / total : 0} />
-      <View className="flex-1 gap-1">
-        <Text className="font-figtree-semibold text-[16px] leading-6 text-remetra-text-primary">
+      <View className="flex-1 gap-[4px]">
+        <Text className="font-figtree-semibold text-[16px] leading-[24px] text-remetra-text-primary">
           {`We’ve checked ${checked} of ${total} food groups`}
         </Text>
-        <Text className="font-figtree text-[12px] leading-4 text-remetra-text-secondary">{`Next update ${nextUpdate}`}</Text>
+        <Text className="font-figtree text-[12px] leading-[16px] text-remetra-text-secondary">{`Next update ${nextUpdate}`}</Text>
         <Pressable
           onPress={onSeeInsights}
           accessibilityRole="button"
-          className="flex-row items-center gap-0.5 self-start py-1"
+          className="flex-row items-center gap-[2px] self-start py-[4px]"
           style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
         >
-          <Text className="font-figtree-semibold text-[14px] leading-5 tracking-[0.14px] text-remetra-text-primary">
+          <Text className="font-figtree-semibold text-[14px] leading-[20px] tracking-[0.14px] text-remetra-text-primary">
             See insights
           </Text>
           <CaretRightLink width={14} height={14} />
