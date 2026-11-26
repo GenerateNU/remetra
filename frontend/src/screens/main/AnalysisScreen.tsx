@@ -125,6 +125,8 @@ export function AnalysisScreen() {
           YOUR ANALYSIS
         </Text>
 
+        <WeeklyResultsEntry />
+
         <SectionDivider label="Symptoms by Occurrences"/>
 
         {loading ? (
@@ -189,6 +191,23 @@ function SectionDivider({ label }: { label: string }) {
       </Text>
       <View className="flex-1 h-px bg-white" />
     </View>
+  );
+}
+
+function WeeklyResultsEntry() {
+  const navigation = useAppNavigation();
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.navigate('WeeklyResults')}
+      accessibilityRole="button"
+      className="bg-white/35 rounded-xl p-4 flex-row items-center gap-3 mb-6"
+    >
+      <View className="flex-1">
+        <Text className="text-[15px] text-remetra-espresso font-semibold">Your weekly results</Text>
+        <Text className="text-xs text-remetra-warm-brown mt-0.5">See which foods look fine and which might be triggers</Text>
+      </View>
+      <ChevronRight size={16} color="#5C2E14" strokeWidth={2} />
+    </TouchableOpacity>
   );
 }
 
