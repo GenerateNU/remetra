@@ -1,9 +1,16 @@
-import { Keyboard, KeyboardAvoidingView, ScrollView, Text } from 'react-native';
+import { Text } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
+import {
+  KeyboardAvoidingView,
+  KeyboardAwareScrollView as KCKeyboardAwareScrollView,
+} from 'react-native-keyboard-controller';
 import { KeyboardAvoider, KeyboardAwareScrollView } from '../KeyboardAvoider';
 
+// react-native-keyboard-controller is mocked in jest.setup.js; the keyboard animation itself is the library's job,
+// so these tests check that our wrappers configure it the way the screens rely on.
+
 describe('KeyboardAvoider', () => {
-  it('renders its children inside a padding-based KeyboardAvoidingView', () => {
+  it('renders its children inside a padding-based KeyboardAvoidingView that fills the space', () => {
     // Arrange / Act
     render(
       <KeyboardAvoider>
@@ -13,30 +20,28 @@ describe('KeyboardAvoider', () => {
 
     // Assert
     expect(screen.getByText('modal content')).toBeTruthy();
-    expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe('padding');
+    const avoider = screen.UNSAFE_getByType(KeyboardAvoidingView);
+    expect(avoider.props.behavior).toBe('padding');
+    expect(avoider.props.style).toEqual([{ flex: 1 }, undefined]);
+  });
+
+  it('merges a custom style and passes other props through', () => {
+    // Arrange / Act
+    render(
+      <KeyboardAvoider style={{ backgroundColor: 'white' }} testID="avoider">
+        <Text>modal content</Text>
+      </KeyboardAvoider>,
+    );
+
+    // Assert
+    const avoider = screen.UNSAFE_getByType(KeyboardAvoidingView);
+    expect(avoider.props.style).toEqual([{ flex: 1 }, { backgroundColor: 'white' }]);
+    expect(avoider.props.testID).toBe('avoider');
   });
 });
 
 describe('KeyboardAwareScrollView', () => {
-  let keyboardDidShow: (() => void) | undefined;
-  // KeyboardAvoidingView registers its own listeners, so track ours separately.
-  const removeDidShow = jest.fn();
-
-  beforeEach(() => {
-    keyboardDidShow = undefined;
-    removeDidShow.mockClear();
-    jest.spyOn(Keyboard, 'addListener').mockImplementation((event, handler) => {
-      if (event === 'keyboardDidShow') keyboardDidShow = handler as () => void;
-      const remove = event === 'keyboardDidShow' ? removeDidShow : jest.fn();
-      return { remove } as unknown as ReturnType<typeof Keyboard.addListener>;
-    });
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('renders its children in a scroll view that lets taps through while the keyboard is open', () => {
+  it('renders its children in a scroll view that keeps the focused input visible and lets taps through', () => {
     // Arrange / Act
     render(
       <KeyboardAwareScrollView>
@@ -46,38 +51,10 @@ describe('KeyboardAwareScrollView', () => {
 
     // Assert
     expect(screen.getByText('form')).toBeTruthy();
-    expect(screen.UNSAFE_getByType(ScrollView).props.keyboardShouldPersistTaps).toBe('handled');
-  });
-
-  it('scrolls to the end when the keyboard opens', () => {
-    // Arrange
-    const scrollToEnd = jest.spyOn(ScrollView.prototype, 'scrollToEnd').mockImplementation(() => {});
-    render(
-      <KeyboardAwareScrollView>
-        <Text>form</Text>
-      </KeyboardAwareScrollView>,
-    );
-
-    // Act
-    keyboardDidShow?.();
-
-    // Assert
-    expect(keyboardDidShow).toBeDefined();
-    expect(scrollToEnd).toHaveBeenCalledWith({ animated: true });
-  });
-
-  it('removes the keyboard listener on unmount', () => {
-    // Arrange
-    const { unmount } = render(
-      <KeyboardAwareScrollView>
-        <Text>form</Text>
-      </KeyboardAwareScrollView>,
-    );
-
-    // Act
-    unmount();
-
-    // Assert
-    expect(removeDidShow).toHaveBeenCalledTimes(1);
+    const scrollView = screen.UNSAFE_getByType(KCKeyboardAwareScrollView);
+    expect(scrollView.props.bottomOffset).toBe(24);
+    expect(scrollView.props.keyboardShouldPersistTaps).toBe('handled');
+    expect(scrollView.props.contentContainerStyle).toEqual({ flexGrow: 1 });
+    expect(scrollView.props.bounces).toBe(false);
   });
 });
